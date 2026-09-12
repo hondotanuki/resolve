@@ -50,3 +50,6 @@ appsettings.Development.local.json
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# internal docs
+docs/internal

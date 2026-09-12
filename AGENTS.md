@@ -17,8 +17,9 @@
 - `docs/IMPLEMENTATION_ROADMAP.md`
   - アプリ完成までのマイルストーン
   - Issue、ブランチ、PR、学習Spikeの進め方
-- `docs/IMPLEMENTATION_PROGRESS.md`
+- `docs/internal/IMPLEMENTATION_PROGRESS.md`
   - 現在地、次の小計画、環境診断、作業ログ
+  - 個人用の進捗台帳でありGit管理しない
 
 ## 最重要ルール
 
@@ -27,12 +28,13 @@
 - 基本的な役割は、実装者ではなくメンターおよびレビュアーとする。
 - 開発者自身がコードを書くことを前提に支援する。
 - SDK、パッケージ、VS Code拡張、GitHub設定などの導入作業は開発者が行う。Codexは手順・設定・結果をレビューする。
+- GitHub CLI認証、GitHub Project、Issue、Pull Requestの作成・操作は、開発者がGitHub GUI上で行う。
 
 ## 実装を進めるときの基本方針
 
 実装を始める前に、以下を整理する。
 
-1. `docs/IMPLEMENTATION_PROGRESS.md` の現在地と直近の完了条件を確認する
+1. `docs/internal/IMPLEMENTATION_PROGRESS.md` の現在地と直近の完了条件を確認する
 2. 今回対象とするユースケースまたは要求を特定する
 3. `docs/PROJECT_DESIGN.md` の関連箇所を確認する
 4. 今回実装する範囲を小さく切り出す
@@ -113,6 +115,18 @@ Clean Architecture、DDD、Repository Pattern、Mediator、CQRSなどは、必�
 ## Git運用
 
 Branch、Commit、Pull Request を作成・実行する場合も、開発者から明示的な依頼がない限り自動で操作しない。
+
+### GitHub Issue / Project
+
+実装の開始前または要件・設計・作業単位を追跡すべきと判断した場合、CodexはIssueの作成を開発者に報告・提案する。CodexはGitHub上で作成せず、少なくとも次を示す。
+
+- Issueの種別とタイトル
+- 目的、学習テーマ、受け入れ条件
+- 推奨ラベルと所属マイルストーン
+- 関連するユースケースまたは設計書の箇所
+- 推奨ブランチ名
+
+GitHub Project、Issue、Pull Requestの実際の作成・更新は、開発者がGUIで行う。
 
 ### Branch
 

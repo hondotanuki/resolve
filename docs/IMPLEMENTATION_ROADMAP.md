@@ -1,6 +1,6 @@
 # Implementation Roadmap
 
-アプリ完成までの全体計画を示す。この文書はマイルストーンを管理し、実際に着手する作業は `IMPLEMENTATION_PROGRESS.md` で小さな計画へ分解する。
+アプリ完成までの全体計画を示す。この文書はマイルストーンを管理し、実際に着手する作業は `docs/internal/IMPLEMENTATION_PROGRESS.md` で小さな計画へ分解する。
 
 ## 進め方
 
@@ -18,7 +18,7 @@
 | --- | --- |
 | `PROJECT_DESIGN.md` | プロダクト仕様と設計判断の正本 |
 | この文書 | アプリ完成までのマイルストーンと順序 |
-| `IMPLEMENTATION_PROGRESS.md` | 現在地、次の小計画、実測結果、学習ログ |
+| `docs/internal/IMPLEMENTATION_PROGRESS.md` | 現在地、次の小計画、実測結果、学習ログ。Git管理しない個人用文書 |
 | `AGENTS.md` | 人間とCodexの協働ルール、レビュー方針 |
 
 ## GitHub運用
@@ -133,4 +133,4 @@ C# / ASP.NET Core / EF Core / React の具体的な学習テーマ。
 2. Codexが設計書との整合、完了条件、次の最小ステップをレビューする
 3. 開発者が実装、Formatter、Linter、テストを実行する
 4. 開発者が結果・差分・疑問点を共有する
-5. Codexがレビューし、`IMPLEMENTATION_PROGRESS.md` の次の小計画を提案する
+5. Codexがレビューし、`docs/internal/IMPLEMENTATION_PROGRESS.md` の次の小計画を提案する
