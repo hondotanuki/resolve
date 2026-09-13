@@ -977,7 +977,7 @@ Infrastructure (EF Core / SQLite / LLM Client / Prompt Configuration)
 ```text
 resolve/
 ├── backend/
-│   ├── Resolve.sln
+│   ├── Resolve.slnx
 │   ├── src/
 │   │   ├── Resolve.Domain/
 │   │   ├── Resolve.Application/
@@ -994,7 +994,7 @@ resolve/
 └── AGENTS.md
 ```
 
-`backend/Resolve.sln` はバックエンドのプロジェクトだけを管理する。ルートに一時的に作成した Console プロジェクトは、`backend/` の最小 Solution がビルドできたことを確認してから削除する。内容を移植する必要はない。
+`backend/Resolve.slnx` はバックエンドのプロジェクトだけを管理する。ルートに一時的に作成した Console プロジェクトは、`backend/` の最小 Solution がビルドできたことを確認してから削除する。内容を移植する必要はない。
 
 ---
 

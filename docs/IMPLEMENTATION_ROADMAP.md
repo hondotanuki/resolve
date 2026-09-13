@@ -14,12 +14,12 @@
 
 ## ドキュメントの役割
 
-| 文書 | 役割 |
-| --- | --- |
-| `PROJECT_DESIGN.md` | プロダクト仕様と設計判断の正本 |
-| この文書 | アプリ完成までのマイルストーンと順序 |
+| 文書                                       | 役割                                                            |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `PROJECT_DESIGN.md`                        | プロダクト仕様と設計判断の正本                                  |
+| この文書                                   | アプリ完成までのマイルストーンと順序                            |
 | `docs/internal/IMPLEMENTATION_PROGRESS.md` | 現在地、次の小計画、実測結果、学習ログ。Git管理しない個人用文書 |
-| `AGENTS.md` | 人間とCodexの協働ルール、レビュー方針 |
+| `AGENTS.md`                                | 人間とCodexの協働ルール、レビュー方針                           |
 
 ## GitHub運用
 
@@ -73,15 +73,9 @@ C# / ASP.NET Core / EF Core / React の具体的な学習テーマ。
 ### M0: 開発環境と運用基盤
 
 - .NET 10 SDK、Node.js、SQLite、Git、GitHub CLI、VS Code拡張を開発者が導入する
-<<<<<<< HEAD
-- Solution、最小4層プロジェクト、React/Vite、SQLite接続、ヘルスチェックを作成する
-- `.editorconfig`、CSharpier、`dotnet format`、Prettier、ESLint、`.vscode/settings.json` を導入する
-=======
-- `backend/Resolve.sln` と `backend/src`・`backend/tests` に最小4層プロジェクトを作成する。React/Viteは `frontend/` に作成する
+- `backend/Resolve.slnx` と `backend/src`・`backend/tests` に最小4層プロジェクトを作成する。React/Viteは `frontend/` に作成する
 - ルートは共通設定・ドキュメント・開発用ツール定義だけを置く。ルートの確認用Consoleプロジェクトは、バックエンドSolutionの検証後に削除する
-- `.editorconfig` を追加し、C#にはCSharpierと.NET Analyzers、ReactにはPrettierとESLint + typescript-eslintを導入する
-- 各ツールの動作確認後に、対応する保存時フォーマット・静的検査を`.vscode/settings.json`へ設定する
->>>>>>> 018de54 (docs: バックエンドとフロントエンドの配置方針を明記)
+- `.editorconfig`、CSharpier、`dotnet format`、Prettier、ESLint、`.vscode/settings.json` を導入する
 - GitHub Project、Issueテンプレート、PRテンプレートを設定する
 
 完了条件: API・Reactを起動でき、フォーマット、Lint、テストの実行コマンドがREADMEに記載されている。
