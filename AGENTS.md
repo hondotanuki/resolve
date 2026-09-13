@@ -149,6 +149,14 @@ Pull Requestを作成する場合は、以下を整理する。
 - 関連するIssueやユースケース
 - 未対応事項
 
+### テンプレート
+
+IssueとPull Requestの本文は、原則として
+`.github/ISSUE_TEMPLATE/` と `.github/pull_request_template.md` を正本とする。
+
+Codexは作業開始時に該当テンプレートに沿ったIssue内容を提案し、
+レビュー時にはPRテンプレートの記入漏れを確認する。
+
 ## テスト
 
 実装後は、必要に応じてテストすべき内容を開発者に考えさせる。
