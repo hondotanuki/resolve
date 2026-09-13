@@ -89,6 +89,45 @@ C# の機能や設計パターンを使用する場合、その機能を使う�
 Pythonに類似する概念がある場合は、必要に応じて比較して説明してよい。
 ただし、単純な対応表だけで理解したことにせず、C#固有の挙動や設計思想も説明すること。
 
+## 開発ツールチェーン
+
+このプロジェクトでは、品質ツールを一度に導入しない。現在のチェックポイントで扱う言語・層と、その作業を安全に確認するために必要なものだけを、開発者が段階的に導入する。
+
+Codexはツール導入を提案するとき、目的、導入する理由、代替案、実行コマンド、設定ファイルへの影響を説明する。実際のインストールと設定の編集は開発者が行い、Codexは結果をレビューする。
+
+### 採用候補
+
+| 役割                      | C# / .NET             | React / TypeScript / Vite              |
+| ------------------------- | --------------------- | -------------------------------------- |
+| Formatter                 | CSharpier             | Prettier                               |
+| Linter / Static Analyzer  | .NET Analyzers        | ESLint + typescript-eslint             |
+| 型チェック                | C# Compiler / Roslyn  | TypeScript (`tsc`)                     |
+| IDE支援 / Language Server | C# Dev Kit            | TypeScript Language Service            |
+| Debugger                  | C# Debugger + VS Code | Browser DevTools + VS Code JS Debugger |
+| Unit Test                 | xUnit                 | Vitest                                 |
+| Component Test            | —                     | React Testing Library + Vitest         |
+| E2E Test                  | Playwright            | Playwright                             |
+| Build / Dev Server        | dotnet CLI / MSBuild  | Vite                                   |
+| パッケージ管理            | NuGet                 | npm                                    |
+| Git Hook / Pre-commit     | Lefthook              | Lefthook                               |
+| CI                        | GitHub Actions        | GitHub Actions                         |
+| 依存関係の脆弱性チェック  | NuGet Audit           | npm audit                              |
+| 依存ライブラリ自動更新    | Dependabot            | Dependabot                             |
+| Security / SAST           | CodeQL                | CodeQL                                 |
+
+Gitは両方の領域で共通して使用する。Pythonはこのプロジェクトの対象外であり、Python向けツールは導入しない。
+
+### 導入と運用の原則
+
+- C#の整形はCSharpierを正とする。`dotnet format`を併用して同じファイルを整形する運用にはしない。書式ルールの競合を避けるためである。
+- `.editorconfig` はエディター間で共有する基本スタイルとAnalyzer設定を置く場所であり、CSharpierまたはPrettierの設定を置き換えるものではない。
+- Reactを作成するまでは、Prettier、ESLint、typescript-eslint、Vitest、React Testing Libraryは導入しない。
+- xUnitは最初のテスト対象となる振る舞いを実装するタイミングで導入する。Playwrightは画面の主要操作を通して確認する必要が生じた段階で導入する。
+- Lefthook、GitHub Actions、Dependabot、CodeQL、脆弱性チェックは、ローカルのFormatter・静的解析・テストの実行方法が安定してから導入する。
+- VS Codeの保存時フォーマットや修正は、対象言語のFormatter/Linterを導入して動作を確認した後に `.vscode/settings.json` へ追加する。
+
+新しいツールを提案する際は、上表の採用候補との重複、設定の競合、現時点で必要かを確認し、不要な追加を避けること。
+
 ## 設計
 
 `docs/PROJECT_DESIGN.md` を現在の設計上の基準とする。
@@ -114,7 +153,8 @@ Clean Architecture、DDD、Repository Pattern、Mediator、CQRSなどは、必�
 
 ## Git運用
 
-Branch、Commit、Pull Request を作成・実行する場合も、開発者から明示的な依頼がない限り自動で操作しない。
+- Branch、Commit、Pull Request を作成・実行する場合も、開発者から明示的な依頼がない限り自動で操作しない。
+- コミットメッセージやPRメッセージの提案は日本語で行う（prefixなどはその限りではない）
 
 ### GitHub Issue / Project
 

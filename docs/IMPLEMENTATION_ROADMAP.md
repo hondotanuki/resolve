@@ -75,10 +75,11 @@ C# / ASP.NET Core / EF Core / React の具体的な学習テーマ。
 - .NET 10 SDK、Node.js、SQLite、Git、GitHub CLI、VS Code拡張を開発者が導入する
 - `backend/Resolve.slnx` と `backend/src`・`backend/tests` に最小4層プロジェクトを作成する。React/Viteは `frontend/` に作成する
 - ルートは共通設定・ドキュメント・開発用ツール定義だけを置く。ルートの確認用Consoleプロジェクトは、バックエンドSolutionの検証後に削除する
-- `.editorconfig`、CSharpier、`dotnet format`、Prettier、ESLint、`.vscode/settings.json` を導入する
+- `.editorconfig` を追加し、C#にはCSharpierと.NET Analyzers、ReactにはPrettierとESLint + typescript-eslintを導入する
+- 各ツールの動作確認後に、対応する保存時フォーマット・静的検査を`.vscode/settings.json`へ設定する
 - GitHub Project、Issueテンプレート、PRテンプレートを設定する
 
-完了条件: API・Reactを起動でき、フォーマット、Lint、テストの実行コマンドがREADMEに記載されている。
+完了条件: API・Reactを起動でき、導入済みのフォーマット・静的検査・テストの実行コマンドがREADMEに記載されている。
 
 ### M1: 最初の縦切り — LearningItemの登録・表示
 
