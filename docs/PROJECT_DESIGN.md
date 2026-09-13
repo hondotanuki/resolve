@@ -970,6 +970,32 @@ Domain
 Infrastructure (EF Core / SQLite / LLM Client / Prompt Configuration)
 ```
 
+## 9.3 Repository Layout
+
+リポジトリ直下は共通設定、ドキュメント、開発用ツール定義を置く場所とし、アプリケーションプロジェクトは置かない。バックエンドとフロントエンドは独立した技術基盤として、それぞれ `backend/` と `frontend/` に配置する。
+
+```text
+resolve/
+├── backend/
+│   ├── Resolve.sln
+│   ├── src/
+│   │   ├── Resolve.Domain/
+│   │   ├── Resolve.Application/
+│   │   ├── Resolve.Infrastructure/
+│   │   └── Resolve.Api/
+│   └── tests/
+│       └── Resolve.Domain.Tests/
+├── frontend/
+├── docs/
+├── .vscode/
+├── .config/dotnet-tools.json
+├── .editorconfig
+├── README.md
+└── AGENTS.md
+```
+
+`backend/Resolve.sln` はバックエンドのプロジェクトだけを管理する。ルートに一時的に作成した Console プロジェクトは、`backend/` の最小 Solution がビルドできたことを確認してから削除する。内容を移植する必要はない。
+
 ---
 
 # 10. Technology Stack
