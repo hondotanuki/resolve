@@ -5,11 +5,23 @@
 ## 必要な環境
 
 - .NET 10 SDK
+- Node.js
+- npm
+- fnm（Node.js のバージョン管理に使用）
 
 ## バックエンドの起動
 
 ```bash
 dotnet run --project backend/src/Resolve.Api --launch-profile http
+```
+
+## フロントエンドの起動
+
+```bash
+fnm use
+cd frontend
+npm install
+npm run dev
 ```
 
 ## 品質確認
@@ -24,4 +36,9 @@ dotnet csharpier format backend
 
 # ビルド
 dotnet build backend/Resolve.slnx
+
+# フロントエンドの静的検査・ビルド
+cd frontend
+npm run lint
+npm run build
 ```

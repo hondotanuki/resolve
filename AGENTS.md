@@ -100,7 +100,7 @@ Codexはツール導入を提案するとき、目的、導入する理由、代
 | 役割                      | C# / .NET             | React / TypeScript / Vite              |
 | ------------------------- | --------------------- | -------------------------------------- |
 | Formatter                 | CSharpier             | Prettier                               |
-| Linter / Static Analyzer  | .NET Analyzers        | ESLint + typescript-eslint             |
+| Linter / Static Analyzer  | .NET Analyzers        | Oxlint                                 |
 | 型チェック                | C# Compiler / Roslyn  | TypeScript (`tsc`)                     |
 | IDE支援 / Language Server | C# Dev Kit            | TypeScript Language Service            |
 | Debugger                  | C# Debugger + VS Code | Browser DevTools + VS Code JS Debugger |
@@ -121,7 +121,7 @@ Gitは両方の領域で共通して使用する。Pythonはこのプロジェ�
 
 - C#の整形はCSharpierを正とする。`dotnet format`を併用して同じファイルを整形する運用にはしない。書式ルールの競合を避けるためである。
 - `.editorconfig` はエディター間で共有する基本スタイルとAnalyzer設定を置く場所であり、CSharpierまたはPrettierの設定を置き換えるものではない。
-- Reactを作成するまでは、Prettier、ESLint、typescript-eslint、Vitest、React Testing Libraryは導入しない。
+- Reactを作成するまでは、Prettier、Oxlint、Vitest、React Testing Libraryは導入しない。React作成後は、各ツールの導入時に動作確認してから設定を追加する。
 - xUnitは最初のテスト対象となる振る舞いを実装するタイミングで導入する。Playwrightは画面の主要操作を通して確認する必要が生じた段階で導入する。
 - Lefthook、GitHub Actions、Dependabot、CodeQL、脆弱性チェックは、ローカルのFormatter・静的解析・テストの実行方法が安定してから導入する。
 - VS Codeの保存時フォーマットや修正は、対象言語のFormatter/Linterを導入して動作を確認した後に `.vscode/settings.json` へ追加する。
