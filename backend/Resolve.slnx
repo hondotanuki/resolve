@@ -8,5 +8,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/Resolve.Application.Tests/Resolve.Application.Tests.csproj" />
     <Project Path="tests/Resolve.Domain.Tests/Resolve.Domain.Tests.csproj" />
+    <Project Path="tests/Resolve.Infrastructure.Tests/Resolve.Infrastructure.Tests.csproj" />
   </Folder>
 </Solution>
