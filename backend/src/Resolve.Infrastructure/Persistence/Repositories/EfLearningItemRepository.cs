@@ -34,4 +34,14 @@ public sealed class EfLearningItemRepository : ILearningItemRepository
             .Where(x => x.ArchivedAt == null)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<LearningItem?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _dbContext
+            .LearningItems.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
 }

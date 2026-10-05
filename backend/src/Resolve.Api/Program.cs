@@ -15,6 +15,7 @@ builder.Services.AddDbContext<ResolveDbContext>(options =>
 builder.Services.AddScoped<ILearningItemRepository, EfLearningItemRepository>();
 builder.Services.AddScoped<CreateLearningItemUseCase>();
 builder.Services.AddScoped<ListLearningItemsUseCase>();
+builder.Services.AddScoped<GetLearningItemByIdUseCase>();
 
 var app = builder.Build();
 
@@ -67,7 +68,7 @@ app.MapGet(
         var output = await useCase.ExecuteAsync(cancellationToken);
 
         var response = output
-            .Select(x => new LearningItemListItemsResponse
+            .Select(x => new ListLearningItemsResponse
             {
                 Id = x.Id,
                 ItemType = ItemTypeMapping.ToApiValue(x.ItemType),
@@ -75,6 +76,32 @@ app.MapGet(
                 ArchivedAt = x.ArchivedAt,
             })
             .ToList();
+
+        return Results.Ok(response);
+    }
+);
+
+app.MapGet(
+    "/learning-items/{id:int}",
+    async (int id, GetLearningItemByIdUseCase useCase, CancellationToken cancellationToken) =>
+    {
+        var output = await useCase.ExecuteAsync(id, cancellationToken);
+
+        if (output is null)
+        {
+            return Results.NotFound();
+        }
+
+        var response = new GetLearningItemResponse
+        {
+            Id = output.Id,
+            ItemType = ItemTypeMapping.ToApiValue(output.ItemType),
+            Title = output.Title,
+            Content = output.Content,
+            ArchivedAt = output.ArchivedAt,
+            CreatedAt = output.CreatedAt,
+            UpdatedAt = output.UpdatedAt,
+        };
 
         return Results.Ok(response);
     }
