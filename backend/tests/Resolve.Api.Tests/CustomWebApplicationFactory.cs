@@ -64,4 +64,14 @@ public sealed class CustomWebApplicationFactory<TProgram> : WebApplicationFactor
             _connection?.Dispose();
         }
     }
+
+    public async Task ResetDatabaseAsync()
+    {
+        using var scope = Services.CreateScope();
+
+        var dbContext = scope.ServiceProvider.GetRequiredService<ResolveDbContext>();
+
+        await dbContext.Database.EnsureDeletedAsync();
+        await dbContext.Database.MigrateAsync();
+    }
 }
