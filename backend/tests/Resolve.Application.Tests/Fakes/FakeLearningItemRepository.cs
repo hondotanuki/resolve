@@ -6,8 +6,10 @@ public sealed class FakeLearningItemRepository : ILearningItemRepository
 {
     public int CreateCallCount { get; private set; }
     public LearningItem? ReceivedItem { get; private set; }
-    public LearningItem? ItemToReturn { get; set; }
-    public IReadOnlyList<LearningItem> ItemsToReturn { get; set; } = [];
+    public LearningItem? CreateResult { get; set; }
+    public IReadOnlyList<LearningItem> ListResult { get; set; } = [];
+    public int? ReceivedId { get; private set; }
+    public LearningItem? GetByIdResult { get; set; }
 
     public Task<LearningItem> CreateAsync(
         LearningItem learningItem,
@@ -17,13 +19,20 @@ public sealed class FakeLearningItemRepository : ILearningItemRepository
         CreateCallCount++;
         ReceivedItem = learningItem;
 
-        return Task.FromResult(ItemToReturn ?? learningItem);
+        return Task.FromResult(CreateResult ?? learningItem);
     }
 
     public Task<IReadOnlyList<LearningItem>> ListAsync(
         CancellationToken cancellationToken = default
     )
     {
-        return Task.FromResult(ItemsToReturn);
+        return Task.FromResult(ListResult);
+    }
+
+    public Task<LearningItem?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        ReceivedId = id;
+
+        return Task.FromResult(GetByIdResult);
     }
 }
