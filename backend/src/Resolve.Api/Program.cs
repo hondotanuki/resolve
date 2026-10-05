@@ -13,8 +13,8 @@ builder.Services.AddDbContext<ResolveDbContext>(options =>
     options.UseSqlite(connectionString);
 });
 builder.Services.AddScoped<ILearningItemRepository, EfLearningItemRepository>();
-
 builder.Services.AddScoped<CreateLearningItemUseCase>();
+builder.Services.AddScoped<ListLearningItemsUseCase>();
 
 var app = builder.Build();
 
@@ -57,6 +57,26 @@ app.MapPost(
         {
             return Results.BadRequest();
         }
+    }
+);
+
+app.MapGet(
+    "/learning-items",
+    async (ListLearningItemsUseCase useCase, CancellationToken cancellationToken) =>
+    {
+        var output = await useCase.ExecuteAsync(cancellationToken);
+
+        var response = output
+            .Select(x => new LearningItemListItemsResponse
+            {
+                Id = x.Id,
+                ItemType = ItemTypeMapping.ToApiValue(x.ItemType),
+                Title = x.Title,
+                ArchivedAt = x.ArchivedAt,
+            })
+            .ToList();
+
+        return Results.Ok(response);
     }
 );
 
