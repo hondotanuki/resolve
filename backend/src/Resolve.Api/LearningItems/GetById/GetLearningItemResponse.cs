@@ -1,4 +1,4 @@
-namespace Resolve.Api;
+namespace Resolve.Api.LearningItems.GetById;
 
 public sealed record GetLearningItemResponse
 {

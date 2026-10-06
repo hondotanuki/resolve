@@ -1,6 +1,6 @@
 using Resolve.Domain;
 
-namespace Resolve.Api;
+namespace Resolve.Api.Mapping;
 
 public static class ItemTypeMapping
 {

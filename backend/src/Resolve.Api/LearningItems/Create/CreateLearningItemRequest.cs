@@ -1,4 +1,4 @@
-namespace Resolve.Api;
+namespace Resolve.Api.LearningItems.Create;
 
 public sealed record CreateLearningItemRequest
 {

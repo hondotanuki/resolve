@@ -1,7 +1,5 @@
 ﻿namespace Resolve.Domain.Tests;
 
-using Resolve.Domain;
-
 public class LearningItemTests
 {
     [Fact]

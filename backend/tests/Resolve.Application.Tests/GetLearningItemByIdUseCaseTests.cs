@@ -1,7 +1,8 @@
-namespace Resolve.Application.Tests;
-
+using Resolve.Application.LearningItems.GetById;
 using Resolve.Application.Tests.Fakes;
 using Resolve.Domain;
+
+namespace Resolve.Application.Tests;
 
 public class GetLearningItemByIdUseCaseTests
 {

@@ -1,6 +1,6 @@
 using Resolve.Domain;
 
-namespace Resolve.Application;
+namespace Resolve.Application.LearningItems.GetById;
 
 public sealed record GetLearningItemOutput(
     int Id,

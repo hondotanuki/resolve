@@ -1,4 +1,4 @@
-namespace Resolve.Api;
+namespace Resolve.Api.LearningItems.List;
 
 public sealed record ListLearningItemsResponse
 {

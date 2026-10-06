@@ -1,4 +1,6 @@
-namespace Resolve.Application;
+using Resolve.Application.Interfaces;
+
+namespace Resolve.Application.LearningItems.GetById;
 
 public sealed class GetLearningItemByIdUseCase
 {

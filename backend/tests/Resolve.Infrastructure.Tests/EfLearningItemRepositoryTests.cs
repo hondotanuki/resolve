@@ -1,9 +1,9 @@
-﻿namespace Resolve.Infrastructure.Tests;
-
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Resolve.Domain;
 using Resolve.Infrastructure.Persistence.Repositories;
+
+namespace Resolve.Infrastructure.Tests;
 
 public class EfLearningItemRepositoryTests
 {
