@@ -110,7 +110,7 @@ public class CreateLearningItemUseCaseTests
             "保存後Content"
         );
 
-        _repository.ItemToReturn = savedItem;
+        _repository.CreateResult = savedItem;
 
         var input = new CreateLearningItemInput
         {

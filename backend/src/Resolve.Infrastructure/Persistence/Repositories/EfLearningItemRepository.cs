@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Resolve.Application;
 using Resolve.Domain;
 
@@ -22,5 +23,25 @@ public sealed class EfLearningItemRepository : ILearningItemRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return learningItem;
+    }
+
+    public async Task<IReadOnlyList<LearningItem>> ListAsync(
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _dbContext
+            .LearningItems.AsNoTracking()
+            .Where(x => x.ArchivedAt == null)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<LearningItem?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _dbContext
+            .LearningItems.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 }

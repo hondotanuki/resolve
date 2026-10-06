@@ -8,4 +8,8 @@ public interface ILearningItemRepository
         LearningItem learningItem,
         CancellationToken cancellationToken = default
     );
+
+    Task<IReadOnlyList<LearningItem>> ListAsync(CancellationToken cancellationToken = default);
+
+    Task<LearningItem?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 }
