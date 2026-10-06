@@ -1,8 +1,13 @@
+import { Route, Routes } from "react-router-dom";
+import { HomePage } from "./pages/HomePage";
+import { LearningItemsPage } from "./pages/LearningItemsPage";
+
 function App() {
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-3xl font-bold text-blue-500">Hello Tailwind</h1>
-    </main>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/learning-items" element={<LearningItemsPage />} />
+    </Routes>
   );
 }
 
