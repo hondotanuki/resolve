@@ -1,4 +1,6 @@
-namespace Resolve.Application;
+using Resolve.Application.Interfaces;
+
+namespace Resolve.Application.LearningItems.List;
 
 public sealed class ListLearningItemsUseCase
 {

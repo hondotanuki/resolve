@@ -1,6 +1,7 @@
-using Resolve.Application;
+using Resolve.Api.Mapping;
+using Resolve.Application.LearningItems.Create;
 
-namespace Resolve.Api;
+namespace Resolve.Api.LearningItems.Create;
 
 public static class CreateLearningItemEndpoint
 {

@@ -1,7 +1,8 @@
-namespace Resolve.Application.Tests;
-
+using Resolve.Application.LearningItems.Create;
 using Resolve.Application.Tests.Fakes;
 using Resolve.Domain;
+
+namespace Resolve.Application.Tests;
 
 public class CreateLearningItemUseCaseTests
 {

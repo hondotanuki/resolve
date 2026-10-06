@@ -1,6 +1,7 @@
-namespace Resolve.Api;
+using Resolve.Api.Mapping;
+using Resolve.Application.LearningItems.List;
 
-using Resolve.Application;
+namespace Resolve.Api.LearningItems.List;
 
 public static class ListLearningItemsEndpoint
 {

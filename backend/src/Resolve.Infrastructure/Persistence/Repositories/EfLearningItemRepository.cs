@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Resolve.Application;
+using Resolve.Application.Interfaces;
 using Resolve.Domain;
 
 namespace Resolve.Infrastructure.Persistence.Repositories;

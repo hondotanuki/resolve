@@ -1,4 +1,8 @@
-namespace Resolve.Api;
+using Resolve.Api.LearningItems.Create;
+using Resolve.Api.LearningItems.GetById;
+using Resolve.Api.LearningItems.List;
+
+namespace Resolve.Api.LearningItems;
 
 public static class LearningItemEndpoints
 {

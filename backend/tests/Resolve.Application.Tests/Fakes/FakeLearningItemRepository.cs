@@ -1,3 +1,4 @@
+using Resolve.Application.Interfaces;
 using Resolve.Domain;
 
 namespace Resolve.Application.Tests.Fakes;

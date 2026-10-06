@@ -1,6 +1,7 @@
-using Resolve.Application;
+using Resolve.Api.Mapping;
+using Resolve.Application.LearningItems.GetById;
 
-namespace Resolve.Api;
+namespace Resolve.Api.LearningItems.GetById;
 
 public static class GetLearningItemByIdEndpoint
 {

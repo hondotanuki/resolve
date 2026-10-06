@@ -1,6 +1,6 @@
 using Resolve.Domain;
 
-namespace Resolve.Application;
+namespace Resolve.Application.Interfaces;
 
 public interface ILearningItemRepository
 {
