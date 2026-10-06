@@ -1,7 +1,12 @@
 {
   "[csharp]": {
-    "editor.defaultFormatter": "csharpier.csharpier-vscode",
-    "editor.formatOnSave": true,
-    "editor.formatOnSaveMode": "file"
-  }
+    "editor.defaultFormatter": "csharpier.csharpier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.formatOnSave": true
 }
