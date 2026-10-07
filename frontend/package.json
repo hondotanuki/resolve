@@ -11,6 +11,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "generate:api": "orval",
     "check": "npm run lint && npm run format:check && npm run test && npm run build"
   },
   "dependencies": {
@@ -28,6 +29,7 @@
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
     "jsdom": "^30.1.2",
+    "orval": "^8.40.0",
     "oxlint": "^1.81.0",
     "prettier": "^3.9.9",
     "tailwindcss": "^4.3.3",
