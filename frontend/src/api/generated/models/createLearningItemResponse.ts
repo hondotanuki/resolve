@@ -7,7 +7,7 @@
 
 export interface CreateLearningItemResponse {
   /** @pattern ^-?(?:0|[1-9]\d*)$ */
-  id?: number | string;
+  id: number | string;
   itemType: string;
   title: string;
   /** @nullable */

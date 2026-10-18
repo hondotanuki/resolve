@@ -2,7 +2,7 @@ namespace Resolve.Api.LearningItems.GetById;
 
 public sealed record GetLearningItemResponse
 {
-    public int Id { get; init; }
+    public required int Id { get; init; }
     public required string ItemType { get; init; }
     public required string Title { get; init; }
     public string? Content { get; init; }

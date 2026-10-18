@@ -9,7 +9,8 @@ export default defineConfig({
     output: {
       target: "./src/api/generated/api.ts",
       schemas: "./src/api/generated/models",
-      client: "fetch",
+      client: "react-query",
+      mode: "tags-split",
       clean: true,
     },
   },
