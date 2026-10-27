@@ -3,7 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Resolve.Infrastructure;
+using Resolve.Infrastructure.Persistence;
 
 #nullable disable
 
@@ -53,6 +53,58 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("learning_items", (string)null);
+                });
+
+            modelBuilder.Entity("Resolve.Domain.StudyRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("DurationSeconds")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("duration_seconds");
+
+                    b.Property<int>("LearningItemId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("learning_item_id");
+
+                    b.Property<string>("Memo")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("memo");
+
+                    b.Property<string>("Result")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("result");
+
+                    b.Property<DateTime>("StudiedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("studied_at");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LearningItemId", "StudiedAt");
+
+                    b.ToTable("study_records", (string)null);
+                });
+
+            modelBuilder.Entity("Resolve.Domain.StudyRecord", b =>
+                {
+                    b.HasOne("Resolve.Domain.LearningItem", null)
+                        .WithMany()
+                        .HasForeignKey("LearningItemId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

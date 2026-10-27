@@ -4,7 +4,7 @@ using Resolve.Application.Interfaces;
 using Resolve.Application.LearningItems.Create;
 using Resolve.Application.LearningItems.GetById;
 using Resolve.Application.LearningItems.List;
-using Resolve.Infrastructure;
+using Resolve.Infrastructure.Persistence;
 using Resolve.Infrastructure.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
