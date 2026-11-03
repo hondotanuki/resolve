@@ -61,6 +61,46 @@ describe("StudyRecordCreateForm", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(
       "学習記録を登録しました。",
     );
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "現在の状態: Completed",
+    );
+  });
+
+  it("Failureの登録後はNeeds Reviewを表示する", async () => {
+    const mutateAsync = vi.fn().mockResolvedValue({
+      status: 201,
+      headers: new Headers(),
+      data: {
+        id: 1,
+        learningItemId: 42,
+        result: "failure",
+        studiedAt: "2026-11-03T01:30:00.000Z",
+        durationSeconds: null,
+        memo: null,
+        createdAt: "2026-11-03T01:30:00.000Z",
+        updatedAt: "2026-11-03T01:30:00.000Z",
+        status: "needs_review",
+      },
+    });
+
+    vi.mocked(useCreateStudyRecord).mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    } as never);
+
+    const { user } = renderWithProviders(
+      <StudyRecordCreateForm learningItemId={42} />,
+    );
+
+    await user.selectOptions(screen.getByLabelText("Result"), "failure");
+    fireEvent.change(screen.getByLabelText("Studied At"), {
+      target: { value: "2026-11-03T10:30" },
+    });
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "現在の状態: Needs Review",
+    );
   });
 
   it("日時が未入力ならAPIを呼ばずにエラーを表示する", async () => {
