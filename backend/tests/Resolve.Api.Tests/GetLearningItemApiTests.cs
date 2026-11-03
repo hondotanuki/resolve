@@ -51,6 +51,7 @@ public sealed class GetLearningItemApiTests
         Assert.Equal("algorithm_problem", json.GetProperty("itemType").GetString());
         Assert.Equal("二分探索", json.GetProperty("title").GetString());
         Assert.Equal("二分探索を解く", json.GetProperty("content").GetString());
+        Assert.Equal("unstarted", json.GetProperty("status").GetString());
         Assert.Equal(JsonValueKind.Null, json.GetProperty("archivedAt").ValueKind);
         Assert.NotEqual(default, createdAt);
         Assert.NotEqual(default, updatedAt);
@@ -77,5 +78,40 @@ public sealed class GetLearningItemApiTests
 
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal(JsonValueKind.Null, json.GetProperty("content").ValueKind);
+    }
+
+    [Theory]
+    [InlineData("failure", "needs_review")]
+    [InlineData("success", "completed")]
+    [InlineData("reviewed", "completed")]
+    public async Task 最新の学習結果に応じた現在状態を返す(string result, string expectedStatus)
+    {
+        var createItemResponse = await _client.PostAsJsonAsync(
+            "/learning-items",
+            new { itemType = "algorithm_problem", title = "二分探索" }
+        );
+        Assert.Equal(HttpStatusCode.Created, createItemResponse.StatusCode);
+        var item = await createItemResponse.Content.ReadFromJsonAsync<JsonElement>();
+        var id = item.GetProperty("id").GetInt32();
+        var newer = new DateTime(2026, 10, 15, 9, 0, 0, DateTimeKind.Utc);
+
+        var newerResponse = await _client.PostAsJsonAsync(
+            $"/learning-items/{id}/study-records",
+            new { result, studiedAt = newer }
+        );
+        Assert.Equal(HttpStatusCode.Created, newerResponse.StatusCode);
+
+        // 後から異なる結果の古い記録を登録し、登録順ではなく学習日時を検証する。
+        var olderResult = result == "failure" ? "success" : "failure";
+        var olderResponse = await _client.PostAsJsonAsync(
+            $"/learning-items/{id}/study-records",
+            new { result = olderResult, studiedAt = newer.AddDays(-1) }
+        );
+        Assert.Equal(HttpStatusCode.Created, olderResponse.StatusCode);
+
+        var response = await _client.GetAsync($"/learning-items/{id}");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(expectedStatus, json.GetProperty("status").GetString());
     }
 }
