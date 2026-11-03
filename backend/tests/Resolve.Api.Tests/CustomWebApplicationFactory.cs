@@ -4,7 +4,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Resolve.Infrastructure;
+using Resolve.Infrastructure.Persistence;
 
 namespace Resolve.Api.Tests;
 

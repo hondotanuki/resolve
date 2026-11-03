@@ -10,6 +10,5 @@ public interface ILearningItemRepository
     );
 
     Task<IReadOnlyList<LearningItem>> ListAsync(CancellationToken cancellationToken = default);
-
     Task<LearningItem?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 }

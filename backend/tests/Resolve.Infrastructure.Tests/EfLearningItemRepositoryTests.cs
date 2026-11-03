@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Resolve.Domain;
+using Resolve.Infrastructure.Persistence;
 using Resolve.Infrastructure.Persistence.Repositories;
 
 namespace Resolve.Infrastructure.Tests;

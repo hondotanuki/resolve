@@ -22,3 +22,6 @@ indent_size = 2
 [*.targets]
 indent_style = space
 indent_size = 2
+
+[**/Migrations/*.cs]
+generated_code = true

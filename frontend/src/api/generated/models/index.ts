@@ -7,5 +7,7 @@
 
 export * from "./createLearningItemRequest";
 export * from "./createLearningItemResponse";
+export * from "./createStudyRecordRequest";
+export * from "./createStudyRecordResponse";
 export * from "./getLearningItemResponse";
 export * from "./listLearningItemsResponse";

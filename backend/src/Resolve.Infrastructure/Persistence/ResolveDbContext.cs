@@ -1,7 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Resolve.Domain;
+using Resolve.Infrastructure.Persistence.Configurations;
 
-namespace Resolve.Infrastructure;
+namespace Resolve.Infrastructure.Persistence;
 
 public class ResolveDbContext : DbContext
 {
@@ -9,30 +10,12 @@ public class ResolveDbContext : DbContext
         : base(options) { }
 
     public DbSet<LearningItem> LearningItems => Set<LearningItem>();
+    public DbSet<StudyRecord> StudyRecords => Set<StudyRecord>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<LearningItem>(entity =>
-        {
-            entity.ToTable("learning_items");
-
-            entity.HasKey(x => x.Id);
-
-            entity.Property(x => x.Id).HasColumnName("id");
-
-            entity.Property(x => x.ItemType).HasColumnName("item_type").HasConversion<string>();
-
-            entity.Property(x => x.Title).HasColumnName("title").IsRequired();
-
-            entity.Property(x => x.Content).HasColumnName("content");
-
-            entity.Property(x => x.ArchivedAt).HasColumnName("archived_at");
-
-            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
-
-            entity.Property(x => x.UpdatedAt).HasColumnName("updated_at").IsRequired();
-        });
+        modelBuilder.ApplyConfiguration(new LearningItemConfiguration());
+        modelBuilder.ApplyConfiguration(new StudyRecordConfiguration());
     }
 }

@@ -6,9 +6,14 @@
  */
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
+  QueryClient,
   QueryFunction,
   QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -18,6 +23,8 @@ import type {
 import type {
   CreateLearningItemRequest,
   CreateLearningItemResponse,
+  CreateStudyRecordRequest,
+  CreateStudyRecordResponse,
   GetLearningItemResponse,
   ListLearningItemsResponse,
 } from "../models";
@@ -160,24 +167,27 @@ export type CreateLearningItemMutationVariables = {
   data: CreateLearningItemRequest;
 };
 
-export const useCreateLearningItem = <
-  TError = void,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createLearningItem>>,
-    TError,
-    CreateLearningItemMutationVariables,
-    TContext
-  >;
-  fetch?: RequestInit;
-}): UseMutationResult<
+export const useCreateLearningItem = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createLearningItem>>,
+      TError,
+      CreateLearningItemMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
   Awaited<ReturnType<typeof createLearningItem>>,
   TError,
   CreateLearningItemMutationVariables,
   TContext
 > => {
-  return useMutation(getCreateLearningItemMutationOptions(options));
+  return useMutation(
+    getCreateLearningItemMutationOptions(options),
+    queryClient,
+  );
 };
 export type listLearningItemsResponse200 = {
   data: ListLearningItemsResponse[];
@@ -219,10 +229,12 @@ export const getListLearningItemsQueryOptions = <
   TData = Awaited<ReturnType<typeof listLearningItems>>,
   TError = unknown,
 >(options?: {
-  query?: UseQueryOptions<
-    Awaited<ReturnType<typeof listLearningItems>>,
-    TError,
-    TData
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listLearningItems>>,
+      TError,
+      TData
+    >
   >;
   fetch?: RequestInit;
 }) => {
@@ -238,7 +250,7 @@ export const getListLearningItemsQueryOptions = <
     Awaited<ReturnType<typeof listLearningItems>>,
     TError,
     TData
-  > & { queryKey: QueryKey };
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type ListLearningItemsQueryResult = NonNullable<
@@ -249,19 +261,98 @@ export type ListLearningItemsQueryError = unknown;
 export function useListLearningItems<
   TData = Awaited<ReturnType<typeof listLearningItems>>,
   TError = unknown,
->(options?: {
-  query?: UseQueryOptions<
-    Awaited<ReturnType<typeof listLearningItems>>,
-    TError,
-    TData
-  >;
-  fetch?: RequestInit;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listLearningItems>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listLearningItems>>,
+          TError,
+          Awaited<ReturnType<typeof listLearningItems>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListLearningItems<
+  TData = Awaited<ReturnType<typeof listLearningItems>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listLearningItems>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listLearningItems>>,
+          TError,
+          Awaited<ReturnType<typeof listLearningItems>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListLearningItems<
+  TData = Awaited<ReturnType<typeof listLearningItems>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listLearningItems>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListLearningItems<
+  TData = Awaited<ReturnType<typeof listLearningItems>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listLearningItems>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
   const queryOptions = getListLearningItemsQueryOptions(options);
 
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
@@ -323,10 +414,12 @@ export const getGetLearningItemByIdQueryOptions = <
 >(
   id: number,
   options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getLearningItemById>>,
-      TError,
-      TData
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getLearningItemById>>,
+        TError,
+        TData
+      >
     >;
     fetch?: RequestInit;
   },
@@ -348,7 +441,7 @@ export const getGetLearningItemByIdQueryOptions = <
     Awaited<ReturnType<typeof getLearningItemById>>,
     TError,
     TData
-  > & { queryKey: QueryKey };
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetLearningItemByIdQueryResult = NonNullable<
@@ -361,20 +454,248 @@ export function useGetLearningItemById<
   TError = void,
 >(
   id: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getLearningItemById>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLearningItemById>>,
+          TError,
+          Awaited<ReturnType<typeof getLearningItemById>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetLearningItemById<
+  TData = Awaited<ReturnType<typeof getLearningItemById>>,
+  TError = void,
+>(
+  id: number,
   options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getLearningItemById>>,
-      TError,
-      TData
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getLearningItemById>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getLearningItemById>>,
+          TError,
+          Awaited<ReturnType<typeof getLearningItemById>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetLearningItemById<
+  TData = Awaited<ReturnType<typeof getLearningItemById>>,
+  TError = void,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getLearningItemById>>,
+        TError,
+        TData
+      >
     >;
     fetch?: RequestInit;
   },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetLearningItemById<
+  TData = Awaited<ReturnType<typeof getLearningItemById>>,
+  TError = void,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getLearningItemById>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
   const queryOptions = getGetLearningItemByIdQueryOptions(id, options);
 
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type createStudyRecordResponse201 = {
+  data: CreateStudyRecordResponse;
+  status: 201;
+};
+
+export type createStudyRecordResponse400 = {
+  data: void;
+  status: 400;
+};
+
+export type createStudyRecordResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type createStudyRecordResponseSuccess = createStudyRecordResponse201 & {
+  headers: Headers;
+};
+export type createStudyRecordResponseError = (
+  createStudyRecordResponse400 | createStudyRecordResponse404
+) & {
+  headers: Headers;
+};
+
+export type createStudyRecordResponse =
+  createStudyRecordResponseSuccess | createStudyRecordResponseError;
+
+export const getCreateStudyRecordUrl = (learningItemId: number) => {
+  return `/learning-items/${learningItemId}/study-records`;
+};
+
+export const createStudyRecord = async (
+  learningItemId: number,
+  createStudyRecordRequest: CreateStudyRecordRequest,
+  options?: RequestInit,
+): Promise<createStudyRecordResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getCreateStudyRecordUrl(learningItemId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createStudyRecordRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createStudyRecordResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createStudyRecordResponse;
+};
+
+export const getCreateStudyRecordMutationKey = () =>
+  ["createStudyRecord"] as const;
+
+export const getCreateStudyRecordMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createStudyRecord>>,
+    TError,
+    CreateStudyRecordMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createStudyRecord>>,
+  TError,
+  CreateStudyRecordMutationVariables,
+  TContext
+> => {
+  const mutationKey = getCreateStudyRecordMutationKey();
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createStudyRecord>>,
+    CreateStudyRecordMutationVariables
+  > = (props) => {
+    const { learningItemId, data } = props ?? {};
+
+    return createStudyRecord(learningItemId, data, fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateStudyRecordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createStudyRecord>>
+>;
+export type CreateStudyRecordMutationBody = CreateStudyRecordRequest;
+export type CreateStudyRecordMutationError = void;
+export type CreateStudyRecordMutationVariables = {
+  learningItemId: number;
+  data: CreateStudyRecordRequest;
+};
+
+export const useCreateStudyRecord = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createStudyRecord>>,
+      TError,
+      CreateStudyRecordMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createStudyRecord>>,
+  TError,
+  CreateStudyRecordMutationVariables,
+  TContext
+> => {
+  return useMutation(getCreateStudyRecordMutationOptions(options), queryClient);
+};
