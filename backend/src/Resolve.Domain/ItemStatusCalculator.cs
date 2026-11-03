@@ -6,7 +6,10 @@ public static class ItemStatusCalculator
     {
         ArgumentNullException.ThrowIfNull(records);
 
-        var latestRecord = records.MaxBy(record => record.StudiedAt);
+        var latestRecord = records
+            .OrderByDescending(record => record.StudiedAt)
+            .ThenByDescending(record => record.Id)
+            .FirstOrDefault();
 
         if (latestRecord is null)
         {
