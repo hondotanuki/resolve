@@ -3,6 +3,7 @@ import {
   useGetLearningItemById,
   getGetLearningItemByIdQueryKey,
 } from "../api/generated";
+import { StudyRecordCreateForm } from "../components/study-records/StudyRecordCreateForm";
 
 export function LearningItemDetailPage() {
   const { id } = useParams();
@@ -89,6 +90,7 @@ export function LearningItemDetailPage() {
         <p>Created: {item.createdAt}</p>
         <p>Updated: {item.updatedAt}</p>
       </div>
+      <StudyRecordCreateForm learningItemId={itemId} />
     </article>
   );
 }
