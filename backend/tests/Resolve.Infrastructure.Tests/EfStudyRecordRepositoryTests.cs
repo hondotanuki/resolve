@@ -196,6 +196,52 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         Assert.Equal(ItemStatus.Completed, status);
     }
 
+    [Fact]
+    public async Task ListByLearningItemIdAsyncは対象の記録を日時とIDの降順で返す()
+    {
+        var item = await CreateLearningItemAsync();
+        var otherItem = await CreateLearningItemAsync("別の学習対象");
+
+        var sameTimeFirst = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Failure, StudiedAt)
+        );
+        var newer = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Reviewed, StudiedAt.AddDays(1))
+        );
+        var sameTimeSecond = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Success, StudiedAt)
+        );
+        var older = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Success, StudiedAt.AddDays(-1))
+        );
+        await _repository.CreateAsync(
+            new StudyRecord(otherItem.Id, StudyResult.Success, StudiedAt.AddDays(2))
+        );
+        _dbContext.ChangeTracker.Clear();
+
+        var actual = await _repository.ListByLearningItemIdAsync(item.Id);
+
+        Assert.Equal(
+            new[] { newer.Id, sameTimeSecond.Id, sameTimeFirst.Id, older.Id },
+            actual.Select(record => record.Id)
+        );
+        Assert.All(actual, record => Assert.Equal(item.Id, record.LearningItemId));
+    }
+
+    [Fact]
+    public async Task ListByLearningItemIdAsyncは対象の記録がなければ空の一覧を返す()
+    {
+        var item = await CreateLearningItemAsync();
+        var otherItem = await CreateLearningItemAsync("別の学習対象");
+        await _repository.CreateAsync(
+            new StudyRecord(otherItem.Id, StudyResult.Success, StudiedAt)
+        );
+
+        var actual = await _repository.ListByLearningItemIdAsync(item.Id);
+
+        Assert.Empty(actual);
+    }
+
     public void Dispose()
     {
         _dbContext.Dispose();

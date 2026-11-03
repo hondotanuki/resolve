@@ -37,4 +37,17 @@ public sealed class EfStudyRecordRepository : IStudyRecordRepository
             .ThenByDescending(record => record.Id)
             .FirstOrDefaultAsync(cancellationToken);
     }
+
+    public async Task<IReadOnlyList<StudyRecord>> ListByLearningItemIdAsync(
+        int learningItemId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _dbContext
+            .StudyRecords.AsNoTracking()
+            .Where(record => record.LearningItemId == learningItemId)
+            .OrderByDescending(record => record.StudiedAt)
+            .ThenByDescending(record => record.Id)
+            .ToListAsync(cancellationToken);
+    }
 }
