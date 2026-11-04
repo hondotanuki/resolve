@@ -87,6 +87,7 @@ public sealed class ListStudyRecordsApiTests
         Assert.Equal(learningItemId, listStudyRecord.GetProperty("learningItemId").GetInt32());
         Assert.Equal("failure", listStudyRecord.GetProperty("result").GetString());
         Assert.Equal(StudiedAt, listStudyRecord.GetProperty("studiedAt").GetDateTime());
+        Assert.Equal("2026-10-15T09:00:00Z", listStudyRecord.GetProperty("studiedAt").GetString());
     }
 
     [Fact]

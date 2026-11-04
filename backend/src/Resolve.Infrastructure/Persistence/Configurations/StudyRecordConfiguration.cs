@@ -15,7 +15,11 @@ public sealed class StudyRecordConfiguration : IEntityTypeConfiguration<StudyRec
             .Property(record => record.LearningItemId)
             .HasColumnName("learning_item_id")
             .IsRequired();
-        builder.Property(record => record.StudiedAt).HasColumnName("studied_at").IsRequired();
+        builder
+            .Property(record => record.StudiedAt)
+            .HasColumnName("studied_at")
+            .IsRequired()
+            .HasConversion(value => value, value => DateTime.SpecifyKind(value, DateTimeKind.Utc));
         builder
             .Property(record => record.Result)
             .HasColumnName("result")
@@ -23,8 +27,16 @@ public sealed class StudyRecordConfiguration : IEntityTypeConfiguration<StudyRec
             .IsRequired();
         builder.Property(record => record.DurationSeconds).HasColumnName("duration_seconds");
         builder.Property(record => record.Memo).HasColumnName("memo");
-        builder.Property(record => record.CreatedAt).HasColumnName("created_at").IsRequired();
-        builder.Property(record => record.UpdatedAt).HasColumnName("updated_at").IsRequired();
+        builder
+            .Property(record => record.CreatedAt)
+            .HasColumnName("created_at")
+            .IsRequired()
+            .HasConversion(value => value, value => DateTime.SpecifyKind(value, DateTimeKind.Utc));
+        builder
+            .Property(record => record.UpdatedAt)
+            .HasColumnName("updated_at")
+            .IsRequired()
+            .HasConversion(value => value, value => DateTime.SpecifyKind(value, DateTimeKind.Utc));
         builder
             .HasOne<LearningItem>()
             .WithMany()

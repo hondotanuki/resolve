@@ -66,10 +66,13 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         Assert.Equal(item.Id, actual.LearningItemId);
         Assert.Equal(StudyResult.Success, actual.Result);
         Assert.Equal(StudiedAt, actual.StudiedAt);
+        Assert.Equal(DateTimeKind.Utc, actual.StudiedAt.Kind);
         Assert.Equal(1800, actual.DurationSeconds);
         Assert.Equal("二分探索を学習した", actual.Memo);
         Assert.Equal(record.CreatedAt, actual.CreatedAt);
         Assert.Equal(record.UpdatedAt, actual.UpdatedAt);
+        Assert.Equal(DateTimeKind.Utc, actual.CreatedAt.Kind);
+        Assert.Equal(DateTimeKind.Utc, actual.UpdatedAt.Kind);
     }
 
     [Fact]

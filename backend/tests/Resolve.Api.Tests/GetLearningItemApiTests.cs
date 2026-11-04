@@ -55,6 +55,8 @@ public sealed class GetLearningItemApiTests
         Assert.Equal(JsonValueKind.Null, json.GetProperty("archivedAt").ValueKind);
         Assert.NotEqual(default, createdAt);
         Assert.NotEqual(default, updatedAt);
+        Assert.EndsWith("Z", json.GetProperty("createdAt").GetString());
+        Assert.EndsWith("Z", json.GetProperty("updatedAt").GetString());
     }
 
     [Fact]
