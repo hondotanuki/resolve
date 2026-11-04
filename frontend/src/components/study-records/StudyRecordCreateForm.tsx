@@ -1,5 +1,10 @@
 import { useState, type SubmitEvent } from "react";
-import { useCreateStudyRecord } from "../../api/generated";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  getGetLearningItemByIdQueryKey,
+  getListStudyRecordsQueryKey,
+  useCreateStudyRecord,
+} from "../../api/generated";
 
 const results = [
   {
@@ -15,12 +20,6 @@ const results = [
     label: "Reviewed",
   },
 ] as const;
-
-const itemStatusLabels: Record<string, string> = {
-  unstarted: "Unstarted",
-  needs_review: "Needs Review",
-  completed: "Completed",
-};
 
 type StudyRecordCreateFormProps = {
   learningItemId: number;
@@ -40,8 +39,9 @@ export function StudyRecordCreateForm({
   >(null);
   const [apiError, setApiError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [itemStatus, setItemStatus] = useState<string | null>(null);
+
   const createMutation = useCreateStudyRecord();
+  const queryClient = useQueryClient();
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,7 +50,6 @@ export function StudyRecordCreateForm({
     setDurationSecondsError(null);
     setApiError(null);
     setSuccessMessage(null);
-    setItemStatus(null);
 
     if (studiedAt === "") {
       setStudiedAtError("学習日時を入力してください。");
@@ -89,8 +88,13 @@ export function StudyRecordCreateForm({
         return;
       }
 
-      setItemStatus(response.data.status);
       setSuccessMessage("学習記録を登録しました。");
+      queryClient.invalidateQueries({
+        queryKey: getGetLearningItemByIdQueryKey(learningItemId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: getListStudyRecordsQueryKey(learningItemId),
+      });
     } catch {
       setApiError("StudyRecordの登録に失敗しました。");
     }
@@ -232,11 +236,6 @@ export function StudyRecordCreateForm({
           className="mt-4 rounded-lg bg-green-50 p-4 text-sm text-green-700"
         >
           <p>{successMessage}</p>
-          {itemStatus && (
-            <p className="mt-1 font-medium">
-              現在の状態: {itemStatusLabels[itemStatus] ?? itemStatus}
-            </p>
-          )}
         </div>
       )}
     </div>

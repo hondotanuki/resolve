@@ -11,3 +11,4 @@ export * from "./createStudyRecordRequest";
 export * from "./createStudyRecordResponse";
 export * from "./getLearningItemResponse";
 export * from "./listLearningItemsResponse";
+export * from "./listStudyRecordsResponse";

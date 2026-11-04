@@ -1,6 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import { fireEvent, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useCreateStudyRecord } from "../api/generated";
+import {
+  getGetLearningItemByIdQueryKey,
+  getListStudyRecordsQueryKey,
+  useCreateStudyRecord,
+} from "../api/generated";
 import { StudyRecordCreateForm } from "../components/study-records/StudyRecordCreateForm";
 import { renderWithProviders } from "./test-utils";
 
@@ -37,9 +42,10 @@ describe("StudyRecordCreateForm", () => {
       isPending: false,
     } as never);
 
-    const { user } = renderWithProviders(
+    const { user, queryClient } = renderWithProviders(
       <StudyRecordCreateForm learningItemId={42} />,
     );
+    const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries");
 
     await user.selectOptions(screen.getByLabelText("Result"), "failure");
     fireEvent.change(screen.getByLabelText("Studied At"), {
@@ -61,12 +67,16 @@ describe("StudyRecordCreateForm", () => {
     expect(await screen.findByRole("status")).toHaveTextContent(
       "学習記録を登録しました。",
     );
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "現在の状態: Completed",
-    );
+    expect(invalidateQueries).toHaveBeenCalledTimes(2);
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: getGetLearningItemByIdQueryKey(42),
+    });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: getListStudyRecordsQueryKey(42),
+    });
   });
 
-  it("Failureの登録後はNeeds Reviewを表示する", async () => {
+  it("登録後に表示中の詳細と履歴が再取得される", async () => {
     const mutateAsync = vi.fn().mockResolvedValue({
       status: 201,
       headers: new Headers(),
@@ -88,9 +98,38 @@ describe("StudyRecordCreateForm", () => {
       isPending: false,
     } as never);
 
-    const { user } = renderWithProviders(
-      <StudyRecordCreateForm learningItemId={42} />,
-    );
+    const fetchDetail = vi
+      .fn()
+      .mockResolvedValueOnce("unstarted")
+      .mockResolvedValue("needs_review");
+    const fetchHistory = vi
+      .fn()
+      .mockResolvedValueOnce("履歴なし")
+      .mockResolvedValue("履歴あり");
+
+    function ActiveQueries() {
+      const detail = useQuery({
+        queryKey: getGetLearningItemByIdQueryKey(42),
+        queryFn: fetchDetail,
+      });
+      const history = useQuery({
+        queryKey: getListStudyRecordsQueryKey(42),
+        queryFn: fetchHistory,
+      });
+      return (
+        <>
+          <p>現在の状態: {detail.data}</p>
+          <p>{history.data}</p>
+          <StudyRecordCreateForm learningItemId={42} />
+        </>
+      );
+    }
+
+    const { user } = renderWithProviders(<ActiveQueries />);
+    expect(
+      await screen.findByText("現在の状態: unstarted"),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("履歴なし")).toBeInTheDocument();
 
     await user.selectOptions(screen.getByLabelText("Result"), "failure");
     fireEvent.change(screen.getByLabelText("Studied At"), {
@@ -98,9 +137,12 @@ describe("StudyRecordCreateForm", () => {
     });
     await user.click(screen.getByRole("button", { name: "Create" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "現在の状態: Needs Review",
-    );
+    expect(
+      await screen.findByText("現在の状態: needs_review"),
+    ).toBeInTheDocument();
+    expect(await screen.findByText("履歴あり")).toBeInTheDocument();
+    expect(fetchDetail).toHaveBeenCalledTimes(2);
+    expect(fetchHistory).toHaveBeenCalledTimes(2);
   });
 
   it("日時が未入力ならAPIを呼ばずにエラーを表示する", async () => {
@@ -111,14 +153,16 @@ describe("StudyRecordCreateForm", () => {
       isPending: false,
     } as never);
 
-    const { user } = renderWithProviders(
+    const { user, queryClient } = renderWithProviders(
       <StudyRecordCreateForm learningItemId={42} />,
     );
+    const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries");
 
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     const input = screen.getByLabelText("Studied At");
     expect(mutateAsync).not.toHaveBeenCalled();
+    expect(invalidateQueries).not.toHaveBeenCalled();
     expect(screen.getByRole("alert")).toHaveTextContent(
       "学習日時を入力してください。",
     );
@@ -199,9 +243,10 @@ describe("StudyRecordCreateForm", () => {
       isPending: false,
     } as never);
 
-    const { user } = renderWithProviders(
+    const { user, queryClient } = renderWithProviders(
       <StudyRecordCreateForm learningItemId={42} />,
     );
+    const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries");
 
     fireEvent.change(screen.getByLabelText("Studied At"), {
       target: { value: "2026-11-03T10:30" },
@@ -211,6 +256,28 @@ describe("StudyRecordCreateForm", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "対象のLearningItemが見つかりません。",
     );
+    expect(invalidateQueries).not.toHaveBeenCalled();
+  });
+
+  it("400の場合はキャッシュを無効化せず入力エラーを表示する", async () => {
+    vi.mocked(useCreateStudyRecord).mockReturnValue({
+      mutateAsync: vi.fn().mockResolvedValue({ status: 400 }),
+      isPending: false,
+    } as never);
+
+    const { user, queryClient } = renderWithProviders(
+      <StudyRecordCreateForm learningItemId={42} />,
+    );
+    const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries");
+    fireEvent.change(screen.getByLabelText("Studied At"), {
+      target: { value: "2026-11-03T10:30" },
+    });
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "入力内容を確認してください。",
+    );
+    expect(invalidateQueries).not.toHaveBeenCalled();
   });
 
   it("登録中はボタンを無効化する", () => {

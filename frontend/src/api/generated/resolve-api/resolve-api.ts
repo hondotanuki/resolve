@@ -27,6 +27,7 @@ import type {
   CreateStudyRecordResponse,
   GetLearningItemResponse,
   ListLearningItemsResponse,
+  ListStudyRecordsResponse,
 } from "../models";
 
 const withQueryKey = <T extends object, K>(
@@ -69,7 +70,7 @@ export type createLearningItemResponse =
   createLearningItemResponseSuccess | createLearningItemResponseError;
 
 export const getCreateLearningItemUrl = () => {
-  return `/learning-items`;
+  return `/api/learning-items`;
 };
 
 export const createLearningItem = async (
@@ -200,7 +201,7 @@ export type listLearningItemsResponseSuccess = listLearningItemsResponse200 & {
 export type listLearningItemsResponse = listLearningItemsResponseSuccess;
 
 export const getListLearningItemsUrl = () => {
-  return `/learning-items`;
+  return `/api/learning-items`;
 };
 
 export const listLearningItems = async (
@@ -222,7 +223,7 @@ export const listLearningItems = async (
 };
 
 export const getListLearningItemsQueryKey = () => {
-  return [`/learning-items`] as const;
+  return [`/api/learning-items`] as const;
 };
 
 export const getListLearningItemsQueryOptions = <
@@ -380,7 +381,7 @@ export type getLearningItemByIdResponse =
   getLearningItemByIdResponseSuccess | getLearningItemByIdResponseError;
 
 export const getGetLearningItemByIdUrl = (id: number) => {
-  return `/learning-items/${id}`;
+  return `/api/learning-items/${id}`;
 };
 
 export const getLearningItemById = async (
@@ -405,7 +406,7 @@ export const getLearningItemById = async (
 };
 
 export const getGetLearningItemByIdQueryKey = (id: number) => {
-  return [`/learning-items/${id}`] as const;
+  return [`/api/learning-items/${id}`] as const;
 };
 
 export const getGetLearningItemByIdQueryOptions = <
@@ -580,7 +581,7 @@ export type createStudyRecordResponse =
   createStudyRecordResponseSuccess | createStudyRecordResponseError;
 
 export const getCreateStudyRecordUrl = (learningItemId: number) => {
-  return `/learning-items/${learningItemId}/study-records`;
+  return `/api/learning-items/${learningItemId}/study-records`;
 };
 
 export const createStudyRecord = async (
@@ -699,3 +700,195 @@ export const useCreateStudyRecord = <TError = void, TContext = unknown>(
 > => {
   return useMutation(getCreateStudyRecordMutationOptions(options), queryClient);
 };
+export type listStudyRecordsResponse200 = {
+  data: ListStudyRecordsResponse[];
+  status: 200;
+};
+
+export type listStudyRecordsResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type listStudyRecordsResponseSuccess = listStudyRecordsResponse200 & {
+  headers: Headers;
+};
+export type listStudyRecordsResponseError = listStudyRecordsResponse404 & {
+  headers: Headers;
+};
+
+export type listStudyRecordsResponse =
+  listStudyRecordsResponseSuccess | listStudyRecordsResponseError;
+
+export const getListStudyRecordsUrl = (learningItemId: number) => {
+  return `/api/learning-items/${learningItemId}/study-records`;
+};
+
+export const listStudyRecords = async (
+  learningItemId: number,
+  options?: RequestInit,
+): Promise<listStudyRecordsResponse> => {
+  const res = await fetch(getListStudyRecordsUrl(learningItemId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listStudyRecordsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listStudyRecordsResponse;
+};
+
+export const getListStudyRecordsQueryKey = (learningItemId: number) => {
+  return [`/api/learning-items/${learningItemId}/study-records`] as const;
+};
+
+export const getListStudyRecordsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listStudyRecords>>,
+  TError = void,
+>(
+  learningItemId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStudyRecords>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+) => {
+  const { query: queryOptions, fetch: fetchOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListStudyRecordsQueryKey(learningItemId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listStudyRecords>>
+  > = ({ signal }) =>
+    listStudyRecords(learningItemId, { signal, ...fetchOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: learningItemId !== null && learningItemId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof listStudyRecords>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListStudyRecordsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listStudyRecords>>
+>;
+export type ListStudyRecordsQueryError = void;
+
+export function useListStudyRecords<
+  TData = Awaited<ReturnType<typeof listStudyRecords>>,
+  TError = void,
+>(
+  learningItemId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStudyRecords>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStudyRecords>>,
+          TError,
+          Awaited<ReturnType<typeof listStudyRecords>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListStudyRecords<
+  TData = Awaited<ReturnType<typeof listStudyRecords>>,
+  TError = void,
+>(
+  learningItemId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStudyRecords>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStudyRecords>>,
+          TError,
+          Awaited<ReturnType<typeof listStudyRecords>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListStudyRecords<
+  TData = Awaited<ReturnType<typeof listStudyRecords>>,
+  TError = void,
+>(
+  learningItemId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStudyRecords>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListStudyRecords<
+  TData = Awaited<ReturnType<typeof listStudyRecords>>,
+  TError = void,
+>(
+  learningItemId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStudyRecords>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListStudyRecordsQueryOptions(learningItemId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

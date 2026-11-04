@@ -4,6 +4,7 @@ import {
   getGetLearningItemByIdQueryKey,
 } from "../api/generated";
 import { StudyRecordCreateForm } from "../components/study-records/StudyRecordCreateForm";
+import { StudyRecordList } from "../components/study-records/StudyRecordList";
 
 export function LearningItemDetailPage() {
   const { id } = useParams();
@@ -75,8 +76,8 @@ export function LearningItemDetailPage() {
       </Link>
 
       <p className="mb-2 text-sm text-zinc-500">{item.itemType}</p>
-
       <h1 className="text-3xl font-semibold">{item.title}</h1>
+      <p>現在の状態: {item.status}</p>
 
       <div className="mt-8 rounded-xl border border-zinc-200 bg-white p-6">
         {item.content ? (
@@ -91,6 +92,7 @@ export function LearningItemDetailPage() {
         <p>Updated: {item.updatedAt}</p>
       </div>
       <StudyRecordCreateForm learningItemId={itemId} />
+      <StudyRecordList learningItemId={itemId} />
     </article>
   );
 }
