@@ -14,6 +14,7 @@ public sealed class StudyRecordTests
         Assert.Equal(1, record.LearningItemId);
         Assert.Equal(StudyResult.Success, record.Result);
         Assert.Equal(StudiedAt, record.StudiedAt);
+        Assert.Equal(DateTimeKind.Utc, record.StudiedAt.Kind);
         Assert.InRange(record.CreatedAt, before, after);
         Assert.Equal(record.CreatedAt, record.UpdatedAt);
     }
@@ -42,6 +43,20 @@ public sealed class StudyRecordTests
     public void StudiedAtが未設定なら生成できない()
     {
         Assert.Throws<ArgumentException>(() => new StudyRecord(1, StudyResult.Success, default));
+    }
+
+    [Theory]
+    [InlineData(DateTimeKind.Local)]
+    [InlineData(DateTimeKind.Unspecified)]
+    public void StudiedAtがUTC以外なら生成できない(DateTimeKind kind)
+    {
+        var studiedAt = new DateTime(2026, 10, 15, 9, 0, 0, kind);
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            new StudyRecord(1, StudyResult.Success, studiedAt)
+        );
+
+        Assert.Equal("studiedAt", exception.ParamName);
     }
 
     [Fact]

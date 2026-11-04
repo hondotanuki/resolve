@@ -66,10 +66,13 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         Assert.Equal(item.Id, actual.LearningItemId);
         Assert.Equal(StudyResult.Success, actual.Result);
         Assert.Equal(StudiedAt, actual.StudiedAt);
+        Assert.Equal(DateTimeKind.Utc, actual.StudiedAt.Kind);
         Assert.Equal(1800, actual.DurationSeconds);
         Assert.Equal("二分探索を学習した", actual.Memo);
         Assert.Equal(record.CreatedAt, actual.CreatedAt);
         Assert.Equal(record.UpdatedAt, actual.UpdatedAt);
+        Assert.Equal(DateTimeKind.Utc, actual.CreatedAt.Kind);
+        Assert.Equal(DateTimeKind.Utc, actual.UpdatedAt.Kind);
     }
 
     [Fact]
@@ -151,6 +154,95 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         var value = await command.ExecuteScalarAsync();
 
         Assert.Equal("Failure", value);
+    }
+
+    [Fact]
+    public async Task StudiedAtが同じならIDの大きい記録を取得する()
+    {
+        var item = await CreateLearningItemAsync();
+
+        var first = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Failure, StudiedAt)
+        );
+        var second = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Success, StudiedAt)
+        );
+        _dbContext.ChangeTracker.Clear();
+
+        var latest = await _repository.GetLatestByLearningItemIdAsync(item.Id);
+
+        Assert.True(second.Id > first.Id);
+        Assert.NotNull(latest);
+        Assert.Equal(second.Id, latest.Id);
+        Assert.Equal(item.Id, latest.LearningItemId);
+        Assert.Equal(StudyResult.Success, latest.Result);
+        Assert.Equal(StudiedAt, latest.StudiedAt);
+    }
+
+    [Fact]
+    public async Task StudiedAtが同じならIDの大きい記録から状態を算出する()
+    {
+        var item = await CreateLearningItemAsync();
+
+        var first = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Failure, StudiedAt)
+        );
+        var second = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Success, StudiedAt)
+        );
+
+        Assert.True(second.Id > first.Id);
+
+        // IDの小さい順に渡し、入力順ではなくIDで選ばれることを確認する。
+        var status = ItemStatusCalculator.Calculate([first, second]);
+
+        Assert.Equal(ItemStatus.Completed, status);
+    }
+
+    [Fact]
+    public async Task ListByLearningItemIdAsyncは対象の記録を日時とIDの降順で返す()
+    {
+        var item = await CreateLearningItemAsync();
+        var otherItem = await CreateLearningItemAsync("別の学習対象");
+
+        var sameTimeFirst = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Failure, StudiedAt)
+        );
+        var newer = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Reviewed, StudiedAt.AddDays(1))
+        );
+        var sameTimeSecond = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Success, StudiedAt)
+        );
+        var older = await _repository.CreateAsync(
+            new StudyRecord(item.Id, StudyResult.Success, StudiedAt.AddDays(-1))
+        );
+        await _repository.CreateAsync(
+            new StudyRecord(otherItem.Id, StudyResult.Success, StudiedAt.AddDays(2))
+        );
+        _dbContext.ChangeTracker.Clear();
+
+        var actual = await _repository.ListByLearningItemIdAsync(item.Id);
+
+        Assert.Equal(
+            new[] { newer.Id, sameTimeSecond.Id, sameTimeFirst.Id, older.Id },
+            actual.Select(record => record.Id)
+        );
+        Assert.All(actual, record => Assert.Equal(item.Id, record.LearningItemId));
+    }
+
+    [Fact]
+    public async Task ListByLearningItemIdAsyncは対象の記録がなければ空の一覧を返す()
+    {
+        var item = await CreateLearningItemAsync();
+        var otherItem = await CreateLearningItemAsync("別の学習対象");
+        await _repository.CreateAsync(
+            new StudyRecord(otherItem.Id, StudyResult.Success, StudiedAt)
+        );
+
+        var actual = await _repository.ListByLearningItemIdAsync(item.Id);
+
+        Assert.Empty(actual);
     }
 
     public void Dispose()

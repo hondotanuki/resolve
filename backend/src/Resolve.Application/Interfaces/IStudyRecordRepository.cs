@@ -12,4 +12,8 @@ public interface IStudyRecordRepository
         int learningItemId,
         CancellationToken cancellationToken = default
     );
+    Task<IReadOnlyList<StudyRecord>> ListByLearningItemIdAsync(
+        int learningItemId,
+        CancellationToken cancellationToken = default
+    );
 }

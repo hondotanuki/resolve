@@ -36,6 +36,11 @@ public sealed class StudyRecord
             throw new ArgumentException("StudiedAt must be specified.", nameof(studiedAt));
         }
 
+        if (studiedAt.Kind != DateTimeKind.Utc)
+        {
+            throw new ArgumentException("StudiedAt must be in UTC.", nameof(studiedAt));
+        }
+
         LearningItemId = learningItemId;
         Result = result;
         StudiedAt = studiedAt;

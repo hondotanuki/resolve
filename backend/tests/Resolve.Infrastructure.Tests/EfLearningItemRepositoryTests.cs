@@ -48,6 +48,31 @@ public class EfLearningItemRepositoryTests
         Assert.Equal("二分探索の問題を解く", actual.Content);
         Assert.Equal(saved.CreatedAt, actual.CreatedAt);
         Assert.Equal(saved.UpdatedAt, actual.UpdatedAt);
+        Assert.Equal(DateTimeKind.Utc, actual.CreatedAt.Kind);
+        Assert.Equal(DateTimeKind.Utc, actual.UpdatedAt.Kind);
         Assert.Equal(saved.ArchivedAt, actual.ArchivedAt);
+    }
+
+    [Fact]
+    public async Task ArchivedAtをUTCで再取得できる()
+    {
+        await using var connection = new SqliteConnection("DataSource=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ResolveDbContext>().UseSqlite(connection).Options;
+        await using var dbContext = new ResolveDbContext(options);
+        await dbContext.Database.EnsureCreatedAsync();
+
+        var item = new LearningItem(ItemType.AlgorithmProblem, "二分探索", null);
+        dbContext.LearningItems.Add(item);
+        var archivedAt = new DateTime(2026, 10, 15, 9, 0, 0, DateTimeKind.Utc);
+        dbContext.Entry(item).Property(x => x.ArchivedAt).CurrentValue = archivedAt;
+        await dbContext.SaveChangesAsync();
+        dbContext.ChangeTracker.Clear();
+
+        var actual = await dbContext.LearningItems.SingleAsync(x => x.Id == item.Id);
+
+        Assert.NotNull(actual.ArchivedAt);
+        Assert.Equal(archivedAt, actual.ArchivedAt.Value);
+        Assert.Equal(DateTimeKind.Utc, actual.ArchivedAt.Value.Kind);
     }
 }

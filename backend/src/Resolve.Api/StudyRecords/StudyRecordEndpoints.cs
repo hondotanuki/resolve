@@ -1,4 +1,5 @@
 using Resolve.Api.StudyRecords.Create;
+using Resolve.Api.StudyRecords.List;
 
 namespace Resolve.Api.StudyRecords;
 
@@ -9,5 +10,6 @@ public static class StudyRecordEndpoints
         var group = app.MapGroup("/learning-items");
 
         group.MapCreateStudyRecord();
+        group.MapListStudyRecords();
     }
 }

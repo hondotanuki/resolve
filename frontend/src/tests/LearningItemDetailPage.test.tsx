@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LearningItemDetailPage } from "../pages/LearningItemDetailPage";
-import { useGetLearningItemById } from "../api/generated";
+import { useGetLearningItemById, useListStudyRecords } from "../api/generated";
 import { renderWithRouter } from "./test-utils";
 
 vi.mock("../api/generated", async (importOriginal) => {
@@ -10,6 +10,7 @@ vi.mock("../api/generated", async (importOriginal) => {
   return {
     ...actual,
     useGetLearningItemById: vi.fn(),
+    useListStudyRecords: vi.fn(),
   };
 });
 
@@ -28,6 +29,11 @@ function renderPage(path = "/learning-items/1") {
 describe("LearningItemDetailPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useListStudyRecords).mockReturnValue({
+      data: { status: 200, headers: new Headers(), data: [] },
+      isPending: false,
+      isError: false,
+    } as never);
   });
 
   it("LearningItemの詳細を表示する", async () => {
@@ -39,6 +45,7 @@ describe("LearningItemDetailPage", () => {
           id: 1,
           itemType: "algorithm_problem",
           title: "二分探索",
+          status: "unstarted",
           content: "二分探索を解く",
           archivedAt: null,
           createdAt: "2026-10-01T10:00:00Z",
@@ -58,6 +65,9 @@ describe("LearningItemDetailPage", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("algorithm_problem")).toBeInTheDocument();
     expect(screen.getByText("二分探索を解く")).toBeInTheDocument();
+    expect(screen.getByText("現在の状態: unstarted")).toBeInTheDocument();
+    expect(screen.getByText("学習履歴はまだありません。")).toBeInTheDocument();
+    expect(vi.mocked(useListStudyRecords).mock.calls[0][0]).toBe(1);
   });
 
   it("取得中はLoadingを表示する", async () => {

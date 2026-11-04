@@ -10,6 +10,7 @@ export interface GetLearningItemResponse {
   id: number | string;
   itemType: string;
   title: string;
+  status: string;
   /** @nullable */
   content?: string | null;
   /** @nullable */

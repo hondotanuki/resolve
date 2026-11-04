@@ -7,6 +7,7 @@ export default defineConfig({
     },
 
     output: {
+      baseUrl: "/api",
       target: "./src/api/generated/api.ts",
       schemas: "./src/api/generated/models",
       client: "react-query",
