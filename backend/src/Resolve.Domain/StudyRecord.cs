@@ -32,12 +32,7 @@ public sealed class StudyRecord
         UpdatedAt = CreatedAt;
     }
 
-    public void Update(
-        StudyResult result,
-        DateTime studiedAt,
-        int? durationSeconds,
-        string? memo
-    )
+    public void Update(StudyResult result, DateTime studiedAt, int? durationSeconds, string? memo)
     {
         Validate(result, studiedAt, durationSeconds);
 
@@ -49,7 +44,11 @@ public sealed class StudyRecord
         UpdatedAt = DateTime.UtcNow;
     }
 
-    private static void Validate(StudyResult result, DateTime studiedAt, int? durationSeconds = null)
+    private static void Validate(
+        StudyResult result,
+        DateTime studiedAt,
+        int? durationSeconds = null
+    )
     {
         if (durationSeconds is < 0)
         {

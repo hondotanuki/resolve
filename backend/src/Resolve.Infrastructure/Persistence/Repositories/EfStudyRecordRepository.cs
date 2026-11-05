@@ -25,6 +25,39 @@ public sealed class EfStudyRecordRepository : IStudyRecordRepository
         return studyRecord;
     }
 
+    public async Task<StudyRecord?> GetByIdAsync(
+        int studyRecordId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await _dbContext
+            .StudyRecords.AsTracking()
+            .FirstOrDefaultAsync(record => record.Id == studyRecordId, cancellationToken);
+    }
+
+    public async Task UpdateAsync(
+        StudyRecord studyRecord,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (_dbContext.Entry(studyRecord).State == EntityState.Detached)
+        {
+            throw new InvalidOperationException("StudyRecord must be tracked.");
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(
+        StudyRecord studyRecord,
+        CancellationToken cancellationToken = default
+    )
+    {
+        _dbContext.StudyRecords.Remove(studyRecord);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<StudyRecord?> GetLatestByLearningItemIdAsync(
         int learningItemId,
         CancellationToken cancellationToken = default

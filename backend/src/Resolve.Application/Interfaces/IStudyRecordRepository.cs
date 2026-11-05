@@ -8,6 +8,12 @@ public interface IStudyRecordRepository
         StudyRecord studyRecord,
         CancellationToken cancellationToken = default
     );
+    Task<StudyRecord?> GetByIdAsync(
+        int studyRecordId,
+        CancellationToken cancellationToken = default
+    );
+    Task UpdateAsync(StudyRecord studyRecord, CancellationToken cancellationToken = default);
+    Task DeleteAsync(StudyRecord studyRecord, CancellationToken cancellationToken = default);
     Task<StudyRecord?> GetLatestByLearningItemIdAsync(
         int learningItemId,
         CancellationToken cancellationToken = default
