@@ -22,7 +22,7 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
             .Options;
 
         _dbContext = new ResolveDbContext(options);
-        _dbContext.Database.EnsureCreated();
+        _dbContext.Database.Migrate();
         _repository = new EfLearningItemRepository(_dbContext);
     }
 
@@ -37,7 +37,6 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
             .LearningItems.AsNoTracking()
             .SingleAsync(x => x.Id == saved.Id);
 
-        // 8. 保存内容を確認
         Assert.True(saved.Id > 0);
         Assert.Equal("二分探索", actual.Title);
         Assert.Equal(ItemType.AlgorithmProblem, actual.ItemType);
