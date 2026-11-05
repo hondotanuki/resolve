@@ -6,6 +6,7 @@ using Resolve.Application.LearningItems.Create;
 using Resolve.Application.LearningItems.GetById;
 using Resolve.Application.LearningItems.List;
 using Resolve.Application.StudyRecords.Create;
+using Resolve.Application.StudyRecords.Delete;
 using Resolve.Application.StudyRecords.List;
 using Resolve.Infrastructure.Persistence;
 using Resolve.Infrastructure.Persistence.Repositories;
@@ -29,6 +30,7 @@ builder.Services.AddScoped<ListLearningItemsUseCase>();
 builder.Services.AddScoped<GetLearningItemByIdUseCase>();
 builder.Services.AddScoped<CreateStudyRecordUseCase>();
 builder.Services.AddScoped<ListStudyRecordsUseCase>();
+builder.Services.AddScoped<DeleteStudyRecordUseCase>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
