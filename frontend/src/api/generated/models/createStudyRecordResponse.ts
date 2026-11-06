@@ -6,17 +6,12 @@
  */
 
 export interface CreateStudyRecordResponse {
-  /** @pattern ^-?(?:0|[1-9]\d*)$ */
-  id: number | string;
-  /** @pattern ^-?(?:0|[1-9]\d*)$ */
-  learningItemId: number | string;
+  id: number;
+  learningItemId: number;
   result: string;
   studiedAt: string;
-  /**
-   * @nullable
-   * @pattern ^-?(?:0|[1-9]\d*)$
-   */
-  durationSeconds?: number | string | null;
+  /** @nullable */
+  durationSeconds?: number | null;
   /** @nullable */
   memo?: string | null;
   createdAt: string;

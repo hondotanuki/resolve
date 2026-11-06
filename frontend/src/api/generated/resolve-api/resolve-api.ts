@@ -28,6 +28,8 @@ import type {
   GetLearningItemResponse,
   ListLearningItemsResponse,
   ListStudyRecordsResponse,
+  UpdateStudyRecordRequest,
+  UpdateStudyRecordResponse,
 } from "../models";
 
 const withQueryKey = <T extends object, K>(
@@ -892,3 +894,263 @@ export function useListStudyRecords<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type deleteStudyRecordResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteStudyRecordResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type deleteStudyRecordResponseSuccess = deleteStudyRecordResponse204 & {
+  headers: Headers;
+};
+export type deleteStudyRecordResponseError = deleteStudyRecordResponse404 & {
+  headers: Headers;
+};
+
+export type deleteStudyRecordResponse =
+  deleteStudyRecordResponseSuccess | deleteStudyRecordResponseError;
+
+export const getDeleteStudyRecordUrl = (studyRecordId: number) => {
+  return `/api/study-records/${studyRecordId}`;
+};
+
+export const deleteStudyRecord = async (
+  studyRecordId: number,
+  options?: RequestInit,
+): Promise<deleteStudyRecordResponse> => {
+  const res = await fetch(getDeleteStudyRecordUrl(studyRecordId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteStudyRecordResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteStudyRecordResponse;
+};
+
+export const getDeleteStudyRecordMutationKey = () =>
+  ["deleteStudyRecord"] as const;
+
+export const getDeleteStudyRecordMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteStudyRecord>>,
+    TError,
+    DeleteStudyRecordMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteStudyRecord>>,
+  TError,
+  DeleteStudyRecordMutationVariables,
+  TContext
+> => {
+  const mutationKey = getDeleteStudyRecordMutationKey();
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteStudyRecord>>,
+    DeleteStudyRecordMutationVariables
+  > = (props) => {
+    const { studyRecordId } = props ?? {};
+
+    return deleteStudyRecord(studyRecordId, fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteStudyRecordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteStudyRecord>>
+>;
+
+export type DeleteStudyRecordMutationError = void;
+export type DeleteStudyRecordMutationVariables = { studyRecordId: number };
+
+export const useDeleteStudyRecord = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteStudyRecord>>,
+      TError,
+      DeleteStudyRecordMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteStudyRecord>>,
+  TError,
+  DeleteStudyRecordMutationVariables,
+  TContext
+> => {
+  return useMutation(getDeleteStudyRecordMutationOptions(options), queryClient);
+};
+export type updateStudyRecordResponse200 = {
+  data: UpdateStudyRecordResponse;
+  status: 200;
+};
+
+export type updateStudyRecordResponse400 = {
+  data: void;
+  status: 400;
+};
+
+export type updateStudyRecordResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type updateStudyRecordResponseSuccess = updateStudyRecordResponse200 & {
+  headers: Headers;
+};
+export type updateStudyRecordResponseError = (
+  updateStudyRecordResponse400 | updateStudyRecordResponse404
+) & {
+  headers: Headers;
+};
+
+export type updateStudyRecordResponse =
+  updateStudyRecordResponseSuccess | updateStudyRecordResponseError;
+
+export const getUpdateStudyRecordUrl = (studyRecordId: number) => {
+  return `/api/study-records/${studyRecordId}`;
+};
+
+export const updateStudyRecord = async (
+  studyRecordId: number,
+  updateStudyRecordRequest: UpdateStudyRecordRequest,
+  options?: RequestInit,
+): Promise<updateStudyRecordResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getUpdateStudyRecordUrl(studyRecordId), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(updateStudyRecordRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateStudyRecordResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateStudyRecordResponse;
+};
+
+export const getUpdateStudyRecordMutationKey = () =>
+  ["updateStudyRecord"] as const;
+
+export const getUpdateStudyRecordMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateStudyRecord>>,
+    TError,
+    UpdateStudyRecordMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateStudyRecord>>,
+  TError,
+  UpdateStudyRecordMutationVariables,
+  TContext
+> => {
+  const mutationKey = getUpdateStudyRecordMutationKey();
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateStudyRecord>>,
+    UpdateStudyRecordMutationVariables
+  > = (props) => {
+    const { studyRecordId, data } = props ?? {};
+
+    return updateStudyRecord(studyRecordId, data, fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateStudyRecordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateStudyRecord>>
+>;
+export type UpdateStudyRecordMutationBody = UpdateStudyRecordRequest;
+export type UpdateStudyRecordMutationError = void;
+export type UpdateStudyRecordMutationVariables = {
+  studyRecordId: number;
+  data: UpdateStudyRecordRequest;
+};
+
+export const useUpdateStudyRecord = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateStudyRecord>>,
+      TError,
+      UpdateStudyRecordMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateStudyRecord>>,
+  TError,
+  UpdateStudyRecordMutationVariables,
+  TContext
+> => {
+  return useMutation(getUpdateStudyRecordMutationOptions(options), queryClient);
+};

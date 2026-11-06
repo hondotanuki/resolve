@@ -12,3 +12,5 @@ export * from "./createStudyRecordResponse";
 export * from "./getLearningItemResponse";
 export * from "./listLearningItemsResponse";
 export * from "./listStudyRecordsResponse";
+export * from "./updateStudyRecordRequest";
+export * from "./updateStudyRecordResponse";
