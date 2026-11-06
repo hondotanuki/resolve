@@ -191,26 +191,39 @@ public sealed class CreateStudyRecordApiTests
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
-    [Fact]
-    public async Task オフセット付き学習日時はUTCに変換して登録される()
+    [Theory]
+    [InlineData("2026-10-15T18:00:00+09:00")]
+    [InlineData("2026-10-15T04:00:00-05:00")]
+    [InlineData("2026-10-15T09:00:00+00:00")]
+    public async Task UTC以外の日時は400を返す(string studiedAt)
     {
         var learningItemId = await CreateLearningItemAsync();
-        var request = new { result = "success", studiedAt = "2026-10-15T18:00:00+09:00" };
+        var request = new { result = "success", studiedAt };
 
         var response = await _client.PostAsJsonAsync(
             $"/learning-items/{learningItemId}/study-records",
             request
         );
 
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var created = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal("2026-10-15T09:00:00Z", created.GetProperty("studiedAt").GetString());
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 
-        var listResponse = await _client.GetAsync(
-            $"/learning-items/{learningItemId}/study-records"
+    [Fact]
+    public async Task 所要時間に数値文字列は使用できない()
+    {
+        var learningItemId = await CreateLearningItemAsync();
+        var request = new
+        {
+            result = "success",
+            studiedAt = StudiedAt,
+            durationSeconds = "120",
+        };
+
+        var response = await _client.PostAsJsonAsync(
+            $"/learning-items/{learningItemId}/study-records",
+            request
         );
-        Assert.Equal(HttpStatusCode.OK, listResponse.StatusCode);
-        var records = await listResponse.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal("2026-10-15T09:00:00Z", records[0].GetProperty("studiedAt").GetString());
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 }

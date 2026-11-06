@@ -1,6 +1,7 @@
 using Resolve.Api.StudyRecords.Create;
 using Resolve.Api.StudyRecords.Delete;
 using Resolve.Api.StudyRecords.List;
+using Resolve.Api.StudyRecords.Update;
 
 namespace Resolve.Api.StudyRecords;
 
@@ -15,5 +16,6 @@ public static class StudyRecordEndpoints
 
         var studyRecordGroup = app.MapGroup("/study-records");
         studyRecordGroup.MapDeleteStudyRecord();
+        studyRecordGroup.MapUpdateStudyRecord();
     }
 }
