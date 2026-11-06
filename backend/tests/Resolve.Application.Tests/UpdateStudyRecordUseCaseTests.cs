@@ -31,13 +31,14 @@ public sealed class UpdateStudyRecordUseCaseTests
         var originalCreatedAt = record.CreatedAt;
 
         var updatedStudiedAt = StudiedAt.AddDays(1);
-        var input = new UpdateStudyRecordInput(
-            StudyRecordId: 10,
-            StudiedAt: OptionalValue.Of(updatedStudiedAt),
-            Result: default,
-            DurationSeconds: default,
-            Memo: OptionalValue.Of<string?>("訂正後")
-        );
+        var input = new UpdateStudyRecordInput
+        {
+            Id = 10,
+            Result = default,
+            StudiedAt = OptionalValue.Of(updatedStudiedAt),
+            DurationSeconds = default,
+            Memo = OptionalValue.Of<string?>("訂正後"),
+        };
 
         var output = await _useCase.ExecuteAsync(input);
 
@@ -69,13 +70,14 @@ public sealed class UpdateStudyRecordUseCaseTests
         );
         _repository.RecordById = record;
 
-        var input = new UpdateStudyRecordInput(
-            StudyRecordId: 10,
-            StudiedAt: default,
-            Result: default,
-            DurationSeconds: OptionalValue.Of<int?>(null),
-            Memo: OptionalValue.Of<string?>(null)
-        );
+        var input = new UpdateStudyRecordInput
+        {
+            Id = 10,
+            Result = default,
+            StudiedAt = default,
+            DurationSeconds = OptionalValue.Of<int?>(null),
+            Memo = OptionalValue.Of<string?>(null),
+        };
 
         var output = await _useCase.ExecuteAsync(input);
 
@@ -90,13 +92,14 @@ public sealed class UpdateStudyRecordUseCaseTests
     [Fact]
     public async Task 対象が存在しなければ訂正しない()
     {
-        var input = new UpdateStudyRecordInput(
-            StudyRecordId: 999,
-            StudiedAt: default,
-            Result: default,
-            DurationSeconds: default,
-            Memo: default
-        );
+        var input = new UpdateStudyRecordInput
+        {
+            Id = 999,
+            Result = default,
+            StudiedAt = default,
+            DurationSeconds = default,
+            Memo = default,
+        };
 
         var output = await _useCase.ExecuteAsync(input);
 
@@ -117,13 +120,14 @@ public sealed class UpdateStudyRecordUseCaseTests
         );
         _repository.RecordById = record;
 
-        var input = new UpdateStudyRecordInput(
-            StudyRecordId: 10,
-            StudiedAt: default,
-            Result: default,
-            DurationSeconds: OptionalValue.Of<int?>(-1),
-            Memo: OptionalValue.Of<string?>("訂正後")
-        );
+        var input = new UpdateStudyRecordInput
+        {
+            Id = 10,
+            Result = default,
+            StudiedAt = default,
+            DurationSeconds = OptionalValue.Of<int?>(-1),
+            Memo = OptionalValue.Of<string?>("訂正後"),
+        };
 
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _useCase.ExecuteAsync(input));
 

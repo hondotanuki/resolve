@@ -16,7 +16,7 @@ public sealed class UpdateStudyRecordUseCase
         CancellationToken cancellationToken = default
     )
     {
-        var record = await _repository.GetByIdAsync(input.StudyRecordId, cancellationToken);
+        var record = await _repository.GetByIdAsync(input.Id, cancellationToken);
 
         if (record is null)
         {
@@ -38,8 +38,8 @@ public sealed class UpdateStudyRecordUseCase
         return new UpdateStudyRecordOutput(
             record.Id,
             record.LearningItemId,
-            record.StudiedAt,
             record.Result,
+            record.StudiedAt,
             record.DurationSeconds,
             record.Memo,
             record.CreatedAt,
