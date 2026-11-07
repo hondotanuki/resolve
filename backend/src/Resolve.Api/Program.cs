@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Resolve.Api.Contracts;
 using Resolve.Api.LearningItems;
 using Resolve.Api.StudyRecords;
 using Resolve.Application.Interfaces;
@@ -17,7 +18,9 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+    options.AddSchemaTransformer<AllowedValuesSchemaTransformer>()
+);
 builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict
 );

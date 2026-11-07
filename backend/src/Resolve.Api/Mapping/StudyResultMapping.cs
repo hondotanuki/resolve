@@ -1,3 +1,4 @@
+using Resolve.Api.Contracts;
 using Resolve.Domain;
 
 namespace Resolve.Api.Mapping;
@@ -8,13 +9,13 @@ public static class StudyResultMapping
     {
         switch (value)
         {
-            case "success":
+            case ApiValues.StudyResults.Success:
                 studyResult = StudyResult.Success;
                 return true;
-            case "failure":
+            case ApiValues.StudyResults.Failure:
                 studyResult = StudyResult.Failure;
                 return true;
-            case "reviewed":
+            case ApiValues.StudyResults.Reviewed:
                 studyResult = StudyResult.Reviewed;
                 return true;
             default:
@@ -27,9 +28,9 @@ public static class StudyResultMapping
     {
         return studyResult switch
         {
-            StudyResult.Success => "success",
-            StudyResult.Failure => "failure",
-            StudyResult.Reviewed => "reviewed",
+            StudyResult.Success => ApiValues.StudyResults.Success,
+            StudyResult.Failure => ApiValues.StudyResults.Failure,
+            StudyResult.Reviewed => ApiValues.StudyResults.Reviewed,
             _ => throw new ArgumentOutOfRangeException(nameof(studyResult), studyResult, null),
         };
     }

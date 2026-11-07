@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Resolve.Api.Contracts;
 
 namespace Resolve.Api.StudyRecords.Update;
 
@@ -22,6 +23,7 @@ public sealed record UpdateStudyRecordRequest
     [JsonIgnore]
     public bool MemoIsSpecified { get; private set; }
 
+    [ApiAllowedValues(ApiValueSet.StudyResults)]
     public string Result
     {
         get => _result;
