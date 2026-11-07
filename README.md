@@ -38,6 +38,7 @@ Backendは次のURLで起動します。
 
 - API: `http://localhost:5041`
 - OpenAPI: `http://localhost:5041/openapi/v1.json`
+- Scalar: `http://localhost:5041/scalar/v1`
 
 ## フロントエンドの起動
 

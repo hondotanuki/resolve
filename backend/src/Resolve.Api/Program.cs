@@ -12,6 +12,7 @@ using Resolve.Application.StudyRecords.List;
 using Resolve.Application.StudyRecords.Update;
 using Resolve.Infrastructure.Persistence;
 using Resolve.Infrastructure.Persistence.Repositories;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -42,6 +43,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 app.MapLearningItemEndpoints();
 app.MapStudyRecordEndpoints();
