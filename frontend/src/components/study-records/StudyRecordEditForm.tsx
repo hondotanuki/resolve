@@ -2,10 +2,13 @@ import { useState, type SubmitEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
-  useUpdateStudyRecord,
   getListStudyRecordsQueryKey,
   getGetLearningItemByIdQueryKey,
 } from "../../api/generated";
+import {
+  hasStudyRecordUpdate,
+  useStudyRecordUpdate,
+} from "../../api/studyRecordUpdates";
 import {
   UpdateStudyRecordRequestResult,
   type ListStudyRecordsResponse,
@@ -22,7 +25,7 @@ export function StudyRecordEditForm({
   onClose,
 }: StudyRecordEditFormProps) {
   const queryClient = useQueryClient();
-  const updateMutation = useUpdateStudyRecord();
+  const updateMutation = useStudyRecordUpdate();
 
   // 入力
   const initialStudiedAt = format(
@@ -90,17 +93,14 @@ export function StudyRecordEditForm({
       data.memo = memo === "" ? null : memo;
     }
     // 変更なしならPATCHしない
-    if (Object.keys(data).length === 0) {
+    if (!hasStudyRecordUpdate(data)) {
       setNoChangesMessage("変更はありません。");
       return;
     }
 
     // PATCHを実行
     try {
-      const response = await updateMutation.mutateAsync({
-        studyRecordId: record.id,
-        data,
-      });
+      const response = await updateMutation.update(record.id, data);
 
       if (response.status === 400) {
         setApiError("入力内容を確認してください。");
