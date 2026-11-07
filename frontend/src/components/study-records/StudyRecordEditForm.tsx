@@ -7,6 +7,7 @@ import {
   getGetLearningItemByIdQueryKey,
 } from "../../api/generated";
 import {
+  UpdateStudyRecordRequestResult,
   type ListStudyRecordsResponse,
   type UpdateStudyRecordRequest,
 } from "../../api/generated/models";
@@ -142,7 +143,12 @@ export function StudyRecordEditForm({
           <select
             id={`study-result-${record.id}`}
             value={result}
-            onChange={(event) => setResult(event.target.value)}
+            onChange={(event) => {
+              const selected = Object.values(
+                UpdateStudyRecordRequestResult,
+              ).find((value) => value === event.target.value);
+              if (selected) setResult(selected);
+            }}
             className="w-full rounded border border-zinc-300 p-2"
           >
             <option value="success">success</option>

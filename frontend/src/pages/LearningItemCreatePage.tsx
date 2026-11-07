@@ -5,6 +5,7 @@ import {
   useCreateLearningItem,
 } from "../api/generated";
 import { useQueryClient } from "@tanstack/react-query";
+import type { CreateLearningItemRequestItemType } from "../api/generated/models";
 
 const itemTypes = [
   {
@@ -19,13 +20,17 @@ const itemTypes = [
     value: "english_article",
     label: "English Article",
   },
-] as const;
+] as const satisfies ReadonlyArray<{
+  value: CreateLearningItemRequestItemType;
+  label: string;
+}>;
 
 export function LearningItemCreatePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [itemType, setItemType] = useState("algorithm_problem");
+  const [itemType, setItemType] =
+    useState<CreateLearningItemRequestItemType>("algorithm_problem");
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -82,7 +87,12 @@ export function LearningItemCreatePage() {
           <select
             id="itemType"
             value={itemType}
-            onChange={(event) => setItemType(event.target.value)}
+            onChange={(event) => {
+              const selected = itemTypes.find(
+                (item) => item.value === event.target.value,
+              );
+              if (selected) setItemType(selected.value);
+            }}
             className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 outline-none focus:border-zinc-900"
           >
             {itemTypes.map((item) => (

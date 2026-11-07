@@ -5,6 +5,7 @@ import {
   getListStudyRecordsQueryKey,
   useCreateStudyRecord,
 } from "../../api/generated";
+import type { CreateStudyRecordRequestResult } from "../../api/generated/models";
 
 const results = [
   {
@@ -19,7 +20,10 @@ const results = [
     value: "reviewed",
     label: "Reviewed",
   },
-] as const;
+] as const satisfies ReadonlyArray<{
+  value: CreateStudyRecordRequestResult;
+  label: string;
+}>;
 
 type StudyRecordCreateFormProps = {
   learningItemId: number;
@@ -28,7 +32,8 @@ type StudyRecordCreateFormProps = {
 export function StudyRecordCreateForm({
   learningItemId,
 }: StudyRecordCreateFormProps) {
-  const [result, setResult] = useState("success");
+  const [result, setResult] =
+    useState<CreateStudyRecordRequestResult>("success");
   const [studiedAt, setStudiedAt] = useState("");
   const [durationSeconds, setDurationSeconds] = useState("");
   const [memo, setMemo] = useState("");
@@ -118,7 +123,12 @@ export function StudyRecordCreateForm({
             id="results"
             required
             value={result}
-            onChange={(e) => setResult(e.target.value)}
+            onChange={(event) => {
+              const selected = results.find(
+                (item) => item.value === event.target.value,
+              );
+              if (selected) setResult(selected.value);
+            }}
             className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 outline-none focus:border-zinc-900"
           >
             {results.map((result) => (

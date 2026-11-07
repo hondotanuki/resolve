@@ -4,9 +4,10 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { CreateStudyRecordRequestResult } from "./createStudyRecordRequestResult";
 
 export interface CreateStudyRecordRequest {
-  result: string;
+  result: CreateStudyRecordRequestResult;
   studiedAt: string;
   /** @nullable */
   durationSeconds?: number | null;

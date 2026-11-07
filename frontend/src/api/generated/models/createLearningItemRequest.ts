@@ -4,9 +4,10 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { CreateLearningItemRequestItemType } from "./createLearningItemRequestItemType";
 
 export interface CreateLearningItemRequest {
-  itemType: string;
+  itemType: CreateLearningItemRequestItemType;
   title: string;
   /** @nullable */
   content?: string | null;

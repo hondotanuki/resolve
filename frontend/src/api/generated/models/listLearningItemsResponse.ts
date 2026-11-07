@@ -4,10 +4,11 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { ListLearningItemsResponseItemType } from "./listLearningItemsResponseItemType";
 
 export interface ListLearningItemsResponse {
   id: number;
-  itemType: string;
+  itemType: ListLearningItemsResponseItemType;
   title: string;
   /** @nullable */
   archivedAt?: string | null;

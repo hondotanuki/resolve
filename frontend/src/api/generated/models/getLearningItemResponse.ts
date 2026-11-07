@@ -4,12 +4,14 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { GetLearningItemResponseItemType } from "./getLearningItemResponseItemType";
+import type { GetLearningItemResponseStatus } from "./getLearningItemResponseStatus";
 
 export interface GetLearningItemResponse {
   id: number;
-  itemType: string;
+  itemType: GetLearningItemResponseItemType;
   title: string;
-  status: string;
+  status: GetLearningItemResponseStatus;
   /** @nullable */
   content?: string | null;
   /** @nullable */

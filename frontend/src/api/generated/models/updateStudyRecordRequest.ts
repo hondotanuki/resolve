@@ -4,9 +4,10 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { UpdateStudyRecordRequestResult } from "./updateStudyRecordRequestResult";
 
 export interface UpdateStudyRecordRequest {
-  result?: string;
+  result?: UpdateStudyRecordRequestResult;
   studiedAt?: string;
   /** @nullable */
   durationSeconds?: number | null;

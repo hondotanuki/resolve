@@ -4,11 +4,13 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { CreateStudyRecordResponseResult } from "./createStudyRecordResponseResult";
+import type { CreateStudyRecordResponseStatus } from "./createStudyRecordResponseStatus";
 
 export interface CreateStudyRecordResponse {
   id: number;
   learningItemId: number;
-  result: string;
+  result: CreateStudyRecordResponseResult;
   studiedAt: string;
   /** @nullable */
   durationSeconds?: number | null;
@@ -16,5 +18,5 @@ export interface CreateStudyRecordResponse {
   memo?: string | null;
   createdAt: string;
   updatedAt: string;
-  status: string;
+  status: CreateStudyRecordResponseStatus;
 }
