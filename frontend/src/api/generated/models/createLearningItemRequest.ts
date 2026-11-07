@@ -8,6 +8,10 @@ import type { CreateLearningItemRequestItemType } from "./createLearningItemRequ
 
 export interface CreateLearningItemRequest {
   itemType: CreateLearningItemRequestItemType;
+  /**
+   * 空文字または空白文字のみのタイトルは指定できません。
+   * @minLength 1
+   */
   title: string;
   /** @nullable */
   content?: string | null;

@@ -8,8 +8,13 @@ import type { UpdateStudyRecordRequestResult } from "./updateStudyRecordRequestR
 
 export interface UpdateStudyRecordRequest {
   result?: UpdateStudyRecordRequestResult;
+  /** UTCの日時をZ付きで指定してください。DateTimeの初期値は指定できません。 */
   studiedAt?: string;
-  /** @nullable */
+  /**
+   * @minimum 0
+   * @maximum 2147483647
+   * @nullable
+   */
   durationSeconds?: number | null;
   /** @nullable */
   memo?: string | null;
