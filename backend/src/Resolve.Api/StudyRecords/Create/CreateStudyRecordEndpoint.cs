@@ -22,6 +22,11 @@ public static class CreateStudyRecordEndpoint
                         return Results.BadRequest();
                     }
 
+                    if (request.StudiedAt.Kind != DateTimeKind.Utc)
+                    {
+                        return Results.BadRequest();
+                    }
+
                     var input = new CreateStudyRecordInput
                     {
                         LearningItemId = learningItemId,
@@ -30,6 +35,7 @@ public static class CreateStudyRecordEndpoint
                         DurationSeconds = request.DurationSeconds,
                         Memo = request.Memo,
                     };
+
                     try
                     {
                         var output = await useCase.ExecuteAsync(input, cancellationToken);

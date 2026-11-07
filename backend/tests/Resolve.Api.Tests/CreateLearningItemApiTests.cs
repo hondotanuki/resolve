@@ -4,13 +4,27 @@ using System.Text.Json;
 
 namespace Resolve.Api.Tests;
 
-public sealed class CreateLearningItemApiTests : IClassFixture<CustomWebApplicationFactory<Program>>
+public sealed class CreateLearningItemApiTests
+    : IClassFixture<CustomWebApplicationFactory<Program>>,
+        IAsyncLifetime
 {
+    private readonly CustomWebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
     public CreateLearningItemApiTests(CustomWebApplicationFactory<Program> factory)
     {
+        _factory = factory;
         _client = factory.CreateClient();
+    }
+
+    public Task InitializeAsync()
+    {
+        return _factory.ResetDatabaseAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact]

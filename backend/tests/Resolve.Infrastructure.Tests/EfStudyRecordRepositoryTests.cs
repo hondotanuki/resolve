@@ -245,6 +245,104 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         Assert.Empty(actual);
     }
 
+    [Fact]
+    public async Task 訂正した学習記録をDBに保存できる()
+    {
+        // Arrange
+        var created = await CreateStudyRecordAsync();
+
+        var originalCreatedAt = created.CreatedAt;
+        var studyRecordId = created.Id;
+        var learningItemId = created.LearningItemId;
+
+        _dbContext.ChangeTracker.Clear();
+
+        var record = await _repository.GetByIdAsync(studyRecordId);
+        Assert.NotNull(record);
+
+        var updatedStudiedAt = StudiedAt.AddDays(1);
+
+        // Act
+        var before = DateTime.UtcNow;
+
+        record.Update(StudyResult.Success, updatedStudiedAt, durationSeconds: 600, memo: "訂正後");
+
+        await _repository.UpdateAsync(record);
+
+        var after = DateTime.UtcNow;
+
+        // DBから再取得
+        _dbContext.ChangeTracker.Clear();
+
+        var actual = await _dbContext
+            .StudyRecords.AsNoTracking()
+            .SingleAsync(x => x.Id == studyRecordId);
+
+        // Assert
+        Assert.Equal(studyRecordId, actual.Id);
+        Assert.Equal(learningItemId, actual.LearningItemId);
+        Assert.Equal(updatedStudiedAt, actual.StudiedAt);
+        Assert.Equal(StudyResult.Success, actual.Result);
+        Assert.Equal(600, actual.DurationSeconds);
+        Assert.Equal("訂正後", actual.Memo);
+        Assert.Equal(originalCreatedAt, actual.CreatedAt);
+        Assert.InRange(actual.UpdatedAt, before, after);
+        Assert.Equal(DateTimeKind.Utc, actual.StudiedAt.Kind);
+    }
+
+    [Fact]
+    public async Task 学習記録をDBから削除できる()
+    {
+        // Arrange
+        var created = await CreateStudyRecordAsync();
+        var studyRecordId = created.Id;
+
+        _dbContext.ChangeTracker.Clear();
+
+        var record = await _repository.GetByIdAsync(studyRecordId);
+        Assert.NotNull(record);
+
+        // Act
+        await _repository.DeleteAsync(record);
+
+        _dbContext.ChangeTracker.Clear();
+
+        var actual = await _dbContext
+            .StudyRecords.AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == studyRecordId);
+
+        // Assert
+        Assert.Null(actual);
+    }
+
+    [Fact]
+    public async Task 存在しないIDならnullを返す()
+    {
+        // Act
+        var actual = await _repository.GetByIdAsync(999);
+
+        // Assert
+        Assert.Null(actual);
+    }
+
+    private async Task<StudyRecord> CreateStudyRecordAsync()
+    {
+        var learningItem = new LearningItem(ItemType.AlgorithmProblem, "二分探索", null);
+
+        _dbContext.LearningItems.Add(learningItem);
+        await _dbContext.SaveChangesAsync();
+
+        var record = new StudyRecord(
+            learningItem.Id,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 1800,
+            memo: "訂正前"
+        );
+
+        return await _repository.CreateAsync(record);
+    }
+
     public void Dispose()
     {
         _dbContext.Dispose();

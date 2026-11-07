@@ -8,11 +8,8 @@
 export interface CreateStudyRecordRequest {
   result: string;
   studiedAt: string;
-  /**
-   * @nullable
-   * @pattern ^-?(?:0|[1-9]\d*)$
-   */
-  durationSeconds?: number | string | null;
+  /** @nullable */
+  durationSeconds?: number | null;
   /** @nullable */
   memo?: string | null;
 }

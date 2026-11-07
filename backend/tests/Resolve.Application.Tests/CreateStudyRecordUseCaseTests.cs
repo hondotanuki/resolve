@@ -7,6 +7,16 @@ namespace Resolve.Application.Tests;
 public sealed class CreateStudyRecordUseCaseTests
 {
     private static readonly DateTime StudiedAt = new(2026, 10, 15, 9, 0, 0, DateTimeKind.Utc);
+    private readonly FakeLearningItemRepository _learningItemRepository;
+    private readonly FakeStudyRecordRepository _studyRecordRepository;
+    private readonly CreateStudyRecordUseCase _useCase;
+
+    public CreateStudyRecordUseCaseTests()
+    {
+        _learningItemRepository = new FakeLearningItemRepository();
+        _studyRecordRepository = new FakeStudyRecordRepository();
+        _useCase = new CreateStudyRecordUseCase(_learningItemRepository, _studyRecordRepository);
+    }
 
     private static CreateStudyRecordInput CreateInput()
     {
@@ -20,23 +30,15 @@ public sealed class CreateStudyRecordUseCaseTests
         };
     }
 
-    private static FakeLearningItemRepository CreateLearningItemRepository()
-    {
-        return new FakeLearningItemRepository
-        {
-            GetByIdResult = new LearningItem(
-                ItemType.AlgorithmProblem,
-                "二分探索",
-                "二分探索を解く"
-            ),
-        };
-    }
-
     [Fact]
     public async Task 正常な入力で記録を保存して現在状態を返す()
     {
         // Arrange
-        FakeLearningItemRepository learningItemRepository = CreateLearningItemRepository();
+        _learningItemRepository.GetByIdResult = new LearningItem(
+            ItemType.AlgorithmProblem,
+            "二分探索",
+            "二分探索を解く"
+        );
 
         // 保存結果。入力とは異なるMemo・DurationSecondsを設定する。
         StudyRecord savedRecord = new(
@@ -50,24 +52,19 @@ public sealed class CreateStudyRecordUseCaseTests
         // 過去の記録を追加した場合、最新記録は別に存在する。
         StudyRecord latestRecord = new(1, StudyResult.Failure, StudiedAt.AddDays(3));
 
-        FakeStudyRecordRepository studyRecordRepository = new()
-        {
-            CreateResult = savedRecord,
-            LatestRecord = latestRecord,
-        };
-
-        CreateStudyRecordUseCase useCase = new(learningItemRepository, studyRecordRepository);
+        _studyRecordRepository.CreateResult = savedRecord;
+        _studyRecordRepository.LatestRecord = latestRecord;
         CreateStudyRecordInput input = CreateInput();
 
         // Act
         CreateStudyRecordOutput output = Assert.IsType<CreateStudyRecordOutput>(
-            await useCase.ExecuteAsync(input)
+            await _useCase.ExecuteAsync(input)
         );
 
         // Assert: 保存処理
-        Assert.Equal(1, studyRecordRepository.CreateCallCount);
+        Assert.Equal(1, _studyRecordRepository.CreateCallCount);
 
-        StudyRecord received = Assert.IsType<StudyRecord>(studyRecordRepository.ReceivedRecord);
+        StudyRecord received = Assert.IsType<StudyRecord>(_studyRecordRepository.ReceivedRecord);
 
         Assert.Equal(input.LearningItemId, received.LearningItemId);
         Assert.Equal(input.Result, received.Result);
@@ -76,8 +73,8 @@ public sealed class CreateStudyRecordUseCaseTests
         Assert.Equal(input.Memo, received.Memo);
 
         // Assert: 最新記録の取得
-        Assert.Equal(1, studyRecordRepository.GetLatestCallCount);
-        Assert.Equal(1, studyRecordRepository.LastRequestedLearningItemId);
+        Assert.Equal(1, _studyRecordRepository.GetLatestCallCount);
+        Assert.Equal(1, _studyRecordRepository.LastRequestedLearningItemId);
 
         // Assert: Outputには保存結果を反映
         Assert.Equal(savedRecord.Id, output.Id);
@@ -96,94 +93,87 @@ public sealed class CreateStudyRecordUseCaseTests
     [Fact]
     public async Task LearningItemが存在しなければnullを返して保存しない()
     {
-        FakeLearningItemRepository learningItemRepository = new() { GetByIdResult = null };
-        FakeStudyRecordRepository studyRecordRepository = new();
-
-        CreateStudyRecordUseCase useCase = new(learningItemRepository, studyRecordRepository);
-
-        CreateStudyRecordOutput? output = await useCase.ExecuteAsync(CreateInput());
+        CreateStudyRecordOutput? output = await _useCase.ExecuteAsync(CreateInput());
 
         Assert.Null(output);
-        Assert.Equal(0, studyRecordRepository.CreateCallCount);
-        Assert.Equal(0, studyRecordRepository.GetLatestCallCount);
+        Assert.Equal(0, _studyRecordRepository.CreateCallCount);
+        Assert.Equal(0, _studyRecordRepository.GetLatestCallCount);
     }
 
     [Fact]
     public async Task 不正なStudyResultなら保存しない()
     {
-        FakeLearningItemRepository learningItemRepository = CreateLearningItemRepository();
-        FakeStudyRecordRepository studyRecordRepository = new();
-
-        CreateStudyRecordUseCase useCase = new(learningItemRepository, studyRecordRepository);
+        _learningItemRepository.GetByIdResult = new LearningItem(
+            ItemType.AlgorithmProblem,
+            "二分探索"
+        );
 
         CreateStudyRecordInput input = CreateInput() with { Result = (StudyResult)999 };
 
         _ = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
-            useCase.ExecuteAsync(input)
+            _useCase.ExecuteAsync(input)
         );
 
-        Assert.Equal(0, studyRecordRepository.CreateCallCount);
-        Assert.Equal(0, studyRecordRepository.GetLatestCallCount);
+        Assert.Equal(0, _studyRecordRepository.CreateCallCount);
+        Assert.Equal(0, _studyRecordRepository.GetLatestCallCount);
     }
 
     [Fact]
     public async Task 負のDurationSecondsなら保存しない()
     {
-        FakeLearningItemRepository learningItemRepository = CreateLearningItemRepository();
-        FakeStudyRecordRepository studyRecordRepository = new();
-
-        CreateStudyRecordUseCase useCase = new(learningItemRepository, studyRecordRepository);
+        _learningItemRepository.GetByIdResult = new LearningItem(
+            ItemType.AlgorithmProblem,
+            "二分探索"
+        );
 
         CreateStudyRecordInput input = CreateInput() with { DurationSeconds = -1 };
 
         _ = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
-            useCase.ExecuteAsync(input)
+            _useCase.ExecuteAsync(input)
         );
 
-        Assert.Equal(0, studyRecordRepository.CreateCallCount);
-        Assert.Equal(0, studyRecordRepository.GetLatestCallCount);
+        Assert.Equal(0, _studyRecordRepository.CreateCallCount);
+        Assert.Equal(0, _studyRecordRepository.GetLatestCallCount);
     }
 
     [Fact]
     public async Task StudiedAtが未設定なら保存しない()
     {
-        FakeLearningItemRepository learningItemRepository = CreateLearningItemRepository();
-        FakeStudyRecordRepository studyRecordRepository = new();
-
-        CreateStudyRecordUseCase useCase = new(learningItemRepository, studyRecordRepository);
+        _learningItemRepository.GetByIdResult = new LearningItem(
+            ItemType.AlgorithmProblem,
+            "二分探索"
+        );
 
         CreateStudyRecordInput input = CreateInput() with { StudiedAt = default };
 
-        _ = await Assert.ThrowsAsync<ArgumentException>(() => useCase.ExecuteAsync(input));
+        _ = await Assert.ThrowsAsync<ArgumentException>(() => _useCase.ExecuteAsync(input));
 
-        Assert.Equal(0, studyRecordRepository.CreateCallCount);
-        Assert.Equal(0, studyRecordRepository.GetLatestCallCount);
+        Assert.Equal(0, _studyRecordRepository.CreateCallCount);
+        Assert.Equal(0, _studyRecordRepository.GetLatestCallCount);
     }
 
     [Fact]
     public async Task DurationSecondsとMemoは省略できる()
     {
-        FakeLearningItemRepository learningItemRepository = CreateLearningItemRepository();
+        _learningItemRepository.GetByIdResult = new LearningItem(
+            ItemType.AlgorithmProblem,
+            "二分探索"
+        );
 
         StudyRecord savedRecord = new(1, StudyResult.Success, StudiedAt);
 
-        FakeStudyRecordRepository studyRecordRepository = new()
-        {
-            CreateResult = savedRecord,
-            LatestRecord = savedRecord,
-        };
-
-        CreateStudyRecordUseCase useCase = new(learningItemRepository, studyRecordRepository);
+        _studyRecordRepository.CreateResult = savedRecord;
+        _studyRecordRepository.LatestRecord = savedRecord;
 
         CreateStudyRecordInput input = CreateInput() with { DurationSeconds = null, Memo = null };
 
         CreateStudyRecordOutput output = Assert.IsType<CreateStudyRecordOutput>(
-            await useCase.ExecuteAsync(input)
+            await _useCase.ExecuteAsync(input)
         );
 
         Assert.Null(output.DurationSeconds);
         Assert.Null(output.Memo);
         Assert.Equal(ItemStatus.Completed, output.Status);
-        Assert.Equal(1, studyRecordRepository.CreateCallCount);
+        Assert.Equal(1, _studyRecordRepository.CreateCallCount);
     }
 }
