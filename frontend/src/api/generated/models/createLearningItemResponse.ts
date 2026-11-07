@@ -11,5 +11,5 @@ export interface CreateLearningItemResponse {
   itemType: CreateLearningItemResponseItemType;
   title: string;
   /** @nullable */
-  archivedAt?: string | null;
+  archivedAt: string | null;
 }

@@ -10,6 +10,6 @@ public sealed record ListStudyRecordsResponse
     [ApiAllowedValues(ApiValueSet.StudyResults)]
     public required string Result { get; init; }
     public required DateTime StudiedAt { get; init; }
-    public int? DurationSeconds { get; init; }
-    public string? Memo { get; init; }
+    public required int? DurationSeconds { get; init; }
+    public required string? Memo { get; init; }
 }

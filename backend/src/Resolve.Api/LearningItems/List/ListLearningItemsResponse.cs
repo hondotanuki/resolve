@@ -9,5 +9,5 @@ public sealed record ListLearningItemsResponse
     [ApiAllowedValues(ApiValueSet.ItemTypes)]
     public required string ItemType { get; init; }
     public required string Title { get; init; }
-    public DateTime? ArchivedAt { get; init; }
+    public required DateTime? ArchivedAt { get; init; }
 }

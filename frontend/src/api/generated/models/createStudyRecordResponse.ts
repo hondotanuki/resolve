@@ -13,9 +13,9 @@ export interface CreateStudyRecordResponse {
   result: CreateStudyRecordResponseResult;
   studiedAt: string;
   /** @nullable */
-  durationSeconds?: number | null;
+  durationSeconds: number | null;
   /** @nullable */
-  memo?: string | null;
+  memo: string | null;
   createdAt: string;
   updatedAt: string;
   status: CreateStudyRecordResponseStatus;

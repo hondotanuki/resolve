@@ -13,9 +13,9 @@ export interface GetLearningItemResponse {
   title: string;
   status: GetLearningItemResponseStatus;
   /** @nullable */
-  content?: string | null;
+  content: string | null;
   /** @nullable */
-  archivedAt?: string | null;
+  archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

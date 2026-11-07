@@ -12,8 +12,8 @@ public sealed record GetLearningItemResponse
 
     [ApiAllowedValues(ApiValueSet.ItemStatuses)]
     public required string Status { get; init; }
-    public string? Content { get; init; }
-    public DateTime? ArchivedAt { get; init; }
+    public required string? Content { get; init; }
+    public required DateTime? ArchivedAt { get; init; }
     public required DateTime CreatedAt { get; init; }
     public required DateTime UpdatedAt { get; init; }
 };

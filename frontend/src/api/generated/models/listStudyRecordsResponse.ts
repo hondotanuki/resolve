@@ -12,7 +12,7 @@ export interface ListStudyRecordsResponse {
   result: ListStudyRecordsResponseResult;
   studiedAt: string;
   /** @nullable */
-  durationSeconds?: number | null;
+  durationSeconds: number | null;
   /** @nullable */
-  memo?: string | null;
+  memo: string | null;
 }
