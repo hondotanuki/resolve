@@ -4,14 +4,15 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { ListStudyRecordsResponseResult } from "./listStudyRecordsResponseResult";
 
 export interface ListStudyRecordsResponse {
   id: number;
   learningItemId: number;
-  result: string;
+  result: ListStudyRecordsResponseResult;
   studiedAt: string;
   /** @nullable */
-  durationSeconds?: number | null;
+  durationSeconds: number | null;
   /** @nullable */
-  memo?: string | null;
+  memo: string | null;
 }

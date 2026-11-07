@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace Resolve.Api.Tests;
@@ -56,6 +57,39 @@ public sealed class CreateLearningItemApiTests
         var response = await _client.PostAsJsonAsync("/learning-items", request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task 必須項目の名前が大文字小文字まで一致しなければ400を返す()
+    {
+        using var request = new StringContent(
+            """{"ItemType":"algorithm_problem","title":"二分探索"}""",
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var response = await _client.PostAsync("/learning-items", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task 任意項目の名前が一致しなければ未知の項目として無視する()
+    {
+        using var request = new StringContent(
+            """{"itemType":"algorithm_problem","title":"二分探索","Content":"本文"}""",
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var response = await _client.PostAsync("/learning-items", request);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var created = await response.Content.ReadFromJsonAsync<JsonElement>();
+        var detail = await _client.GetFromJsonAsync<JsonElement>(
+            $"/learning-items/{created.GetProperty("id").GetInt32()}"
+        );
+
+        Assert.Equal(JsonValueKind.Null, detail.GetProperty("content").ValueKind);
     }
 
     [Fact]

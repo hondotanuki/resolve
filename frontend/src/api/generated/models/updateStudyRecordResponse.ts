@@ -4,16 +4,17 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { UpdateStudyRecordResponseResult } from "./updateStudyRecordResponseResult";
 
 export interface UpdateStudyRecordResponse {
   id: number;
   learningItemId: number;
-  result: string;
+  result: UpdateStudyRecordResponseResult;
   studiedAt: string;
   /** @nullable */
-  durationSeconds?: number | null;
+  durationSeconds: number | null;
   /** @nullable */
-  memo?: string | null;
+  memo: string | null;
   createdAt: string;
   updatedAt: string;
 }

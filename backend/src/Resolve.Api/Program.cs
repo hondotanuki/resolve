@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Resolve.Api.Contracts;
 using Resolve.Api.LearningItems;
 using Resolve.Api.StudyRecords;
 using Resolve.Application.Interfaces;
@@ -12,14 +13,21 @@ using Resolve.Application.StudyRecords.List;
 using Resolve.Application.StudyRecords.Update;
 using Resolve.Infrastructure.Persistence;
 using Resolve.Infrastructure.Persistence.Repositories;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddSchemaTransformer<AllowedValuesSchemaTransformer>();
+    options.AddSchemaTransformer<UpdateStudyRecordSchemaTransformer>();
+});
 builder.Services.ConfigureHttpJsonOptions(options =>
-    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict
-);
+{
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+    options.SerializerOptions.PropertyNameCaseInsensitive = false;
+});
 builder.Services.AddDbContext<ResolveDbContext>(options =>
 {
     options.UseSqlite(connectionString);
@@ -42,6 +50,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 app.MapLearningItemEndpoints();
 app.MapStudyRecordEndpoints();

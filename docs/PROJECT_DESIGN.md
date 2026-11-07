@@ -825,11 +825,13 @@ LearningItem 1 --- N StudyRecord
 
 ## 8.1 API一覧
 
-日時はUTCを基準に扱う。学習日時のAPI入力はUTCとして受け付け、UTC以外またはタイムゾーン情報がない入力は拒否する。フロントエンドは利用者のローカル時刻で入力し、UTCへ変換して送信する。APIはUTCを明示して日時を返し、フロントエンドはローカル時刻で表示する。
+日時はUTCを基準に扱う。学習日時のAPI入力はUTCとして受け付け、UTC以外またはタイムゾーン情報がない入力は拒否する。現在の実装は `Z` 付きのUTC日時を受け付け、`+00:00` を含むオフセット付き日時は拒否する。フロントエンドは利用者のローカル時刻で入力し、UTCへ変換して送信する。APIはUTCを明示して日時を返し、フロントエンドはローカル時刻で表示する。
 
-所要時間のAPI入力はJSONの数値またはnullとし、数値文字列は受け付けない。
+所要時間のAPI入力は0以上の32ビット整数またはnullとし、数値文字列や小数は受け付けない。
 
 SQLiteに保存する日時はUTCとし、読み出し時にもUTCとして扱う。過去のデータは保存時の意味を確認してから移行し、タイムゾーン不明の値を無条件に変換しない。
+
+次の一覧と以降の例には、未実装の機能も含む。実装済みAPIの現在の契約は後述の「実装済みAPIの契約」とOpenAPIを参照する。
 
 | Method | Path | Purpose |
 | --- | --- | --- |
@@ -848,7 +850,19 @@ SQLiteに保存する日時はUTCとし、読み出し時にもUTCとして扱�
 | PATCH | /item-tags/{id} | タグ候補の確認 |
 | GET | /review-items | 復習対象取得 |
 
+### 実装済みAPIの契約
+
+- 学習対象の `itemType` は `algorithm_problem`・`english_word`・`english_article`、学習結果の `result` は `success`・`failure`・`reviewed`、現在状態の `status` は `unstarted`・`needs_review`・`completed` を使用する。
+- 学習対象の `title` は必須で、空文字や空白文字のみは受け付けない。学習記録の `studiedAt` は登録時必須で、日時の初期値は受け付けない。
+- レスポンスの `archivedAt`・`content`・`durationSeconds`・`memo` は、該当する項目が存在するレスポンスでは省略せず、値がなければ `null` を返す。
+- `PATCH /study-records/{id}` は `result`・`studiedAt`・`durationSeconds`・`memo` のうち1項目以上を指定する。省略した項目は変更しない。`durationSeconds`・`memo` は `null` で消去でき、`result`・`studiedAt` に `null` は指定できない。空の更新は400を返す。
+- JSONの項目名は大文字・小文字を区別し、OpenAPIに記載されたcamelCaseを使う。未知の項目は無視するため、既知の項目と混在する場合は既知の項目だけを扱う。未知の項目だけでは更新にならず400を返す。
+- StudyRecordの登録時に返すLocationは `/study-records/{id}`。このURIではPATCH・DELETEを利用できるが、単体GETは未実装であり、復習対象の推薦に取り組む際に追加する方針とする。
+- OpenAPIとScalarはDevelopment環境で提供する。OpenAPIの `anyOf` はPATCHに1項目以上必要なことを表すが、Orvalの生成型だけではこの制約を表現できない。Frontendでは生成型を基にした更新用ラッパーで補う。空白のみのタイトル・UTC限定・日時の初期値拒否はOpenAPIの説明と実行時の検証で示す。
+
 ## 8.2 POST /learning-items
+
+以下は出典・タグ・難易度を含む将来の設計例であり、現在の実装ではこれらの入力はまだ提供していない。
 
 ### Request
 

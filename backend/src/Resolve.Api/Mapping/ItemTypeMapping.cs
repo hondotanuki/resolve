@@ -1,3 +1,4 @@
+using Resolve.Api.Contracts;
 using Resolve.Domain;
 
 namespace Resolve.Api.Mapping;
@@ -8,15 +9,15 @@ public static class ItemTypeMapping
     {
         switch (value)
         {
-            case "algorithm_problem":
+            case ApiValues.ItemTypes.AlgorithmProblem:
                 itemType = ItemType.AlgorithmProblem;
                 return true;
 
-            case "english_word":
+            case ApiValues.ItemTypes.EnglishWord:
                 itemType = ItemType.EnglishWord;
                 return true;
 
-            case "english_article":
+            case ApiValues.ItemTypes.EnglishArticle:
                 itemType = ItemType.EnglishArticle;
                 return true;
 
@@ -30,11 +31,11 @@ public static class ItemTypeMapping
     {
         return itemType switch
         {
-            ItemType.AlgorithmProblem => "algorithm_problem",
+            ItemType.AlgorithmProblem => ApiValues.ItemTypes.AlgorithmProblem,
 
-            ItemType.EnglishWord => "english_word",
+            ItemType.EnglishWord => ApiValues.ItemTypes.EnglishWord,
 
-            ItemType.EnglishArticle => "english_article",
+            ItemType.EnglishArticle => ApiValues.ItemTypes.EnglishArticle,
 
             _ => throw new ArgumentOutOfRangeException(nameof(itemType), itemType, null),
         };

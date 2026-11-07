@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 
 namespace Resolve.Api.Tests;
@@ -42,6 +43,22 @@ public sealed class CreateStudyRecordApiTests
 
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
         return json.GetProperty("id").GetInt32();
+    }
+
+    [Theory]
+    [InlineData("""{"Result":"success","studiedAt":"2026-10-15T09:00:00Z"}""")]
+    [InlineData("""{"result":"success","StudiedAt":"2026-10-15T09:00:00Z"}""")]
+    public async Task 必須項目の名前が大文字小文字まで一致しなければ400を返す(string json)
+    {
+        var learningItemId = await CreateLearningItemAsync();
+        using var request = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _client.PostAsync(
+            $"/learning-items/{learningItemId}/study-records",
+            request
+        );
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]

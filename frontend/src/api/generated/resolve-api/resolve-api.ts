@@ -1038,6 +1038,9 @@ export const getUpdateStudyRecordUrl = (studyRecordId: number) => {
   return `/api/study-records/${studyRecordId}`;
 };
 
+/**
+ * 更新項目を1つ以上指定してください。APIは項目名の大文字・小文字を区別し、未知の項目は無視します。
+ */
 export const updateStudyRecord = async (
   studyRecordId: number,
   updateStudyRecordRequest: UpdateStudyRecordRequest,

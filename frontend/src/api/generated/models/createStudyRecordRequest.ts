@@ -4,11 +4,17 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { CreateStudyRecordRequestResult } from "./createStudyRecordRequestResult";
 
 export interface CreateStudyRecordRequest {
-  result: string;
+  result: CreateStudyRecordRequestResult;
+  /** UTCの日時をZ付きで指定してください。DateTimeの初期値は指定できません。 */
   studiedAt: string;
-  /** @nullable */
+  /**
+   * @minimum 0
+   * @maximum 2147483647
+   * @nullable
+   */
   durationSeconds?: number | null;
   /** @nullable */
   memo?: string | null;

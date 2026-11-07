@@ -1,5 +1,8 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Resolve.Api.Contracts;
 
 namespace Resolve.Api.StudyRecords.Update;
 
@@ -22,6 +25,7 @@ public sealed record UpdateStudyRecordRequest
     [JsonIgnore]
     public bool MemoIsSpecified { get; private set; }
 
+    [ApiAllowedValues(ApiValueSet.StudyResults)]
     public string Result
     {
         get => _result;
@@ -32,6 +36,7 @@ public sealed record UpdateStudyRecordRequest
         }
     }
 
+    [Description("UTCの日時をZ付きで指定してください。DateTimeの初期値は指定できません。")]
     public DateTime StudiedAt
     {
         get => _studiedAt;
@@ -42,6 +47,7 @@ public sealed record UpdateStudyRecordRequest
         }
     }
 
+    [Range(0, int.MaxValue)]
     public int? DurationSeconds
     {
         get => _durationSeconds;

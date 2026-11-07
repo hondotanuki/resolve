@@ -9,6 +9,13 @@ public sealed class UpdateStudyRecordApiTests
     : IClassFixture<CustomWebApplicationFactory<Program>>,
         IAsyncLifetime
 {
+    private static readonly string[] UpdatePropertyNames =
+    [
+        "durationSeconds",
+        "memo",
+        "result",
+        "studiedAt",
+    ];
     private readonly CustomWebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
@@ -140,6 +147,9 @@ public sealed class UpdateStudyRecordApiTests
 
     [Theory]
     [InlineData("{}")]
+    [InlineData("""{"unknown":1}""")]
+    [InlineData("""{"Result":"success"}""")]
+    [InlineData("""{"Memo":"訂正後"}""")]
     [InlineData("""{"result":null}""")]
     [InlineData("""{"result":"invalid"}""")]
     [InlineData("""{"studiedAt":null}""")]
@@ -175,6 +185,39 @@ public sealed class UpdateStudyRecordApiTests
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 
+    [Theory]
+    [InlineData("""{"result":"success","unknown":1}""")]
+    [InlineData("""{"result":"success","memo":null}""")]
+    public async Task 既知の更新項目があれば未知の項目や複数項目を受け付ける(string json)
+    {
+        var itemId = await CreateLearningItemAsync();
+        var recordId = await CreateStudyRecordAsync(itemId, "2026-10-15T09:00:00Z", "failure");
+
+        var response = await PatchAsync(recordId, json);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var records = await GetRecordsAsync(itemId);
+        Assert.Equal("success", records[0].GetProperty("result").GetString());
+        if (json.Contains("\"memo\"", StringComparison.Ordinal))
+        {
+            Assert.Equal(JsonValueKind.Null, records[0].GetProperty("memo").ValueKind);
+        }
+    }
+
+    [Fact]
+    public async Task 項目名が大文字小文字まで一致する値だけを更新する()
+    {
+        var itemId = await CreateLearningItemAsync();
+        var recordId = await CreateStudyRecordAsync(itemId, "2026-10-15T09:00:00Z", "failure");
+
+        var response = await PatchAsync(recordId, """{"memo":"訂正後","Result":"success"}""");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var records = await GetRecordsAsync(itemId);
+        Assert.Equal("failure", records[0].GetProperty("result").GetString());
+        Assert.Equal("訂正後", records[0].GetProperty("memo").GetString());
+    }
+
     [Fact]
     public async Task OpenAPIに更新項目の省略とnullの契約が反映される()
     {
@@ -185,6 +228,7 @@ public sealed class UpdateStudyRecordApiTests
             .GetProperty("paths")
             .GetProperty("/study-records/{studyRecordId}")
             .GetProperty("patch");
+        Assert.Contains("更新項目を1つ以上", patch.GetProperty("description").GetString());
         var responses = patch.GetProperty("responses");
         Assert.True(responses.TryGetProperty("200", out _));
         Assert.True(responses.TryGetProperty("400", out _));
@@ -194,10 +238,23 @@ public sealed class UpdateStudyRecordApiTests
             .GetProperty("components")
             .GetProperty("schemas")
             .GetProperty("UpdateStudyRecordRequest");
+        Assert.False(requestSchema.TryGetProperty("description", out _));
         var properties = requestSchema.GetProperty("properties");
         Assert.False(
             requestSchema.TryGetProperty("required", out var required)
                 && required.GetArrayLength() != 0
+        );
+        var alternatives = requestSchema.GetProperty("anyOf").EnumerateArray().ToArray();
+        Assert.Equal(4, alternatives.Length);
+        Assert.All(
+            alternatives,
+            alternative => Assert.Single(alternative.GetProperty("required").EnumerateArray())
+        );
+        Assert.Equal(
+            UpdatePropertyNames,
+            alternatives
+                .Select(alternative => alternative.GetProperty("required")[0].GetString())
+                .Order()
         );
         Assert.Equal("string", properties.GetProperty("result").GetProperty("type").GetString());
         Assert.Equal("string", properties.GetProperty("studiedAt").GetProperty("type").GetString());

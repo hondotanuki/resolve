@@ -1,3 +1,4 @@
+using Resolve.Api.Contracts;
 using Resolve.Domain;
 
 namespace Resolve.Api.Mapping;
@@ -8,9 +9,9 @@ public static class ItemStatusMapping
     {
         return itemStatus switch
         {
-            ItemStatus.Unstarted => "unstarted",
-            ItemStatus.NeedsReview => "needs_review",
-            ItemStatus.Completed => "completed",
+            ItemStatus.Unstarted => ApiValues.ItemStatuses.Unstarted,
+            ItemStatus.NeedsReview => ApiValues.ItemStatuses.NeedsReview,
+            ItemStatus.Completed => ApiValues.ItemStatuses.Completed,
             _ => throw new ArgumentOutOfRangeException(nameof(itemStatus), itemStatus, null),
         };
     }
