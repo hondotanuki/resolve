@@ -19,8 +19,10 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddOpenApi(options =>
-    options.AddSchemaTransformer<AllowedValuesSchemaTransformer>()
-);
+{
+    options.AddSchemaTransformer<AllowedValuesSchemaTransformer>();
+    options.AddSchemaTransformer<UpdateStudyRecordSchemaTransformer>();
+});
 builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict
 );

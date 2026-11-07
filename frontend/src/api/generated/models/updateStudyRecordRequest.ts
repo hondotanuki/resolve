@@ -6,7 +6,7 @@
  */
 import type { UpdateStudyRecordRequestResult } from "./updateStudyRecordRequestResult";
 
-export interface UpdateStudyRecordRequest {
+export type UpdateStudyRecordRequest = unknown & {
   result?: UpdateStudyRecordRequestResult;
   /** UTCの日時をZ付きで指定してください。DateTimeの初期値は指定できません。 */
   studiedAt?: string;
@@ -18,4 +18,4 @@ export interface UpdateStudyRecordRequest {
   durationSeconds?: number | null;
   /** @nullable */
   memo?: string | null;
-}
+};
