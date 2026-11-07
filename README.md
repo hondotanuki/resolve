@@ -49,12 +49,15 @@ npm install
 npm run dev
 ```
 
-Frontendは、開発時に`/learning-items`へのリクエストをBackendへ転送します。
+Frontendは、開発時に`/api/learning-items`と`/api/study-records`へのリクエストをBackendへ転送します。
 BackendとFrontendは、それぞれ別のターミナルで起動してください。
 
 ## OpenAPIからAPIクライアントを生成
 
-Backendを起動した状態で、Frontendから実行します。
+BackendをDevelopment環境で起動すると、上記URLでOpenAPIのJSONとScalarのAPI画面を確認できます。
+Scalarではエンドポイント、入力、レスポンスを確認できます。
+
+API契約を変更した場合は、Backendを再起動し、Frontendからクライアントを再生成します。
 
 ```bash
 cd frontend
@@ -63,6 +66,8 @@ npm run generate:api
 
 生成されたクライアントは`frontend/src/api/generated/`に出力されます。
 生成ファイルは手動で編集せず、BackendのOpenAPI定義または`frontend/orval.config.ts`を変更して再生成します。
+生成後は`npm run check`を実行し、Frontendとの整合性を確認します。
+学習記録のPATCHには、空の更新を防ぐため`frontend/src/api/studyRecordUpdates.ts`のラッパーを使います。
 
 ## 品質確認
 
