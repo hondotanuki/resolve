@@ -93,7 +93,7 @@ public static class UpdateStudyRecordEndpoint
             )
             .WithName("UpdateStudyRecord")
             .WithDescription(
-                "更新項目を1つ以上指定してください。APIは項目名の大文字・小文字を区別せず、未知の項目は無視します。"
+                "更新項目を1つ以上指定してください。APIは項目名の大文字・小文字を区別し、未知の項目は無視します。"
             )
             .Produces<UpdateStudyRecordResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)

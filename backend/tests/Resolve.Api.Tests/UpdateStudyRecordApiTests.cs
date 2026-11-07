@@ -148,6 +148,8 @@ public sealed class UpdateStudyRecordApiTests
     [Theory]
     [InlineData("{}")]
     [InlineData("""{"unknown":1}""")]
+    [InlineData("""{"Result":"success"}""")]
+    [InlineData("""{"Memo":"訂正後"}""")]
     [InlineData("""{"result":null}""")]
     [InlineData("""{"result":"invalid"}""")]
     [InlineData("""{"studiedAt":null}""")]
@@ -185,9 +187,8 @@ public sealed class UpdateStudyRecordApiTests
 
     [Theory]
     [InlineData("""{"result":"success","unknown":1}""")]
-    [InlineData("""{"Result":"success"}""")]
     [InlineData("""{"result":"success","memo":null}""")]
-    public async Task 既知の更新項目があれば追加項目や異なる大文字小文字を受け付ける(string json)
+    public async Task 既知の更新項目があれば未知の項目や複数項目を受け付ける(string json)
     {
         var itemId = await CreateLearningItemAsync();
         var recordId = await CreateStudyRecordAsync(itemId, "2026-10-15T09:00:00Z", "failure");
@@ -201,6 +202,20 @@ public sealed class UpdateStudyRecordApiTests
         {
             Assert.Equal(JsonValueKind.Null, records[0].GetProperty("memo").ValueKind);
         }
+    }
+
+    [Fact]
+    public async Task 項目名が大文字小文字まで一致する値だけを更新する()
+    {
+        var itemId = await CreateLearningItemAsync();
+        var recordId = await CreateStudyRecordAsync(itemId, "2026-10-15T09:00:00Z", "failure");
+
+        var response = await PatchAsync(recordId, """{"memo":"訂正後","Result":"success"}""");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var records = await GetRecordsAsync(itemId);
+        Assert.Equal("failure", records[0].GetProperty("result").GetString());
+        Assert.Equal("訂正後", records[0].GetProperty("memo").GetString());
     }
 
     [Fact]

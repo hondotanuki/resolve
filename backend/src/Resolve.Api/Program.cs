@@ -24,8 +24,10 @@ builder.Services.AddOpenApi(options =>
     options.AddSchemaTransformer<UpdateStudyRecordSchemaTransformer>();
 });
 builder.Services.ConfigureHttpJsonOptions(options =>
-    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict
-);
+{
+    options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+    options.SerializerOptions.PropertyNameCaseInsensitive = false;
+});
 builder.Services.AddDbContext<ResolveDbContext>(options =>
 {
     options.UseSqlite(connectionString);
