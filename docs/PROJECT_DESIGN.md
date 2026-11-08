@@ -458,14 +458,14 @@ StudyRecord登録時のLocationに対応する `GET /study-records/{id}` は、�
 
 - `GET /learning-items`、`POST /learning-items`、`GET /learning-items/{id}` がある。
 - `GET /learning-items/{id}/study-records`、`POST /learning-items/{id}/study-records`、`PATCH /study-records/{id}`、`DELETE /study-records/{id}` がある。
-- 現在の `itemType` は `algorithm_problem`・`english_word`・`english_article` のままで、英語向け種別は後続で外す。学習結果の `result` は `success`・`failure` のみ。
+- 問題は出典・コンテスト種別・問題区分で扱い、`itemType` は持たない。学習結果の `result` は `success`・`failure` のみ。
 - 問題登録APIは `source`・`category`・`problemIndex` を要求し、対応表にない区分を拒否する。URLからの自動登録は未実装。
 - 学習日時入力は `Z` 付きUTCを受け付け、`+00:00` を含むオフセット付き・タイムゾーンなしの入力を拒否する。所要時間は必須の0以上の32ビット整数で、数値文字列・小数・nullを受け付けない。記録は保存時の `targetSeconds` を持つ。
-- 現在のレスポンスの `archivedAt`・`content`・`memo` は、該当する項目のあるレスポンスでは省略せずnullを返せる。
+- 現在のレスポンスの `archivedAt`・`memo` は、該当する項目のあるレスポンスでは省略せずnullを返せる。問題の `content` は廃止した。
 - 現在のPATCHは `result`・`studiedAt`・`durationSeconds`・`memo` の1項目以上を要求し、`memo` は明示的なnullで消去できる。Orval生成型に1項目以上の条件は反映されず、Frontend側のラッパーで補う。
 - JSONの項目名は大文字・小文字を区別し、OpenAPIに記載されたcamelCaseを使う。未知の項目は無視し、未知の項目だけのPATCHは400を返す。
 
-Frontendの生成型・画面はこのAPI変更にまだ追従していない。後続作業で生成型・画面・テストを揃える。
+Frontendは現在のAPI契約に対応し、問題区分と所要時間を手入力する。URLからの自動登録とタイマーは後続で実装する。
 
 ---
 
