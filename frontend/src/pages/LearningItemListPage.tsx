@@ -32,7 +32,9 @@ export function LearningItemListPage() {
               to={`/learning-items/${item.id}`}
               className="block rounded-xl border border-zinc-200 bg-white p-5 transition hover:border-zinc-400"
             >
-              <p className="mb-1 text-xs text-zinc-500">{item.itemType}</p>
+              <p className="mb-1 text-xs text-zinc-500">
+                {item.source} / {item.category} / {item.problemIndex}
+              </p>
 
               <h2 className="font-medium">{item.title}</h2>
             </Link>

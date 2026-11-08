@@ -43,10 +43,12 @@ describe("LearningItemDetailPage", () => {
         headers: new Headers(),
         data: {
           id: 1,
-          itemType: "algorithm_problem",
+
+          source: "AtCoder",
+          category: "Beginner",
+          problemIndex: "A",
           title: "二分探索",
           status: "unstarted",
-          content: "二分探索を解く",
           archivedAt: null,
           createdAt: "2026-10-01T10:00:00Z",
           updatedAt: "2026-10-01T10:00:00Z",
@@ -63,8 +65,7 @@ describe("LearningItemDetailPage", () => {
         name: "二分探索",
       }),
     ).toBeInTheDocument();
-    expect(screen.getByText("algorithm_problem")).toBeInTheDocument();
-    expect(screen.getByText("二分探索を解く")).toBeInTheDocument();
+    expect(screen.getByText("AtCoder / Beginner / A")).toBeInTheDocument();
     expect(screen.getByText("現在の状態: unstarted")).toBeInTheDocument();
     expect(screen.getByText("学習履歴はまだありません。")).toBeInTheDocument();
     expect(vi.mocked(useListStudyRecords).mock.calls[0][0]).toBe(1);

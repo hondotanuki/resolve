@@ -19,13 +19,13 @@ describe("CreateLearningItemPage", () => {
     vi.clearAllMocks();
   });
 
-  it("正常な入力なら登録して一覧へ遷移する", async () => {
+  it("正常な入力なら区分を登録して詳細へ遷移する", async () => {
     const mutateAsync = vi.fn().mockResolvedValue({
       status: 201,
       headers: new Headers(),
       data: {
         id: 1,
-        itemType: "english_word",
+
         title: "apple",
         archivedAt: null,
       },
@@ -43,8 +43,8 @@ describe("CreateLearningItemPage", () => {
           element: <LearningItemCreatePage />,
         },
         {
-          path: "/learning-items",
-          element: <div>一覧画面</div>,
+          path: "/learning-items/:id",
+          element: <div>詳細画面</div>,
         },
       ],
       ["/learning-items/new"],
@@ -52,11 +52,15 @@ describe("CreateLearningItemPage", () => {
     const invalidateQueriesSpy = vi.spyOn(queryClient, "invalidateQueries");
 
     await user.selectOptions(
-      screen.getByLabelText("Item Type"),
-      "english_word",
+      screen.getByLabelText("Source"),
+      "OnlineMathContest",
     );
+    await user.selectOptions(
+      screen.getByLabelText("Contest Category"),
+      "Expert",
+    );
+    await user.selectOptions(screen.getByLabelText("Problem Index"), "B");
     await user.type(screen.getByLabelText("Title"), "  apple  ");
-    await user.type(screen.getByLabelText("Content"), "  りんご  ");
     await user.click(
       screen.getByRole("button", {
         name: "Create",
@@ -65,15 +69,16 @@ describe("CreateLearningItemPage", () => {
 
     expect(mutateAsync).toHaveBeenCalledWith({
       data: {
-        itemType: "english_word",
         title: "apple",
-        content: "りんご",
+        source: "OnlineMathContest",
+        category: "Expert",
+        problemIndex: "B",
       },
     });
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: getListLearningItemsQueryKey(),
     });
-    expect(await screen.findByText("一覧画面")).toBeInTheDocument();
+    expect(await screen.findByText("詳細画面")).toBeInTheDocument();
   });
 
   it("タイトル未入力ならエラーを表示して登録しない", async () => {
@@ -97,13 +102,13 @@ describe("CreateLearningItemPage", () => {
     ).toBeInTheDocument();
     expect(mutateAsync).not.toHaveBeenCalled();
   });
-  it("Content未入力ならnullで登録する", async () => {
+  it("既定の区分で登録する", async () => {
     const mutateAsync = vi.fn().mockResolvedValue({
       status: 201,
       headers: new Headers(),
       data: {
         id: 1,
-        itemType: "algorithm_problem",
+
         title: "二分探索",
         archivedAt: null,
       },
@@ -121,8 +126,8 @@ describe("CreateLearningItemPage", () => {
           element: <LearningItemCreatePage />,
         },
         {
-          path: "/learning-items",
-          element: <div>一覧画面</div>,
+          path: "/learning-items/:id",
+          element: <div>詳細画面</div>,
         },
       ],
       ["/learning-items/new"],
@@ -135,11 +140,13 @@ describe("CreateLearningItemPage", () => {
       }),
     );
 
+    expect(await screen.findByText("詳細画面")).toBeInTheDocument();
     expect(mutateAsync).toHaveBeenCalledWith({
       data: {
-        itemType: "algorithm_problem",
         title: "二分探索",
-        content: null,
+        source: "AtCoder",
+        category: "Beginner",
+        problemIndex: "A",
       },
     });
   });

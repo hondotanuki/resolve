@@ -75,17 +75,12 @@ export function LearningItemDetailPage() {
         ← Back
       </Link>
 
-      <p className="mb-2 text-sm text-zinc-500">{item.itemType}</p>
       <h1 className="text-3xl font-semibold">{item.title}</h1>
       <p>現在の状態: {item.status}</p>
 
-      <div className="mt-8 rounded-xl border border-zinc-200 bg-white p-6">
-        {item.content ? (
-          <p className="whitespace-pre-wrap leading-7">{item.content}</p>
-        ) : (
-          <p className="text-zinc-400">Contentはありません。</p>
-        )}
-      </div>
+      <p className="mt-4 text-sm text-zinc-600">
+        {item.source} / {item.category} / {item.problemIndex}
+      </p>
 
       <div className="mt-6 space-y-1 text-xs text-zinc-400">
         <p>Created: {item.createdAt}</p>
