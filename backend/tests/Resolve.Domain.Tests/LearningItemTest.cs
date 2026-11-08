@@ -17,6 +17,31 @@ public class LearningItemTests
         Assert.Equal(ProblemSource.AtCoder, item.Source);
         Assert.Equal(ContestCategory.Beginner, item.Category);
         Assert.Equal('A', item.ProblemIndex);
+        Assert.Null(item.ProblemUrl);
+        Assert.Null(item.ContestId);
+        Assert.Null(item.ContestName);
+        Assert.Null(item.ContestStartDate);
+    }
+
+    [Fact]
+    public void 問題URLとコンテスト情報を指定して生成できる()
+    {
+        var date = new DateOnly(2026, 10, 31);
+        var item = new LearningItem(
+            "Nigiri",
+            ProblemSource.AtCoder,
+            ContestCategory.Beginner,
+            'A',
+            "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            "abc482",
+            "AtCoder Beginner Contest 482",
+            date
+        );
+
+        Assert.Equal("https://atcoder.jp/contests/abc482/tasks/abc482_a", item.ProblemUrl);
+        Assert.Equal("abc482", item.ContestId);
+        Assert.Equal("AtCoder Beginner Contest 482", item.ContestName);
+        Assert.Equal(date, item.ContestStartDate);
     }
 
     [Fact]

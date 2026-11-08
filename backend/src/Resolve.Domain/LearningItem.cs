@@ -7,6 +7,10 @@ public class LearningItem
     public ContestCategory Category { get; private set; }
     public char ProblemIndex { get; private set; }
     public string Title { get; private set; }
+    public string? ProblemUrl { get; private set; }
+    public string? ContestId { get; private set; }
+    public string? ContestName { get; private set; }
+    public DateOnly? ContestStartDate { get; private set; }
     public DateTime? ArchivedAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
@@ -31,6 +35,24 @@ public class LearningItem
 
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = CreatedAt;
+    }
+
+    public LearningItem(
+        string title,
+        ProblemSource source,
+        ContestCategory category,
+        char problemIndex,
+        string problemUrl,
+        string contestId,
+        string contestName,
+        DateOnly contestStartDate
+    )
+        : this(title, source, category, problemIndex)
+    {
+        ProblemUrl = problemUrl;
+        ContestId = contestId;
+        ContestName = contestName;
+        ContestStartDate = contestStartDate;
     }
 
     public void SetProblemCategory(

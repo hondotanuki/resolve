@@ -9,6 +9,30 @@ namespace Resolve.Infrastructure.Tests;
 public sealed class ProblemCategoryMigrationTests
 {
     [Fact]
+    public async Task 問題URLとコンテスト情報の追加時に既存の問題を保持する()
+    {
+        await using var connection = new SqliteConnection("DataSource=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ResolveDbContext>().UseSqlite(connection).Options;
+        await using var context = new ResolveDbContext(options);
+        var migrator = context.GetService<IMigrator>();
+        await migrator.MigrateAsync("20261108074817_RemoveLearningItemType");
+        await context.Database.ExecuteSqlRawAsync(
+            "INSERT INTO learning_items (title, source, category, problem_index, created_at, updated_at) VALUES ('既存の問題', 'AtCoder', 'Beginner', 'A', '2026-01-01', '2026-01-01')"
+        );
+
+        await migrator.MigrateAsync();
+
+        var item = await context.LearningItems.SingleAsync();
+        Assert.Equal("既存の問題", item.Title);
+        Assert.Equal('A', item.ProblemIndex);
+        Assert.Null(item.ProblemUrl);
+        Assert.Null(item.ContestId);
+        Assert.Null(item.ContestName);
+        Assert.Null(item.ContestStartDate);
+    }
+
+    [Fact]
     public async Task ContentとItemTypeの削除後も問題と学習記録を保持する()
     {
         await using var connection = new SqliteConnection("DataSource=:memory:");

@@ -53,6 +53,30 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task 問題URLとコンテスト情報を保存し再取得できる()
+    {
+        var item = new LearningItem(
+            "Nigiri",
+            ProblemSource.AtCoder,
+            ContestCategory.Beginner,
+            'A',
+            "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            "abc482",
+            "AtCoder Beginner Contest 482",
+            new DateOnly(2026, 10, 31)
+        );
+
+        var saved = await _repository.CreateAsync(item);
+        _dbContext.ChangeTracker.Clear();
+        var actual = await _dbContext.LearningItems.SingleAsync(x => x.Id == saved.Id);
+
+        Assert.Equal(item.ProblemUrl, actual.ProblemUrl);
+        Assert.Equal(item.ContestId, actual.ContestId);
+        Assert.Equal(item.ContestName, actual.ContestName);
+        Assert.Equal(item.ContestStartDate, actual.ContestStartDate);
+    }
+
+    [Fact]
     public async Task ArchivedAtをUTCで再取得できる()
     {
         var item = new LearningItem(

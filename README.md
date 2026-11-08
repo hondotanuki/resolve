@@ -39,6 +39,8 @@ dotnet ef database update --project backend/src/Resolve.Infrastructure --startup
 
 問題区分と学習記録の目標時間を追加するMigrationは、既存の問題・記録があるDBには適用できません。開発用DBを作り直す場合は、必要なデータを退避してから対象のSQLite DBを削除し、上のコマンドを実行してください。既定のDBは `backend/src/Resolve.Api/resolve.db` です。
 
+問題URLとコンテスト情報を追加するMigrationは、既存データを残したまま適用できます。新しい項目は、URL登録機能を追加するまでは未設定です。既存DBへの適用にも上の `dotnet ef database update` を使用します。
+
 ```bash
 dotnet run --project backend/src/Resolve.Api --launch-profile http
 ```
