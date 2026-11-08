@@ -39,6 +39,12 @@ builder.Services.AddSingleton(serviceProvider => new ExternalHttpClient(
     serviceProvider.GetRequiredService<IExternalRequestClock>(),
     new HttpClientHandler { AllowAutoRedirect = false }
 ));
+builder.Services.AddSingleton(serviceProvider => new AtCoderDatasetCache(
+    serviceProvider.GetRequiredService<ExternalHttpClient>(),
+    serviceProvider.GetRequiredService<IExternalRequestClock>(),
+    Path.Combine(builder.Environment.ContentRootPath, ".cache", "atcoder-problems", "datasets.json")
+));
+builder.Services.AddSingleton<AtCoderProblemInfoProvider>();
 
 // Repositories
 builder.Services.AddScoped<ILearningItemRepository, EfLearningItemRepository>();

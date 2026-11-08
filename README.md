@@ -55,6 +55,8 @@ Backendは次のURLで起動します。
 
 問題は現在、タイトル・出典・コンテスト種別・問題区分を手入力して登録します。URLからの自動登録とタイマーは今後実装します。
 
+AtCoder Problemsの問題情報取得基盤は、一覧を `backend/src/Resolve.Api/.cache/atcoder-problems/datasets.json` に保存します。未登録問題の取得時、前回の取得開始後に日本時間の木曜日0時を過ぎていれば更新します。現在この取得基盤は登録画面には接続されていません。
+
 ```bash
 fnm use
 cd frontend
