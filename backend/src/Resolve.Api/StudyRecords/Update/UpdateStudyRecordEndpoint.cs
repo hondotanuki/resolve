@@ -79,6 +79,7 @@ public static class UpdateStudyRecordEndpoint
                             Result = StudyResultMapping.ToApiValue(output.Result),
                             StudiedAt = output.StudiedAt,
                             DurationSeconds = output.DurationSeconds,
+                            TargetSeconds = output.TargetSeconds,
                             Memo = output.Memo,
                             CreatedAt = output.CreatedAt,
                             UpdatedAt = output.UpdatedAt,

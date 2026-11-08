@@ -5,6 +5,8 @@ public enum ApiValueSet
     ItemTypes,
     StudyResults,
     ItemStatuses,
+    ProblemSources,
+    ContestCategories,
 }
 
 [AttributeUsage(AttributeTargets.Property)]

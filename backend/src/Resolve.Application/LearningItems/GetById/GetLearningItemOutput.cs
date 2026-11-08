@@ -10,5 +10,8 @@ public sealed record GetLearningItemOutput(
     string? Content,
     DateTime? ArchivedAt,
     DateTime CreatedAt,
-    DateTime UpdatedAt
+    DateTime UpdatedAt,
+    ProblemSource Source,
+    ContestCategory Category,
+    char ProblemIndex
 );

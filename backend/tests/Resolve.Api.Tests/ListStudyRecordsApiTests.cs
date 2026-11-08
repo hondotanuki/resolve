@@ -20,7 +20,14 @@ public sealed class ListStudyRecordsApiTests
 
     private async Task<int> CreateLearningItemAsync()
     {
-        var request = new { itemType = "algorithm_problem", title = "二分探索" };
+        var request = new
+        {
+            itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
+            title = "二分探索",
+        };
         var response = await _client.PostAsJsonAsync("/learning-items", request);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -31,7 +38,7 @@ public sealed class ListStudyRecordsApiTests
         int learningItemId,
         DateTime studiedAt,
         string result = "success",
-        int? durationSeconds = null,
+        int durationSeconds = 0,
         string? memo = null
     )
     {

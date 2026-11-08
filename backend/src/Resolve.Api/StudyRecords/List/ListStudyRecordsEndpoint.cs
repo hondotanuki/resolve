@@ -31,6 +31,7 @@ public static class ListStudyRecordsEndpoint
                             Result = StudyResultMapping.ToApiValue(output.Result),
                             StudiedAt = output.StudiedAt,
                             DurationSeconds = output.DurationSeconds,
+                            TargetSeconds = output.TargetSeconds,
                             Memo = output.Memo,
                         })
                         .ToList();

@@ -43,7 +43,10 @@ public sealed class GetLearningItemByIdUseCase
             item.Content,
             item.ArchivedAt,
             item.CreatedAt,
-            item.UpdatedAt
+            item.UpdatedAt,
+            item.Source,
+            item.Category,
+            item.ProblemIndex
         );
     }
 }

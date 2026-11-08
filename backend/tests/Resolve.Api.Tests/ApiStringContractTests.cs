@@ -30,7 +30,14 @@ public sealed class ApiStringContractTests
     {
         var response = await _client.PostAsJsonAsync(
             "/learning-items",
-            new { itemType, title = "title" }
+            new
+            {
+                itemType,
+                title = "title",
+                source = "AtCoder",
+                category = "Beginner",
+                problemIndex = "A",
+            }
         );
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -56,18 +63,29 @@ public sealed class ApiStringContractTests
     [Theory]
     [InlineData("success")]
     [InlineData("failure")]
-    [InlineData("reviewed")]
     public async Task 学習結果は既存の文字列で登録と更新ができる(string result)
     {
         var itemResponse = await _client.PostAsJsonAsync(
             "/learning-items",
-            new { itemType = "english_word", title = "title" }
+            new
+            {
+                itemType = "english_word",
+                source = "AtCoder",
+                category = "Beginner",
+                problemIndex = "A",
+                title = "title",
+            }
         );
         var item = await itemResponse.Content.ReadFromJsonAsync<JsonElement>();
         var itemId = item.GetProperty("id").GetInt32();
         var created = await _client.PostAsJsonAsync(
             $"/learning-items/{itemId}/study-records",
-            new { result, studiedAt = "2026-11-01T00:00:00Z" }
+            new
+            {
+                result,
+                studiedAt = "2026-11-01T00:00:00Z",
+                durationSeconds = 0,
+            }
         );
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         var json = await created.Content.ReadFromJsonAsync<JsonElement>();
@@ -134,7 +152,7 @@ public sealed class ApiStringContractTests
                 "UpdateStudyRecordResponse",
             }
         )
-            AssertValues(schemas, name, "result", ["success", "failure", "reviewed"]);
+            AssertValues(schemas, name, "result", ["success", "failure"]);
         foreach (var name in new[] { "GetLearningItemResponse", "CreateStudyRecordResponse" })
             AssertValues(schemas, name, "status", ["unstarted", "needs_review", "completed"]);
     }

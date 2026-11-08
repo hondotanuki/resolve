@@ -7,6 +7,7 @@ public sealed record ListStudyRecordsOutput(
     int LearningItemId,
     StudyResult Result,
     DateTime StudiedAt,
-    int? DurationSeconds,
+    int DurationSeconds,
+    int TargetSeconds,
     string? Memo
 );

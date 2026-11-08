@@ -154,4 +154,83 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
         var items = await _client.GetFromJsonAsync<JsonElement>("/learning-items");
         Assert.Empty(items.EnumerateArray());
     }
+
+    [Theory]
+    [InlineData(
+        """{"itemType":"algorithm_problem","title":"問題","category":"Beginner","problemIndex":"A"}"""
+    )]
+    [InlineData(
+        """{"itemType":"algorithm_problem","title":"問題","source":null,"category":"Beginner","problemIndex":"A"}"""
+    )]
+    [InlineData(
+        """{"itemType":"algorithm_problem","title":"問題","source":"AtCoder","problemIndex":"A"}"""
+    )]
+    [InlineData(
+        """{"itemType":"algorithm_problem","title":"問題","source":"AtCoder","category":null,"problemIndex":"A"}"""
+    )]
+    [InlineData(
+        """{"itemType":"algorithm_problem","title":"問題","source":"AtCoder","category":"Beginner"}"""
+    )]
+    [InlineData(
+        """{"itemType":"algorithm_problem","title":"問題","source":"AtCoder","category":"Beginner","problemIndex":null}"""
+    )]
+    public async Task 問題区分が欠けた入力は保存しない(string json)
+    {
+        using var body = new StringContent(json, Encoding.UTF8, "application/json");
+        var response = await _client.PostAsync("/learning-items", body);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var items = await _client.GetFromJsonAsync<JsonElement>("/learning-items");
+        Assert.Empty(items.EnumerateArray());
+    }
+
+    [Fact]
+    public async Task 問題区分はOpenAPIで必須の非nullとして表される()
+    {
+        var document = await _client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
+        var schemas = document.GetProperty("components").GetProperty("schemas");
+        foreach (
+            var name in new[]
+            {
+                "CreateLearningItemRequest",
+                "CreateLearningItemResponse",
+                "GetLearningItemResponse",
+            }
+        )
+        {
+            var schema = schemas.GetProperty(name);
+            var required = schema
+                .GetProperty("required")
+                .EnumerateArray()
+                .Select(x => x.GetString())
+                .ToArray();
+            foreach (var field in new[] { "source", "category", "problemIndex" })
+            {
+                Assert.Contains(field, required);
+                Assert.Equal(
+                    "string",
+                    schema
+                        .GetProperty("properties")
+                        .GetProperty(field)
+                        .GetProperty("type")
+                        .GetString()
+                );
+            }
+            Assert.Contains(
+                schema
+                    .GetProperty("properties")
+                    .GetProperty("source")
+                    .GetProperty("enum")
+                    .EnumerateArray(),
+                x => x.GetString() == "AtCoder"
+            );
+            Assert.Contains(
+                schema
+                    .GetProperty("properties")
+                    .GetProperty("category")
+                    .GetProperty("enum")
+                    .EnumerateArray(),
+                x => x.GetString() == "Beginner"
+            );
+        }
+    }
 }

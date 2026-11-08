@@ -26,6 +26,7 @@ public sealed class StudyRecordConfiguration : IEntityTypeConfiguration<StudyRec
             .HasConversion<string>()
             .IsRequired();
         builder.Property(record => record.DurationSeconds).HasColumnName("duration_seconds");
+        builder.Property(record => record.TargetSeconds).HasColumnName("target_seconds");
         builder.Property(record => record.Memo).HasColumnName("memo");
         builder
             .Property(record => record.CreatedAt)

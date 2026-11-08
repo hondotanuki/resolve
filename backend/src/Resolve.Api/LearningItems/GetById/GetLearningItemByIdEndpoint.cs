@@ -33,6 +33,9 @@ public static class GetLearningItemByIdEndpoint
                         ArchivedAt = output.ArchivedAt,
                         CreatedAt = output.CreatedAt,
                         UpdatedAt = output.UpdatedAt,
+                        Source = output.Source.ToString(),
+                        Category = output.Category.ToString(),
+                        ProblemIndex = output.ProblemIndex.ToString(),
                     };
 
                     return Results.Ok(response);

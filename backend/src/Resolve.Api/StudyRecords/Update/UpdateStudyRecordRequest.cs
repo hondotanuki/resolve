@@ -10,7 +10,7 @@ public sealed record UpdateStudyRecordRequest
 {
     private string _result = string.Empty;
     private DateTime _studiedAt;
-    private int? _durationSeconds;
+    private int _durationSeconds;
     private string? _memo;
 
     [JsonIgnore]
@@ -48,7 +48,7 @@ public sealed record UpdateStudyRecordRequest
     }
 
     [Range(0, int.MaxValue)]
-    public int? DurationSeconds
+    public int DurationSeconds
     {
         get => _durationSeconds;
         init

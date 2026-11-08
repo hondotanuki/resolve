@@ -18,7 +18,14 @@ public sealed class ListLearningItemsUseCaseTests
     [Fact]
     public async Task 登録済み項目をOutputへ変換できる()
     {
-        var item = new LearningItem(ItemType.AlgorithmProblem, "二分探索", "二分探索を解く");
+        var item = new LearningItem(
+            ItemType.AlgorithmProblem,
+            "二分探索",
+            "二分探索を解く",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
 
         _repository.ListResult = [item];
 

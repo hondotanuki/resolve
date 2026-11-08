@@ -19,7 +19,13 @@ public sealed class DeleteStudyRecordUseCaseTests
     [Fact]
     public async Task 対象が存在すれば削除できる()
     {
-        var record = new StudyRecord(1, StudyResult.Success, StudiedAt);
+        var record = new StudyRecord(
+            1,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
         _repository.RecordById = record;
 
         var result = await _useCase.ExecuteAsync(10);

@@ -12,6 +12,21 @@ public sealed class LearningItemConfiguration : IEntityTypeConfiguration<Learnin
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasColumnName("id");
         builder.Property(x => x.ItemType).HasColumnName("item_type").HasConversion<string>();
+        builder
+            .Property(x => x.Source)
+            .HasColumnName("source")
+            .HasConversion<string>()
+            .IsRequired();
+        builder
+            .Property(x => x.Category)
+            .HasColumnName("category")
+            .HasConversion<string>()
+            .IsRequired();
+        builder
+            .Property(x => x.ProblemIndex)
+            .HasColumnName("problem_index")
+            .HasConversion<string>()
+            .IsRequired();
         builder.Property(x => x.Title).HasColumnName("title").IsRequired();
         builder.Property(x => x.Content).HasColumnName("content");
         builder

@@ -15,9 +15,6 @@ public static class StudyResultMapping
             case ApiValues.StudyResults.Failure:
                 studyResult = StudyResult.Failure;
                 return true;
-            case ApiValues.StudyResults.Reviewed:
-                studyResult = StudyResult.Reviewed;
-                return true;
             default:
                 studyResult = default;
                 return false;
@@ -30,7 +27,6 @@ public static class StudyResultMapping
         {
             StudyResult.Success => ApiValues.StudyResults.Success,
             StudyResult.Failure => ApiValues.StudyResults.Failure,
-            StudyResult.Reviewed => ApiValues.StudyResults.Reviewed,
             _ => throw new ArgumentOutOfRangeException(nameof(studyResult), studyResult, null),
         };
     }

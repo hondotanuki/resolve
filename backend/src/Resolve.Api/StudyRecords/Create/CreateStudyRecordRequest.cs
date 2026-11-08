@@ -13,6 +13,6 @@ public sealed record CreateStudyRecordRequest
     public required DateTime StudiedAt { get; init; }
 
     [Range(0, int.MaxValue)]
-    public int? DurationSeconds { get; init; }
+    public required int DurationSeconds { get; init; }
     public string? Memo { get; init; }
 }

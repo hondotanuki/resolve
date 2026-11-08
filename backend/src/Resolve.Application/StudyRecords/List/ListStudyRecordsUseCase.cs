@@ -42,6 +42,7 @@ public sealed class ListStudyRecordsUseCase
                 x.Result,
                 x.StudiedAt,
                 x.DurationSeconds,
+                x.TargetSeconds,
                 x.Memo
             ))
             .ToList();

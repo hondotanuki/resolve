@@ -26,11 +26,22 @@ public sealed class CreateStudyRecordUseCase(
             return null;
         }
 
+        if (
+            TargetTime.GetSeconds(
+                learningItem.Source,
+                learningItem.Category,
+                learningItem.ProblemIndex
+            )
+            is not { } targetSeconds
+        )
+            throw new ArgumentException("Learning item has no supported problem category.");
+
         StudyRecord record = new(
             input.LearningItemId,
             input.Result,
             input.StudiedAt,
             input.DurationSeconds,
+            targetSeconds,
             input.Memo
         );
         StudyRecord createdRecord = await studyRecordRepository.CreateAsync(
@@ -51,6 +62,7 @@ public sealed class CreateStudyRecordUseCase(
             createdRecord.Result,
             createdRecord.StudiedAt,
             createdRecord.DurationSeconds,
+            createdRecord.TargetSeconds,
             createdRecord.Memo,
             createdRecord.CreatedAt,
             createdRecord.UpdatedAt,

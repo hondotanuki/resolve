@@ -17,7 +17,14 @@ public sealed class CreateLearningItemUseCase
         CancellationToken cancellationToken = default
     )
     {
-        var learningItem = new LearningItem(input.ItemType, input.Title, input.Content);
+        var learningItem = new LearningItem(
+            input.ItemType,
+            input.Title,
+            input.Content,
+            input.Source,
+            input.Category,
+            input.ProblemIndex
+        );
         var saved = await _repository.CreateAsync(learningItem, cancellationToken);
         return new CreateLearningItemOutput(
             saved.Id,
@@ -26,7 +33,10 @@ public sealed class CreateLearningItemUseCase
             saved.Content,
             saved.ArchivedAt,
             saved.CreatedAt,
-            saved.UpdatedAt
+            saved.UpdatedAt,
+            saved.Source,
+            saved.Category,
+            saved.ProblemIndex
         );
     }
 }

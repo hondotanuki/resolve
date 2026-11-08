@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -34,6 +34,9 @@ public sealed class CreateLearningItemApiTests
         var request = new
         {
             itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
             title = "二分探索",
             content = "二分探索の問題を解く",
         };
@@ -53,7 +56,14 @@ public sealed class CreateLearningItemApiTests
     [Fact]
     public async Task Contentなしでも201を返す()
     {
-        var request = new { itemType = "algorithm_problem", title = "二分探索" };
+        var request = new
+        {
+            itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
+            title = "二分探索",
+        };
         var response = await _client.PostAsJsonAsync("/learning-items", request);
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -77,7 +87,7 @@ public sealed class CreateLearningItemApiTests
     public async Task 任意項目の名前が一致しなければ未知の項目として無視する()
     {
         using var request = new StringContent(
-            """{"itemType":"algorithm_problem","title":"二分探索","Content":"本文"}""",
+            """{"itemType":"algorithm_problem","title":"二分探索","Content":"本文","source":"AtCoder","category":"Beginner","problemIndex":"A"}""",
             Encoding.UTF8,
             "application/json"
         );
@@ -98,6 +108,9 @@ public sealed class CreateLearningItemApiTests
         var request = new
         {
             itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
             title = "",
             content = "二分探索の問題を解く",
         };
@@ -112,6 +125,9 @@ public sealed class CreateLearningItemApiTests
         var request = new
         {
             itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
             title = "   ",
             content = "二分探索の問題を解く",
         };
@@ -126,6 +142,9 @@ public sealed class CreateLearningItemApiTests
         var request = new
         {
             itemType = "invalid_type",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
             title = "二分探索",
             content = "二分探索の問題を解く",
         };

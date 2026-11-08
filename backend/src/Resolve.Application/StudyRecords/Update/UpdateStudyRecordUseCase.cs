@@ -41,6 +41,7 @@ public sealed class UpdateStudyRecordUseCase
             record.Result,
             record.StudiedAt,
             record.DurationSeconds,
+            record.TargetSeconds,
             record.Memo,
             record.CreatedAt,
             record.UpdatedAt

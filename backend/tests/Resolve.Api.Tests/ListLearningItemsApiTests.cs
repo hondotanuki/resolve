@@ -33,6 +33,9 @@ public sealed class ListLearningItemsApiTests
         var createRequest = new
         {
             itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
             title = "二分探索",
             content = "二分探索を解く",
         };

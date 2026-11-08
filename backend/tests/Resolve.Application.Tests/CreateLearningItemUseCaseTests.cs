@@ -20,6 +20,9 @@ public class CreateLearningItemUseCaseTests
     {
         var input = new CreateLearningItemInput
         {
+            Source = ProblemSource.AtCoder,
+            Category = ContestCategory.Beginner,
+            ProblemIndex = 'A',
             ItemType = ItemType.AlgorithmProblem,
             Title = "二分探索",
             Content = "二分探索の問題を解く",
@@ -36,6 +39,9 @@ public class CreateLearningItemUseCaseTests
     {
         var input = new CreateLearningItemInput
         {
+            Source = ProblemSource.AtCoder,
+            Category = ContestCategory.Beginner,
+            ProblemIndex = 'A',
             ItemType = ItemType.AlgorithmProblem,
             Title = "二分探索",
             Content = "二分探索の問題を解く",
@@ -50,6 +56,9 @@ public class CreateLearningItemUseCaseTests
     {
         var input = new CreateLearningItemInput
         {
+            Source = ProblemSource.AtCoder,
+            Category = ContestCategory.Beginner,
+            ProblemIndex = 'A',
             ItemType = ItemType.AlgorithmProblem,
             Title = "二分探索",
             Content = "二分探索の問題を解く",
@@ -69,6 +78,9 @@ public class CreateLearningItemUseCaseTests
     {
         var input = new CreateLearningItemInput
         {
+            Source = ProblemSource.AtCoder,
+            Category = ContestCategory.Beginner,
+            ProblemIndex = 'A',
             ItemType = ItemType.AlgorithmProblem,
             Title = "二分探索",
         };
@@ -85,6 +97,9 @@ public class CreateLearningItemUseCaseTests
     {
         var input = new CreateLearningItemInput
         {
+            Source = ProblemSource.AtCoder,
+            Category = ContestCategory.Beginner,
+            ProblemIndex = 'A',
             ItemType = ItemType.AlgorithmProblem,
             Title = "",
         };
@@ -96,7 +111,14 @@ public class CreateLearningItemUseCaseTests
     [Fact]
     public async Task 不正なItemTypeではRepositoryが呼ばれない()
     {
-        var input = new CreateLearningItemInput { ItemType = (ItemType)999, Title = "二分探索" };
+        var input = new CreateLearningItemInput
+        {
+            Source = ProblemSource.AtCoder,
+            Category = ContestCategory.Beginner,
+            ProblemIndex = 'A',
+            ItemType = (ItemType)999,
+            Title = "二分探索",
+        };
 
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _useCase.ExecuteAsync(input));
         Assert.Equal(0, _repository.CreateCallCount);
@@ -108,13 +130,19 @@ public class CreateLearningItemUseCaseTests
         var savedItem = new LearningItem(
             ItemType.AlgorithmProblem,
             "保存後タイトル",
-            "保存後Content"
+            "保存後Content",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
         );
 
         _repository.CreateResult = savedItem;
 
         var input = new CreateLearningItemInput
         {
+            Source = ProblemSource.AtCoder,
+            Category = ContestCategory.Beginner,
+            ProblemIndex = 'A',
             ItemType = ItemType.AlgorithmProblem,
             Title = "入力タイトル",
             Content = "入力Content",
