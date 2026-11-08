@@ -10,7 +10,7 @@
 
 ## 1.2 この文書の見方
 
-この文書の「新方針」は、これから実装するプロダクトの仕様であり、実装済みを意味しない。移行前のAPI契約は「8.2 移行前の実装済みAPI契約」に区別して記載する。
+この文書の「新方針」は、これから実装するプロダクトの仕様であり、実装済みを意味しない。現在のAPI契約は「8.2 移行中の実装済みAPI契約」に区別して記載する。
 
 現在のコードでは問題を `LearningItem` と呼ぶ。画面・仕様上は「問題」と呼ぶが、コード名・テーブル名を `Problem` に変更するかは未決定とする。
 
@@ -452,19 +452,20 @@ StudyRecord登録時のLocationに対応する `GET /study-records/{id}` は、�
 
 日時はUTCを基準に扱う。学習日時はUTC入力・UTC出力とし、Frontendは利用者のローカル時刻で表示する。復習の168時間・1440時間は経過時間として判定する。
 
-## 8.2 移行前の実装済みAPI契約
+## 8.2 移行中の実装済みAPI契約
 
-以下は**現在のコードの説明**であり、新方針への移行後の契約ではない。移行前の詳細は [api-contract-inventory.md](api-contract-inventory.md) と、Development環境で提供するOpenAPI・Scalarを参照する。
+以下は**現在のコードの説明**であり、新方針への移行後の最終契約ではない。Issue #29時点の契約は [api-contract-inventory.md](api-contract-inventory.md)、現在の詳細はDevelopment環境のOpenAPI・Scalarを参照する。
 
 - `GET /learning-items`、`POST /learning-items`、`GET /learning-items/{id}` がある。
 - `GET /learning-items/{id}/study-records`、`POST /learning-items/{id}/study-records`、`PATCH /study-records/{id}`、`DELETE /study-records/{id}` がある。
-- 現在の `itemType` は `algorithm_problem`・`english_word`・`english_article`、学習結果の `result` は `success`・`failure`・`reviewed`。新方針では英語向け種別を外し、`reviewed` を廃止する。
-- 現在の学習日時入力は `Z` 付きUTCを受け付け、`+00:00` を含むオフセット付き・タイムゾーンなしの入力を拒否する。所要時間は0以上の32ビット整数またはnullで、数値文字列・小数を受け付けない。
-- 現在のレスポンスの `archivedAt`・`content`・`durationSeconds`・`memo` は、該当する項目のあるレスポンスでは省略せずnullを返せる。
-- 現在のPATCHは `result`・`studiedAt`・`durationSeconds`・`memo` の1項目以上を要求し、`durationSeconds`・`memo` は明示的なnullで消去できる。Orval生成型に1項目以上の条件は反映されず、Frontend側のラッパーで補う。
+- 現在の `itemType` は `algorithm_problem`・`english_word`・`english_article` のままで、英語向け種別は後続で外す。学習結果の `result` は `success`・`failure` のみ。
+- 問題登録APIは `source`・`category`・`problemIndex` を要求し、対応表にない区分を拒否する。URLからの自動登録は未実装。
+- 学習日時入力は `Z` 付きUTCを受け付け、`+00:00` を含むオフセット付き・タイムゾーンなしの入力を拒否する。所要時間は必須の0以上の32ビット整数で、数値文字列・小数・nullを受け付けない。記録は保存時の `targetSeconds` を持つ。
+- 現在のレスポンスの `archivedAt`・`content`・`memo` は、該当する項目のあるレスポンスでは省略せずnullを返せる。
+- 現在のPATCHは `result`・`studiedAt`・`durationSeconds`・`memo` の1項目以上を要求し、`memo` は明示的なnullで消去できる。Orval生成型に1項目以上の条件は反映されず、Frontend側のラッパーで補う。
 - JSONの項目名は大文字・小文字を区別し、OpenAPIに記載されたcamelCaseを使う。未知の項目は無視し、未知の項目だけのPATCHは400を返す。
 
-新方針への変更時には、APIとOpenAPI、Frontendの生成型・画面・テスト・ドキュメントを揃える。
+Frontendの生成型・画面はこのAPI変更にまだ追従していない。後続作業で生成型・画面・テストを揃える。
 
 ---
 

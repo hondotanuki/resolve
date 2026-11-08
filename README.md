@@ -30,6 +30,15 @@ docs/
 
 ## バックエンドの起動
 
+初回はローカルツールを復元し、DBを作成します。
+
+```bash
+dotnet tool restore
+dotnet ef database update --project backend/src/Resolve.Infrastructure --startup-project backend/src/Resolve.Api
+```
+
+問題区分と学習記録の目標時間を追加するMigrationは、既存の問題・記録があるDBには適用できません。開発用DBを作り直す場合は、必要なデータを退避してから対象のSQLite DBを削除し、上のコマンドを実行してください。既定のDBは `backend/src/Resolve.Api/resolve.db` です。
+
 ```bash
 dotnet run --project backend/src/Resolve.Api --launch-profile http
 ```
@@ -41,6 +50,8 @@ Backendは次のURLで起動します。
 - Scalar: `http://localhost:5041/scalar/v1`
 
 ## フロントエンドの起動
+
+問題区分と学習記録のAPI変更に対する画面の更新は後続作業です。現在の画面では新しい必須項目を送信できません。
 
 ```bash
 fnm use

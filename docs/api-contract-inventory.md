@@ -1,5 +1,7 @@
 # API契約の棚卸し
 
+> この文書はIssue #29時点の契約の記録です。Issue #32で問題区分と学習記録のAPI契約を変更中のため、現在のAPIとは一致しません。最新の契約はDevelopment環境のOpenAPIを参照してください。
+
 ## 目的・見方
 
 実装済みのLearningItem・StudyRecord APIについて、APIの挙動、OpenAPI、OrvalのFrontend生成型をまとめる。プロダクト全体の仕様は [PROJECT_DESIGN.md](PROJECT_DESIGN.md)、OpenAPI・Scalarの利用方法は [README.md](../README.md) を参照する。
