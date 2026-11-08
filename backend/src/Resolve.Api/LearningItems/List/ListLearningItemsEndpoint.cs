@@ -23,6 +23,10 @@ public static class ListLearningItemsEndpoint
                             Source = x.Source.ToString(),
                             Category = x.Category.ToString(),
                             ProblemIndex = x.ProblemIndex.ToString(),
+                            ProblemUrl = x.ProblemUrl,
+                            ContestId = x.ContestId,
+                            ContestName = x.ContestName,
+                            ContestStartDate = x.ContestStartDate,
                         })
                         .ToList();
 

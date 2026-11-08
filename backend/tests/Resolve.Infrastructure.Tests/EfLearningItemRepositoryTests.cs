@@ -27,6 +27,36 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task 同じURLの競合登録は既存の問題を返す()
+    {
+        var first = new LearningItem(
+            "first",
+            ProblemSource.AtCoder,
+            ContestCategory.Beginner,
+            'A',
+            "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            "abc482",
+            "ABC 482",
+            new DateOnly(2026, 10, 31)
+        );
+        var second = new LearningItem(
+            "second",
+            ProblemSource.AtCoder,
+            ContestCategory.Beginner,
+            'A',
+            "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            "abc482",
+            "ABC 482",
+            new DateOnly(2026, 10, 31)
+        );
+        var saved = await _repository.CreateOrGetByProblemUrlAsync(first);
+        var existing = await _repository.CreateOrGetByProblemUrlAsync(second);
+        Assert.Equal(saved.Id, existing.Id);
+        Assert.Equal("first", existing.Title);
+        Assert.Equal(1, await _dbContext.LearningItems.CountAsync());
+    }
+
+    [Fact]
     public async Task CreateAsyncでLearningItemを保存できる()
     {
         var item = new LearningItem(

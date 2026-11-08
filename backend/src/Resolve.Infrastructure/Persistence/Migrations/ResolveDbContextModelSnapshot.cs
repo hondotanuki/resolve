@@ -74,6 +74,9 @@ namespace Resolve.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProblemUrl")
+                        .IsUnique();
+
                     b.ToTable("learning_items", (string)null);
                 });
 

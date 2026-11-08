@@ -11,6 +11,7 @@ public sealed class FakeLearningItemRepository : ILearningItemRepository
     public IReadOnlyList<LearningItem> ListResult { get; set; } = [];
     public int? ReceivedId { get; private set; }
     public LearningItem? GetByIdResult { get; set; }
+    public LearningItem? FindByUrlResult { get; set; }
 
     public Task<LearningItem> CreateAsync(
         LearningItem learningItem,
@@ -36,4 +37,22 @@ public sealed class FakeLearningItemRepository : ILearningItemRepository
 
         return Task.FromResult(GetByIdResult);
     }
+
+    public Task<LearningItem?> GetForUpdateAsync(
+        int id,
+        CancellationToken cancellationToken = default
+    ) => GetByIdAsync(id, cancellationToken);
+
+    public Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
+
+    public Task<LearningItem?> FindByProblemUrlAsync(
+        string problemUrl,
+        CancellationToken cancellationToken = default
+    ) => Task.FromResult(FindByUrlResult);
+
+    public Task<LearningItem> CreateOrGetByProblemUrlAsync(
+        LearningItem item,
+        CancellationToken cancellationToken = default
+    ) => CreateAsync(item, cancellationToken);
 }

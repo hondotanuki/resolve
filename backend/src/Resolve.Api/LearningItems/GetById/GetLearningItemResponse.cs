@@ -20,4 +20,8 @@ public sealed record GetLearningItemResponse
     [ApiAllowedValues(ApiValueSet.ContestCategories)]
     public required string Category { get; init; }
     public required string ProblemIndex { get; init; }
+    public string? ProblemUrl { get; init; }
+    public string? ContestId { get; init; }
+    public string? ContestName { get; init; }
+    public DateOnly? ContestStartDate { get; init; }
 };

@@ -28,6 +28,7 @@ public sealed class LearningItemConfiguration : IEntityTypeConfiguration<Learnin
             .IsRequired();
         builder.Property(x => x.Title).HasColumnName("title").IsRequired();
         builder.Property(x => x.ProblemUrl).HasColumnName("problem_url");
+        builder.HasIndex(x => x.ProblemUrl).IsUnique();
         builder.Property(x => x.ContestId).HasColumnName("contest_id");
         builder.Property(x => x.ContestName).HasColumnName("contest_name");
         builder.Property(x => x.ContestStartDate).HasColumnName("contest_start_date");

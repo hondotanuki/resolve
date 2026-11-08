@@ -49,6 +49,14 @@ public class LearningItem
     )
         : this(title, source, category, problemIndex)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(problemUrl);
+        ArgumentException.ThrowIfNullOrWhiteSpace(contestId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(contestName);
+        if (contestStartDate == default)
+            throw new ArgumentException(
+                "Contest start date is required.",
+                nameof(contestStartDate)
+            );
         ProblemUrl = problemUrl;
         ContestId = contestId;
         ContestName = contestName;
@@ -67,6 +75,15 @@ public class LearningItem
         Source = source;
         Category = category;
         ProblemIndex = problemIndex;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void UpdateTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title must not be empty.", nameof(title));
+
+        Title = title;
         UpdatedAt = DateTime.UtcNow;
     }
 }

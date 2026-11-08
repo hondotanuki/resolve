@@ -24,7 +24,11 @@ public sealed class ListLearningItemsUseCase
                 x.ArchivedAt,
                 x.Source,
                 x.Category,
-                x.ProblemIndex
+                x.ProblemIndex,
+                x.ProblemUrl,
+                x.ContestId,
+                x.ContestName,
+                x.ContestStartDate
             ))
             .ToList();
     }

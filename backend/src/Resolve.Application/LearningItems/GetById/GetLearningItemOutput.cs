@@ -11,5 +11,9 @@ public sealed record GetLearningItemOutput(
     DateTime UpdatedAt,
     ProblemSource Source,
     ContestCategory Category,
-    char ProblemIndex
+    char ProblemIndex,
+    string? ProblemUrl = null,
+    string? ContestId = null,
+    string? ContestName = null,
+    DateOnly? ContestStartDate = null
 );

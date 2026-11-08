@@ -44,7 +44,11 @@ public sealed class GetLearningItemByIdUseCase
             item.UpdatedAt,
             item.Source,
             item.Category,
-            item.ProblemIndex
+            item.ProblemIndex,
+            item.ProblemUrl,
+            item.ContestId,
+            item.ContestName,
+            item.ContestStartDate
         );
     }
 }

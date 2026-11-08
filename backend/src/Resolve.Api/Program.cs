@@ -7,6 +7,7 @@ using Resolve.Application.Interfaces;
 using Resolve.Application.LearningItems.Create;
 using Resolve.Application.LearningItems.GetById;
 using Resolve.Application.LearningItems.List;
+using Resolve.Application.LearningItems.Update;
 using Resolve.Application.StudyRecords.Create;
 using Resolve.Application.StudyRecords.Delete;
 using Resolve.Application.StudyRecords.List;
@@ -45,6 +46,8 @@ builder.Services.AddSingleton(serviceProvider => new AtCoderDatasetCache(
     Path.Combine(builder.Environment.ContentRootPath, ".cache", "atcoder-problems", "datasets.json")
 ));
 builder.Services.AddSingleton<AtCoderProblemInfoProvider>();
+builder.Services.AddSingleton<OmcProblemInfoProvider>();
+builder.Services.AddSingleton<IProblemMetadataProvider, ProblemMetadataProvider>();
 
 // Repositories
 builder.Services.AddScoped<ILearningItemRepository, EfLearningItemRepository>();
@@ -52,7 +55,9 @@ builder.Services.AddScoped<IStudyRecordRepository, EfStudyRecordRepository>();
 
 // UseCases
 builder.Services.AddScoped<CreateLearningItemUseCase>();
+builder.Services.AddScoped<CreateLearningItemFromUrlUseCase>();
 builder.Services.AddScoped<ListLearningItemsUseCase>();
+builder.Services.AddScoped<UpdateLearningItemTitleUseCase>();
 builder.Services.AddScoped<GetLearningItemByIdUseCase>();
 builder.Services.AddScoped<CreateStudyRecordUseCase>();
 builder.Services.AddScoped<ListStudyRecordsUseCase>();

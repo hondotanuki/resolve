@@ -34,6 +34,10 @@ public static class GetLearningItemByIdEndpoint
                         Source = output.Source.ToString(),
                         Category = output.Category.ToString(),
                         ProblemIndex = output.ProblemIndex.ToString(),
+                        ProblemUrl = output.ProblemUrl,
+                        ContestId = output.ContestId,
+                        ContestName = output.ContestName,
+                        ContestStartDate = output.ContestStartDate,
                     };
 
                     return Results.Ok(response);
