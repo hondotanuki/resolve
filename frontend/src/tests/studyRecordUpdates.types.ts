@@ -10,7 +10,7 @@ export function checkStudyRecordUpdateTypes(
   const valid: StudyRecordUpdate[] = [
     { result: "success" },
     { studiedAt: "2026-11-07T09:00:00Z" },
-    { durationSeconds: null },
+    { durationSeconds: 0 },
     { memo: null },
     { result: "failure", memo: "復習" },
   ];
@@ -20,6 +20,8 @@ export function checkStudyRecordUpdateTypes(
   void update(1, {});
   // @ts-expect-error undefinedは項目を指定したことにならない
   void update(1, { result: undefined });
+  // @ts-expect-error durationSecondsはnull不可
+  void update(1, { durationSeconds: null });
   // @ts-expect-error resultはnull不可
   void update(1, { result: null });
   // @ts-expect-error resultは定義済みの値のみ

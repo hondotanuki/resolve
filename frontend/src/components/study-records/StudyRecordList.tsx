@@ -104,10 +104,16 @@ export function StudyRecordList({ learningItemId }: StudyRecordListProps) {
                     </div>
                     <div className="flex gap-2">
                       <dt className="font-medium">Duration:</dt>
+                      <dd>{`${record.durationSeconds} seconds`}</dd>
+                    </div>
+                    <div className="flex gap-2">
+                      <dt className="font-medium">Target:</dt>
                       <dd>
-                        {record.durationSeconds == null
-                          ? "—"
-                          : `${record.durationSeconds} seconds`}
+                        {record.targetSeconds} seconds (
+                        {record.durationSeconds > record.targetSeconds
+                          ? "時間超過"
+                          : "時間内"}
+                        )
                       </dd>
                     </div>
                     <div className="flex gap-2">
