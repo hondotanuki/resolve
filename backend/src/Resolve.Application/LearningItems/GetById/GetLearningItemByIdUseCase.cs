@@ -37,13 +37,14 @@ public sealed class GetLearningItemByIdUseCase
 
         return new GetLearningItemOutput(
             item.Id,
-            item.ItemType,
             item.Title,
             status,
-            item.Content,
             item.ArchivedAt,
             item.CreatedAt,
-            item.UpdatedAt
+            item.UpdatedAt,
+            item.Source,
+            item.Category,
+            item.ProblemIndex
         );
     }
 }

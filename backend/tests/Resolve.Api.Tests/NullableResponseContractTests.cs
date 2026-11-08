@@ -26,7 +26,13 @@ public sealed class NullableResponseContractTests
     {
         var createdItem = await _client.PostAsJsonAsync(
             "/learning-items",
-            new { itemType = "english_word", title = "title" }
+            new
+            {
+                source = "AtCoder",
+                category = "Beginner",
+                problemIndex = "A",
+                title = "title",
+            }
         );
         Assert.Equal(HttpStatusCode.Created, createdItem.StatusCode);
         var item = await createdItem.Content.ReadFromJsonAsync<JsonElement>();
@@ -37,29 +43,35 @@ public sealed class NullableResponseContractTests
         Assert.Single(items.EnumerateArray());
         AssertNullProperties(items[0], "archivedAt");
         var detail = await _client.GetFromJsonAsync<JsonElement>($"/learning-items/{itemId}");
-        AssertNullProperties(detail, "content", "archivedAt");
+        AssertNullProperties(detail, "archivedAt");
+        Assert.False(detail.TryGetProperty("content", out _));
 
         var createdRecord = await _client.PostAsJsonAsync(
             $"/learning-items/{itemId}/study-records",
-            new { result = "success", studiedAt = "2026-11-01T00:00:00Z" }
+            new
+            {
+                result = "success",
+                studiedAt = "2026-11-01T00:00:00Z",
+                durationSeconds = 0,
+            }
         );
         Assert.Equal(HttpStatusCode.Created, createdRecord.StatusCode);
         var record = await createdRecord.Content.ReadFromJsonAsync<JsonElement>();
-        AssertNullProperties(record, "durationSeconds", "memo");
+        AssertNullProperties(record, "memo");
         var recordId = record.GetProperty("id").GetInt32();
 
         var records = await _client.GetFromJsonAsync<JsonElement>(
             $"/learning-items/{itemId}/study-records"
         );
         Assert.Single(records.EnumerateArray());
-        AssertNullProperties(records[0], "durationSeconds", "memo");
+        AssertNullProperties(records[0], "memo");
         var updated = await _client.PatchAsJsonAsync(
             $"/study-records/{recordId}",
             new { result = "failure" }
         );
         Assert.Equal(HttpStatusCode.OK, updated.StatusCode);
         var updatedRecord = await updated.Content.ReadFromJsonAsync<JsonElement>();
-        AssertNullProperties(updatedRecord, "durationSeconds", "memo");
+        AssertNullProperties(updatedRecord, "memo");
     }
 
     [Fact]
@@ -69,13 +81,24 @@ public sealed class NullableResponseContractTests
         var schemas = document.GetProperty("components").GetProperty("schemas");
         AssertRequiredNullable(schemas, "CreateLearningItemResponse", "archivedAt");
         AssertRequiredNullable(schemas, "ListLearningItemsResponse", "archivedAt");
-        AssertRequiredNullable(schemas, "GetLearningItemResponse", "content", "archivedAt");
-        AssertRequiredNullable(schemas, "CreateStudyRecordResponse", "durationSeconds", "memo");
-        AssertRequiredNullable(schemas, "ListStudyRecordsResponse", "durationSeconds", "memo");
-        AssertRequiredNullable(schemas, "UpdateStudyRecordResponse", "durationSeconds", "memo");
-        AssertOptionalNullable(schemas, "CreateLearningItemRequest", "content");
-        AssertOptionalNullable(schemas, "CreateStudyRecordRequest", "durationSeconds", "memo");
-        AssertOptionalNullable(schemas, "UpdateStudyRecordRequest", "durationSeconds", "memo");
+        AssertRequiredNullable(schemas, "GetLearningItemResponse", "archivedAt");
+        AssertRequiredNullable(schemas, "CreateStudyRecordResponse", "memo");
+        AssertRequiredNullable(schemas, "ListStudyRecordsResponse", "memo");
+        AssertRequiredNullable(schemas, "UpdateStudyRecordResponse", "memo");
+        Assert.False(
+            schemas
+                .GetProperty("CreateLearningItemRequest")
+                .GetProperty("properties")
+                .TryGetProperty("content", out _)
+        );
+        Assert.False(
+            schemas
+                .GetProperty("GetLearningItemResponse")
+                .GetProperty("properties")
+                .TryGetProperty("content", out _)
+        );
+        AssertOptionalNullable(schemas, "CreateStudyRecordRequest", "memo");
+        AssertOptionalNullable(schemas, "UpdateStudyRecordRequest", "memo");
     }
 
     private static void AssertNullProperties(JsonElement json, params string[] names)

@@ -6,7 +6,9 @@ public sealed class StudyRecord
     public int LearningItemId { get; private set; }
     public StudyResult Result { get; private set; }
     public DateTime StudiedAt { get; private set; }
-    public int? DurationSeconds { get; private set; }
+    public int DurationSeconds { get; private set; }
+    public int TargetSeconds { get; private set; }
+    public bool IsOvertime => StudyTime.IsOvertime(DurationSeconds, TargetSeconds);
     public string? Memo { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
@@ -15,24 +17,27 @@ public sealed class StudyRecord
         int learningItemId,
         StudyResult result,
         DateTime studiedAt,
-        int? durationSeconds = null,
+        int durationSeconds,
+        int targetSeconds,
         string? memo = null
     )
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(learningItemId);
         Validate(result, studiedAt, durationSeconds);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(targetSeconds);
 
         LearningItemId = learningItemId;
         Result = result;
         StudiedAt = studiedAt;
         DurationSeconds = durationSeconds;
+        TargetSeconds = targetSeconds;
         Memo = memo;
 
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = CreatedAt;
     }
 
-    public void Update(StudyResult result, DateTime studiedAt, int? durationSeconds, string? memo)
+    public void Update(StudyResult result, DateTime studiedAt, int durationSeconds, string? memo)
     {
         Validate(result, studiedAt, durationSeconds);
 
@@ -44,19 +49,9 @@ public sealed class StudyRecord
         UpdatedAt = DateTime.UtcNow;
     }
 
-    private static void Validate(
-        StudyResult result,
-        DateTime studiedAt,
-        int? durationSeconds = null
-    )
+    private static void Validate(StudyResult result, DateTime studiedAt, int durationSeconds)
     {
-        if (durationSeconds is < 0)
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(
-                durationSeconds.Value,
-                nameof(durationSeconds)
-            );
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(durationSeconds);
 
         if (!Enum.IsDefined(result))
         {

@@ -30,7 +30,12 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
 
     private async Task<LearningItem> CreateLearningItemAsync(string title = "二分探索")
     {
-        var item = new LearningItem(ItemType.AlgorithmProblem, title, null);
+        var item = new LearningItem(
+            title,
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
 
         _dbContext.LearningItems.Add(item);
         await _dbContext.SaveChangesAsync();
@@ -49,7 +54,8 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "二分探索を学習した"
+            memo: "二分探索を学習した",
+            targetSeconds: 600
         );
 
         // Act
@@ -79,15 +85,21 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
     public async Task DurationSecondsとMemoはnullで保存できる()
     {
         var item = await CreateLearningItemAsync();
-        var record = new StudyRecord(item.Id, StudyResult.Reviewed, StudiedAt);
+        var record = new StudyRecord(
+            item.Id,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
         var saved = await _repository.CreateAsync(record);
 
         _dbContext.ChangeTracker.Clear();
         var actual = await _dbContext.StudyRecords.SingleAsync(x => x.Id == saved.Id);
 
-        Assert.Null(actual.DurationSeconds);
+        Assert.Equal(0, actual.DurationSeconds);
         Assert.Null(actual.Memo);
-        Assert.Equal(StudyResult.Reviewed, actual.Result);
+        Assert.Equal(StudyResult.Success, actual.Result);
     }
 
     [Fact]
@@ -97,16 +109,36 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         var otherItem = await CreateLearningItemAsync("クイックソート");
 
         // 先に新しい学習日時の記録を登録
-        await _repository.CreateAsync(new StudyRecord(item.Id, StudyResult.Failure, StudiedAt));
+        await _repository.CreateAsync(
+            new StudyRecord(
+                item.Id,
+                StudyResult.Failure,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
+        );
 
         // 後から古い学習日時の記録を登録
         await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Success, StudiedAt.AddDays(-3))
+            new StudyRecord(
+                item.Id,
+                StudyResult.Success,
+                StudiedAt.AddDays(-3),
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
 
         // 別のLearningItemの、さらに新しい記録
         await _repository.CreateAsync(
-            new StudyRecord(otherItem.Id, StudyResult.Reviewed, StudiedAt.AddDays(1))
+            new StudyRecord(
+                otherItem.Id,
+                StudyResult.Success,
+                StudiedAt.AddDays(1),
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
 
         _dbContext.ChangeTracker.Clear();
@@ -133,7 +165,13 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
     [Fact]
     public async Task 存在しないLearningItemIdでは保存できない()
     {
-        var record = new StudyRecord(999, StudyResult.Success, StudiedAt);
+        var record = new StudyRecord(
+            999,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
 
         await Assert.ThrowsAsync<DbUpdateException>(() => _repository.CreateAsync(record));
     }
@@ -143,7 +181,13 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
     {
         var item = await CreateLearningItemAsync();
         var saved = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Failure, StudiedAt)
+            new StudyRecord(
+                item.Id,
+                StudyResult.Failure,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
 
         using var command = _connection.CreateCommand();
@@ -162,10 +206,22 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         var item = await CreateLearningItemAsync();
 
         var first = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Failure, StudiedAt)
+            new StudyRecord(
+                item.Id,
+                StudyResult.Failure,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
         var second = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Success, StudiedAt)
+            new StudyRecord(
+                item.Id,
+                StudyResult.Success,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
         _dbContext.ChangeTracker.Clear();
 
@@ -185,10 +241,22 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         var item = await CreateLearningItemAsync();
 
         var first = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Failure, StudiedAt)
+            new StudyRecord(
+                item.Id,
+                StudyResult.Failure,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
         var second = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Success, StudiedAt)
+            new StudyRecord(
+                item.Id,
+                StudyResult.Success,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
 
         Assert.True(second.Id > first.Id);
@@ -206,19 +274,49 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         var otherItem = await CreateLearningItemAsync("別の学習対象");
 
         var sameTimeFirst = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Failure, StudiedAt)
+            new StudyRecord(
+                item.Id,
+                StudyResult.Failure,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
         var newer = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Reviewed, StudiedAt.AddDays(1))
+            new StudyRecord(
+                item.Id,
+                StudyResult.Success,
+                StudiedAt.AddDays(1),
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
         var sameTimeSecond = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Success, StudiedAt)
+            new StudyRecord(
+                item.Id,
+                StudyResult.Success,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
         var older = await _repository.CreateAsync(
-            new StudyRecord(item.Id, StudyResult.Success, StudiedAt.AddDays(-1))
+            new StudyRecord(
+                item.Id,
+                StudyResult.Success,
+                StudiedAt.AddDays(-1),
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
         await _repository.CreateAsync(
-            new StudyRecord(otherItem.Id, StudyResult.Success, StudiedAt.AddDays(2))
+            new StudyRecord(
+                otherItem.Id,
+                StudyResult.Success,
+                StudiedAt.AddDays(2),
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
         _dbContext.ChangeTracker.Clear();
 
@@ -237,7 +335,13 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
         var item = await CreateLearningItemAsync();
         var otherItem = await CreateLearningItemAsync("別の学習対象");
         await _repository.CreateAsync(
-            new StudyRecord(otherItem.Id, StudyResult.Success, StudiedAt)
+            new StudyRecord(
+                otherItem.Id,
+                StudyResult.Success,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
 
         var actual = await _repository.ListByLearningItemIdAsync(item.Id);
@@ -327,7 +431,12 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
 
     private async Task<StudyRecord> CreateStudyRecordAsync()
     {
-        var learningItem = new LearningItem(ItemType.AlgorithmProblem, "二分探索", null);
+        var learningItem = new LearningItem(
+            "二分探索",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
 
         _dbContext.LearningItems.Add(learningItem);
         await _dbContext.SaveChangesAsync();
@@ -337,7 +446,8 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "訂正前"
+            memo: "訂正前",
+            targetSeconds: 600
         );
 
         return await _repository.CreateAsync(record);

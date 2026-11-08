@@ -18,9 +18,10 @@ public static class ItemStatusCalculator
 
         return latestRecord.Result switch
         {
-            StudyResult.Success => ItemStatus.Completed,
+            StudyResult.Success => latestRecord.IsOvertime
+                ? ItemStatus.NeedsReview
+                : ItemStatus.Completed,
             StudyResult.Failure => ItemStatus.NeedsReview,
-            StudyResult.Reviewed => ItemStatus.Completed,
             _ => throw new InvalidOperationException("Unknown study result."),
         };
     }

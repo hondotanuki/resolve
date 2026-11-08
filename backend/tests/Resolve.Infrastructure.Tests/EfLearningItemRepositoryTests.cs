@@ -1,4 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Resolve.Domain;
 using Resolve.Infrastructure.Persistence;
@@ -29,7 +29,12 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
     [Fact]
     public async Task CreateAsyncでLearningItemを保存できる()
     {
-        var item = new LearningItem(ItemType.AlgorithmProblem, "二分探索", "二分探索の問題を解く");
+        var item = new LearningItem(
+            "二分探索",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
 
         var saved = await _repository.CreateAsync(item);
 
@@ -39,8 +44,7 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
 
         Assert.True(saved.Id > 0);
         Assert.Equal("二分探索", actual.Title);
-        Assert.Equal(ItemType.AlgorithmProblem, actual.ItemType);
-        Assert.Equal("二分探索の問題を解く", actual.Content);
+
         Assert.Equal(saved.CreatedAt, actual.CreatedAt);
         Assert.Equal(saved.UpdatedAt, actual.UpdatedAt);
         Assert.Equal(DateTimeKind.Utc, actual.CreatedAt.Kind);
@@ -51,7 +55,12 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
     [Fact]
     public async Task ArchivedAtをUTCで再取得できる()
     {
-        var item = new LearningItem(ItemType.AlgorithmProblem, "二分探索", null);
+        var item = new LearningItem(
+            "二分探索",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
         _dbContext.LearningItems.Add(item);
         var archivedAt = new DateTime(2026, 10, 15, 9, 0, 0, DateTimeKind.Utc);
         _dbContext.Entry(item).Property(x => x.ArchivedAt).CurrentValue = archivedAt;

@@ -33,7 +33,13 @@ public sealed class UpdateStudyRecordApiTests
     {
         var response = await _client.PostAsJsonAsync(
             "/learning-items",
-            new { itemType = "algorithm_problem", title = "二分探索" }
+            new
+            {
+                source = "AtCoder",
+                category = "Beginner",
+                problemIndex = "A",
+                title = "二分探索",
+            }
         );
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -114,14 +120,14 @@ public sealed class UpdateStudyRecordApiTests
         var itemId = await CreateLearningItemAsync();
         var recordId = await CreateStudyRecordAsync(itemId, "2026-10-15T09:00:00Z", "success");
 
-        var response = await PatchAsync(recordId, """{"durationSeconds":null,"memo":null}""");
+        var response = await PatchAsync(recordId, """{"memo":null}""");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var updated = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal(JsonValueKind.Null, updated.GetProperty("durationSeconds").ValueKind);
+        Assert.Equal(120, updated.GetProperty("durationSeconds").GetInt32());
         Assert.Equal(JsonValueKind.Null, updated.GetProperty("memo").ValueKind);
         var records = await GetRecordsAsync(itemId);
-        Assert.Equal(JsonValueKind.Null, records[0].GetProperty("durationSeconds").ValueKind);
+        Assert.Equal(120, records[0].GetProperty("durationSeconds").GetInt32());
         Assert.Equal(JsonValueKind.Null, records[0].GetProperty("memo").ValueKind);
         Assert.Equal("success", records[0].GetProperty("result").GetString());
     }
@@ -159,6 +165,7 @@ public sealed class UpdateStudyRecordApiTests
     [InlineData("""{"studiedAt":"2026-10-15T09:00:00+00:00"}""")]
     [InlineData("""{"studiedAt":"invalid"}""")]
     [InlineData("""{"durationSeconds":-1}""")]
+    [InlineData("""{"durationSeconds":null}""")]
     [InlineData("""{"durationSeconds":"120"}""")]
     public async Task 不正な入力は400を返し記録を変更しない(string json)
     {
@@ -262,14 +269,10 @@ public sealed class UpdateStudyRecordApiTests
             "date-time",
             properties.GetProperty("studiedAt").GetProperty("format").GetString()
         );
-        var durationTypes = properties
-            .GetProperty("durationSeconds")
-            .GetProperty("type")
-            .EnumerateArray()
-            .Select(x => x.GetString());
-        Assert.Contains("integer", durationTypes);
-        Assert.Contains("null", durationTypes);
-        Assert.DoesNotContain("string", durationTypes);
+        Assert.Equal(
+            "integer",
+            properties.GetProperty("durationSeconds").GetProperty("type").GetString()
+        );
         var memoTypes = properties
             .GetProperty("memo")
             .GetProperty("type")

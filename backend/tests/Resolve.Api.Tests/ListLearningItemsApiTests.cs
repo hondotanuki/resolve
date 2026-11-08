@@ -32,7 +32,9 @@ public sealed class ListLearningItemsApiTests
     {
         var createRequest = new
         {
-            itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
             title = "二分探索",
             content = "二分探索を解く",
         };
@@ -46,7 +48,7 @@ public sealed class ListLearningItemsApiTests
 
         var item = json[0];
         Assert.True(item.GetProperty("id").GetInt32() > 0);
-        Assert.Equal("algorithm_problem", item.GetProperty("itemType").GetString());
+
         Assert.Equal("二分探索", item.GetProperty("title").GetString());
         Assert.Equal(JsonValueKind.Null, item.GetProperty("archivedAt").ValueKind);
     }

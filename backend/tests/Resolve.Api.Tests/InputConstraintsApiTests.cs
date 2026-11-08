@@ -40,10 +40,7 @@ public sealed class InputConstraintsApiTests
             var duration = properties.GetProperty("durationSeconds");
             Assert.Equal(0, duration.GetProperty("minimum").GetInt32());
             Assert.Equal(int.MaxValue, duration.GetProperty("maximum").GetInt32());
-            Assert.Contains(
-                duration.GetProperty("type").EnumerateArray(),
-                x => x.GetString() == "null"
-            );
+            Assert.Equal("integer", duration.GetProperty("type").GetString());
             var date = properties.GetProperty("studiedAt");
             Assert.Equal("date-time", date.GetProperty("format").GetString());
             Assert.Contains("UTC", date.GetProperty("description").GetString());
@@ -85,7 +82,12 @@ public sealed class InputConstraintsApiTests
         var itemId = await CreateItemAsync();
         var created = await _client.PostAsJsonAsync(
             $"/learning-items/{itemId}/study-records",
-            new { result = "success", studiedAt = "2026-11-01T00:00:00Z" }
+            new
+            {
+                result = "success",
+                studiedAt = "2026-11-01T00:00:00Z",
+                durationSeconds = 0,
+            }
         );
         var record = await created.Content.ReadFromJsonAsync<JsonElement>();
         var createBody = Json(
@@ -115,7 +117,12 @@ public sealed class InputConstraintsApiTests
         var itemId = await CreateItemAsync();
         var created = await _client.PostAsJsonAsync(
             $"/learning-items/{itemId}/study-records",
-            new { result = "success", studiedAt = "2026-11-01T00:00:00Z" }
+            new
+            {
+                result = "success",
+                studiedAt = "2026-11-01T00:00:00Z",
+                durationSeconds = 0,
+            }
         );
         var record = await created.Content.ReadFromJsonAsync<JsonElement>();
         const string initialDate = "0001-01-01T00:00:00Z";
@@ -143,7 +150,13 @@ public sealed class InputConstraintsApiTests
     {
         var response = await _client.PostAsJsonAsync(
             "/learning-items",
-            new { itemType = "english_word", title = "a" }
+            new
+            {
+                source = "AtCoder",
+                category = "Beginner",
+                problemIndex = "A",
+                title = "a",
+            }
         );
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         return (await response.Content.ReadFromJsonAsync<JsonElement>())

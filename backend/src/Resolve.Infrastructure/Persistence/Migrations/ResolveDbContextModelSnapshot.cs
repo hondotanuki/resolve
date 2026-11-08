@@ -28,18 +28,24 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("archived_at");
 
-                    b.Property<string>("Content")
+                    b.Property<string>("Category")
+                        .IsRequired()
                         .HasColumnType("TEXT")
-                        .HasColumnName("content");
+                        .HasColumnName("category");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("ItemType")
+                    b.Property<string>("ProblemIndex")
                         .IsRequired()
                         .HasColumnType("TEXT")
-                        .HasColumnName("item_type");
+                        .HasColumnName("problem_index");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("source");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -66,7 +72,7 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("created_at");
 
-                    b.Property<int?>("DurationSeconds")
+                    b.Property<int>("DurationSeconds")
                         .HasColumnType("INTEGER")
                         .HasColumnName("duration_seconds");
 
@@ -86,6 +92,10 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("StudiedAt")
                         .HasColumnType("TEXT")
                         .HasColumnName("studied_at");
+
+                    b.Property<int>("TargetSeconds")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("target_seconds");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TEXT")

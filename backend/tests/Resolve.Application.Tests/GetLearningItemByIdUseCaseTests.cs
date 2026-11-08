@@ -20,15 +20,19 @@ public class GetLearningItemByIdUseCaseTests
     [Fact]
     public async Task 存在するIDなら詳細を返す()
     {
-        var item = new LearningItem(ItemType.AlgorithmProblem, "二分探索", "二分探索を解く");
+        var item = new LearningItem(
+            "二分探索",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
 
         _learningItemRepository.GetByIdResult = item;
         var output = await _useCase.ExecuteAsync(1);
 
         Assert.NotNull(output);
-        Assert.Equal(ItemType.AlgorithmProblem, output.ItemType);
+
         Assert.Equal("二分探索", output.Title);
-        Assert.Equal("二分探索を解く", output.Content);
     }
 
     [Fact]
@@ -43,7 +47,12 @@ public class GetLearningItemByIdUseCaseTests
     [Fact]
     public async Task 記録なしならUnstartedを返す()
     {
-        var item = new LearningItem(ItemType.AlgorithmProblem, "二分探索", "二分探索を解く");
+        var item = new LearningItem(
+            "二分探索",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
         _learningItemRepository.GetByIdResult = item;
         _studyRecordRepository.LatestRecord = null;
         var output = await _useCase.ExecuteAsync(1);
@@ -56,15 +65,21 @@ public class GetLearningItemByIdUseCaseTests
     [Theory]
     [InlineData(StudyResult.Failure, ItemStatus.NeedsReview)]
     [InlineData(StudyResult.Success, ItemStatus.Completed)]
-    [InlineData(StudyResult.Reviewed, ItemStatus.Completed)]
     public async Task 最新の学習結果から現在状態を返す(StudyResult result, ItemStatus expected)
     {
         const int learningItemId = 42;
-        _learningItemRepository.GetByIdResult = new LearningItem(ItemType.EnglishWord, "apple");
+        _learningItemRepository.GetByIdResult = new LearningItem(
+            "apple",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
         _studyRecordRepository.LatestRecord = new StudyRecord(
             learningItemId,
             result,
-            new DateTime(2026, 10, 15, 9, 0, 0, DateTimeKind.Utc)
+            new DateTime(2026, 10, 15, 9, 0, 0, DateTimeKind.Utc),
+            durationSeconds: 0,
+            targetSeconds: 600
         );
 
         var output = await _useCase.ExecuteAsync(learningItemId);

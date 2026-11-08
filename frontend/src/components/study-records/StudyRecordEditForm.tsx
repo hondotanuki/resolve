@@ -36,7 +36,7 @@ export function StudyRecordEditForm({
   const [result, setResult] = useState(record.result);
   const [studiedAt, setStudiedAt] = useState(initialStudiedAt);
   const [durationSeconds, setDurationSeconds] = useState(
-    record.durationSeconds?.toString() ?? "",
+    record.durationSeconds.toString(),
   );
   const [memo, setMemo] = useState(record.memo ?? "");
 
@@ -65,11 +65,12 @@ export function StudyRecordEditForm({
       return;
     }
 
-    const durationValue =
-      durationSeconds.trim() === "" ? null : Number(durationSeconds);
+    const durationValue = Number(durationSeconds);
     if (
-      durationValue !== null &&
-      (!Number.isSafeInteger(durationValue) || durationValue < 0)
+      durationSeconds.trim() === "" ||
+      !Number.isInteger(durationValue) ||
+      durationValue < 0 ||
+      durationValue > 2147483647
     ) {
       setDurationError("0以上の整数を入力してください。");
       return;
@@ -84,7 +85,7 @@ export function StudyRecordEditForm({
     if (studiedAt !== initialStudiedAt) {
       data.studiedAt = date.toISOString();
     }
-    if (durationValue !== (record.durationSeconds ?? null)) {
+    if (durationValue !== record.durationSeconds) {
       data.durationSeconds = durationValue;
     }
     // 空文字列をnullに統一して扱う
@@ -153,7 +154,6 @@ export function StudyRecordEditForm({
           >
             <option value="success">success</option>
             <option value="failure">failure</option>
-            <option value="reviewed">reviewed</option>
           </select>
         </div>
 
@@ -196,6 +196,7 @@ export function StudyRecordEditForm({
           <input
             id={`study-duration-${record.id}`}
             type="number"
+            required
             min="0"
             value={durationSeconds}
             onChange={(event) => setDurationSeconds(event.target.value)}

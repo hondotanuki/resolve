@@ -23,51 +23,30 @@ public sealed class ApiStringContractTests
     public Task DisposeAsync() => Task.CompletedTask;
 
     [Theory]
-    [InlineData("algorithm_problem")]
-    [InlineData("english_word")]
-    [InlineData("english_article")]
-    public async Task 学習対象の種別は既存の文字列で送受信できる(string itemType)
-    {
-        var response = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new { itemType, title = "title" }
-        );
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal(itemType, json.GetProperty("itemType").GetString());
-    }
-
-    [Theory]
-    [InlineData("\"ALGORITHM_PROBLEM\"")]
-    [InlineData("\"unknown\"")]
-    [InlineData("0")]
-    [InlineData("null")]
-    public async Task 不正な学習対象の種別は拒否する(string value)
-    {
-        var body = new StringContent(
-            $"{{\"itemType\":{value},\"title\":\"title\"}}",
-            Encoding.UTF8,
-            "application/json"
-        );
-        var response = await _client.PostAsync("/learning-items", body);
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Theory]
     [InlineData("success")]
     [InlineData("failure")]
-    [InlineData("reviewed")]
     public async Task 学習結果は既存の文字列で登録と更新ができる(string result)
     {
         var itemResponse = await _client.PostAsJsonAsync(
             "/learning-items",
-            new { itemType = "english_word", title = "title" }
+            new
+            {
+                source = "AtCoder",
+                category = "Beginner",
+                problemIndex = "A",
+                title = "title",
+            }
         );
         var item = await itemResponse.Content.ReadFromJsonAsync<JsonElement>();
         var itemId = item.GetProperty("id").GetInt32();
         var created = await _client.PostAsJsonAsync(
             $"/learning-items/{itemId}/study-records",
-            new { result, studiedAt = "2026-11-01T00:00:00Z" }
+            new
+            {
+                result,
+                studiedAt = "2026-11-01T00:00:00Z",
+                durationSeconds = 0,
+            }
         );
         Assert.Equal(HttpStatusCode.Created, created.StatusCode);
         var json = await created.Content.ReadFromJsonAsync<JsonElement>();
@@ -89,7 +68,7 @@ public sealed class ApiStringContractTests
     public async Task 不正な学習結果は登録と更新で拒否する(string value)
     {
         var create = new StringContent(
-            $"{{\"result\":{value},\"studiedAt\":\"2026-11-01T00:00:00Z\"}}",
+            $"{{\"result\":{value},\"studiedAt\":\"2026-11-01T00:00:00Z\",\"durationSeconds\":0}}",
             Encoding.UTF8,
             "application/json"
         );
@@ -112,21 +91,6 @@ public sealed class ApiStringContractTests
         foreach (
             var name in new[]
             {
-                "CreateLearningItemRequest",
-                "CreateLearningItemResponse",
-                "ListLearningItemsResponse",
-                "GetLearningItemResponse",
-            }
-        )
-            AssertValues(
-                schemas,
-                name,
-                "itemType",
-                ["algorithm_problem", "english_word", "english_article"]
-            );
-        foreach (
-            var name in new[]
-            {
                 "CreateStudyRecordRequest",
                 "CreateStudyRecordResponse",
                 "ListStudyRecordsResponse",
@@ -134,7 +98,7 @@ public sealed class ApiStringContractTests
                 "UpdateStudyRecordResponse",
             }
         )
-            AssertValues(schemas, name, "result", ["success", "failure", "reviewed"]);
+            AssertValues(schemas, name, "result", ["success", "failure"]);
         foreach (var name in new[] { "GetLearningItemResponse", "CreateStudyRecordResponse" })
             AssertValues(schemas, name, "status", ["unstarted", "needs_review", "completed"]);
     }

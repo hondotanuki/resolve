@@ -11,5 +11,4 @@ export type CreateStudyRecordRequestResult =
 export const CreateStudyRecordRequestResult = {
   success: "success",
   failure: "failure",
-  reviewed: "reviewed",
 } as const;

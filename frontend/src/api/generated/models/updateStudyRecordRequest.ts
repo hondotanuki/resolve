@@ -13,9 +13,8 @@ export type UpdateStudyRecordRequest = unknown & {
   /**
    * @minimum 0
    * @maximum 2147483647
-   * @nullable
    */
-  durationSeconds?: number | null;
+  durationSeconds?: number;
   /** @nullable */
   memo?: string | null;
 };

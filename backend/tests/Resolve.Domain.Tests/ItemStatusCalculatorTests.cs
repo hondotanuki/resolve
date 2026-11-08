@@ -16,10 +16,12 @@ public sealed class ItemStatusCalculatorTests
     [Theory]
     [InlineData(StudyResult.Success, ItemStatus.Completed)]
     [InlineData(StudyResult.Failure, ItemStatus.NeedsReview)]
-    [InlineData(StudyResult.Reviewed, ItemStatus.Completed)]
     public void 最新の学習結果から状態を算出できる(StudyResult result, ItemStatus expected)
     {
-        var records = new[] { new StudyRecord(1, result, StudiedAt) };
+        var records = new[]
+        {
+            new StudyRecord(1, result, StudiedAt, durationSeconds: 0, targetSeconds: 600),
+        };
         var status = ItemStatusCalculator.Calculate(records);
 
         Assert.Equal(expected, status);
@@ -30,11 +32,37 @@ public sealed class ItemStatusCalculatorTests
     {
         var records = new[]
         {
-            new StudyRecord(1, StudyResult.Failure, StudiedAt),
-            new StudyRecord(1, StudyResult.Success, StudiedAt.AddDays(-2)),
+            new StudyRecord(
+                1,
+                StudyResult.Failure,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            ),
+            new StudyRecord(
+                1,
+                StudyResult.Success,
+                StudiedAt.AddDays(-2),
+                durationSeconds: 0,
+                targetSeconds: 600
+            ),
         };
         var status = ItemStatusCalculator.Calculate(records);
 
         Assert.Equal(ItemStatus.NeedsReview, status);
+    }
+
+    [Theory]
+    [InlineData(StudyResult.Success, 600, ItemStatus.Completed)]
+    [InlineData(StudyResult.Success, 601, ItemStatus.NeedsReview)]
+    [InlineData(StudyResult.Failure, 0, ItemStatus.NeedsReview)]
+    public void 正誤と保存時の目標時間から状態を算出する(
+        StudyResult result,
+        int duration,
+        ItemStatus expected
+    )
+    {
+        var record = new StudyRecord(1, result, StudiedAt, duration, 600);
+        Assert.Equal(expected, ItemStatusCalculator.Calculate([record]));
     }
 }

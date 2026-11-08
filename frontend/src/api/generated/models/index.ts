@@ -6,19 +6,23 @@
  */
 
 export * from "./createLearningItemRequest";
-export * from "./createLearningItemRequestItemType";
+export * from "./createLearningItemRequestCategory";
+export * from "./createLearningItemRequestSource";
 export * from "./createLearningItemResponse";
-export * from "./createLearningItemResponseItemType";
+export * from "./createLearningItemResponseCategory";
+export * from "./createLearningItemResponseSource";
 export * from "./createStudyRecordRequest";
 export * from "./createStudyRecordRequestResult";
 export * from "./createStudyRecordResponse";
 export * from "./createStudyRecordResponseResult";
 export * from "./createStudyRecordResponseStatus";
 export * from "./getLearningItemResponse";
-export * from "./getLearningItemResponseItemType";
+export * from "./getLearningItemResponseCategory";
+export * from "./getLearningItemResponseSource";
 export * from "./getLearningItemResponseStatus";
 export * from "./listLearningItemsResponse";
-export * from "./listLearningItemsResponseItemType";
+export * from "./listLearningItemsResponseCategory";
+export * from "./listLearningItemsResponseSource";
 export * from "./listStudyRecordsResponse";
 export * from "./listStudyRecordsResponseResult";
 export * from "./updateStudyRecordRequest";

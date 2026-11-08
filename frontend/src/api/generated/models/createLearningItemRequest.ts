@@ -4,15 +4,17 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateLearningItemRequestItemType } from "./createLearningItemRequestItemType";
+import type { CreateLearningItemRequestCategory } from "./createLearningItemRequestCategory";
+import type { CreateLearningItemRequestSource } from "./createLearningItemRequestSource";
 
 export interface CreateLearningItemRequest {
-  itemType: CreateLearningItemRequestItemType;
   /**
    * 空文字または空白文字のみのタイトルは指定できません。
    * @minLength 1
    */
   title: string;
-  /** @nullable */
-  content?: string | null;
+  source: CreateLearningItemRequestSource;
+  category: CreateLearningItemRequestCategory;
+  /** @pattern ^[A-Z]$ */
+  problemIndex: string;
 }

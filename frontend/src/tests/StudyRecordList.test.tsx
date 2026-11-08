@@ -28,7 +28,7 @@ describe("StudyRecordList", () => {
     } as never);
   });
 
-  it("履歴をAPIの順に表示し未入力と0秒を区別する", () => {
+  it("履歴の順序と目標時間内・超過を表示する", () => {
     const studiedAt = "2026-10-15T09:00:00Z";
     vi.mocked(useListStudyRecords).mockReturnValue({
       data: {
@@ -41,6 +41,7 @@ describe("StudyRecordList", () => {
             result: "success",
             studiedAt,
             durationSeconds: 0,
+            targetSeconds: 600,
             memo: "復習した\n次も確認",
           },
           {
@@ -48,7 +49,8 @@ describe("StudyRecordList", () => {
             learningItemId: 42,
             result: "failure",
             studiedAt,
-            durationSeconds: null,
+            durationSeconds: 601,
+            targetSeconds: 600,
             memo: null,
           },
         ],
@@ -73,7 +75,9 @@ describe("StudyRecordList", () => {
       ),
     ).toBeInTheDocument();
     expect(within(items[1]).getByText("failure")).toBeInTheDocument();
-    expect(within(items[1]).getAllByText("—")).toHaveLength(2);
+    expect(within(items[1]).getByText("—")).toBeInTheDocument();
+    expect(within(items[0]).getByText(/時間内/)).toBeInTheDocument();
+    expect(within(items[1]).getByText(/時間超過/)).toBeInTheDocument();
   });
 
   it("履歴がない場合は空状態を表示する", () => {
@@ -127,6 +131,7 @@ describe("StudyRecordList", () => {
               result: "success",
               studiedAt: "2026-10-15T09:00:00Z",
               durationSeconds: 60,
+              targetSeconds: 600,
               memo: "記録",
             },
           ],

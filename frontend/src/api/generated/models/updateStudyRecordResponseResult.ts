@@ -11,5 +11,4 @@ export type UpdateStudyRecordResponseResult =
 export const UpdateStudyRecordResponseResult = {
   success: "success",
   failure: "failure",
-  reviewed: "reviewed",
 } as const;

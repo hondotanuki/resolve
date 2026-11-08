@@ -22,13 +22,19 @@ public sealed class ListStudyRecordsUseCaseTests
     public async Task 対象が存在するとき指定したIDの履歴をOutputに変換する()
     {
         const int learningItemId = 42;
-        _learningItems.GetByIdResult = new LearningItem(ItemType.EnglishWord, "apple");
+        _learningItems.GetByIdResult = new LearningItem(
+            "apple",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
         var record = new StudyRecord(
             learningItemId,
             StudyResult.Failure,
             StudiedAt,
             durationSeconds: 120,
-            memo: "復習する"
+            memo: "復習する",
+            targetSeconds: 600
         );
         _records.ListResult = [record];
 
@@ -50,7 +56,12 @@ public sealed class ListStudyRecordsUseCaseTests
     [Fact]
     public async Task 対象は存在するが記録がなければ空の一覧を返す()
     {
-        _learningItems.GetByIdResult = new LearningItem(ItemType.EnglishWord, "apple");
+        _learningItems.GetByIdResult = new LearningItem(
+            "apple",
+            source: ProblemSource.AtCoder,
+            category: ContestCategory.Beginner,
+            problemIndex: 'A'
+        );
 
         var output = await _useCase.ExecuteAsync(42);
 

@@ -33,7 +33,9 @@ public sealed class CreateStudyRecordApiTests
     {
         var request = new
         {
-            itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
             title = "二分探索",
             content = "二分探索を解く",
         };
@@ -65,7 +67,12 @@ public sealed class CreateStudyRecordApiTests
     public async Task 正常なJSONなら登録結果を返す()
     {
         var learningItemId = await CreateLearningItemAsync();
-        var createStudyRecordRequest = new { Result = "success", StudiedAt };
+        var createStudyRecordRequest = new
+        {
+            Result = "success",
+            StudiedAt,
+            DurationSeconds = 0,
+        };
 
         var createdStudyRecordResponse = await _client.PostAsJsonAsync(
             $"/learning-items/{learningItemId}/study-records",
@@ -87,10 +94,7 @@ public sealed class CreateStudyRecordApiTests
         Assert.Equal("success", createdStudyRecordJson.GetProperty("result").GetString());
         Assert.Equal("completed", createdStudyRecordJson.GetProperty("status").GetString());
         Assert.Equal(StudiedAt, createdStudyRecordJson.GetProperty("studiedAt").GetDateTime());
-        Assert.Equal(
-            JsonValueKind.Null,
-            createdStudyRecordJson.GetProperty("durationSeconds").ValueKind
-        );
+        Assert.Equal(0, createdStudyRecordJson.GetProperty("durationSeconds").GetInt32());
         Assert.Equal(JsonValueKind.Null, createdStudyRecordJson.GetProperty("memo").ValueKind);
     }
 
@@ -129,7 +133,12 @@ public sealed class CreateStudyRecordApiTests
     public async Task FailureならNeedsReviewを返す()
     {
         var learningItemId = await CreateLearningItemAsync();
-        var request = new { Result = "failure", StudiedAt };
+        var request = new
+        {
+            Result = "failure",
+            StudiedAt,
+            DurationSeconds = 0,
+        };
 
         var response = await _client.PostAsJsonAsync(
             $"/learning-items/{learningItemId}/study-records",
@@ -146,7 +155,12 @@ public sealed class CreateStudyRecordApiTests
     [Fact]
     public async Task 存在しないIDなら404を返す()
     {
-        var createStudyRecordRequest = new { Result = "success", StudiedAt };
+        var createStudyRecordRequest = new
+        {
+            Result = "success",
+            StudiedAt,
+            DurationSeconds = 0,
+        };
         var createdStudyRecordResponse = await _client.PostAsJsonAsync(
             "/learning-items/999999/study-records",
             createStudyRecordRequest

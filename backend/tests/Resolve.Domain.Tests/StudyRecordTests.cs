@@ -8,7 +8,13 @@ public sealed class StudyRecordTests
     public void 有効な入力でStudyRecordを生成できる()
     {
         var before = DateTime.UtcNow;
-        var record = new StudyRecord(1, StudyResult.Success, StudiedAt);
+        var record = new StudyRecord(
+            1,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
         var after = DateTime.UtcNow;
 
         Assert.Equal(1, record.LearningItemId);
@@ -25,7 +31,13 @@ public sealed class StudyRecordTests
     public void LearningItemIdが不正なら生成できない(int id)
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            new StudyRecord(id, StudyResult.Success, StudiedAt)
+            new StudyRecord(
+                id,
+                StudyResult.Success,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
     }
 
@@ -35,14 +47,22 @@ public sealed class StudyRecordTests
     public void StudyResultが不正なら生成できない(int value)
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            new StudyRecord(1, (StudyResult)value, StudiedAt)
+            new StudyRecord(
+                1,
+                (StudyResult)value,
+                StudiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
     }
 
     [Fact]
     public void StudiedAtが未設定なら生成できない()
     {
-        Assert.Throws<ArgumentException>(() => new StudyRecord(1, StudyResult.Success, default));
+        Assert.Throws<ArgumentException>(() =>
+            new StudyRecord(1, StudyResult.Success, default, durationSeconds: 0, targetSeconds: 600)
+        );
     }
 
     [Theory]
@@ -53,18 +73,30 @@ public sealed class StudyRecordTests
         var studiedAt = new DateTime(2026, 10, 15, 9, 0, 0, kind);
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            new StudyRecord(1, StudyResult.Success, studiedAt)
+            new StudyRecord(
+                1,
+                StudyResult.Success,
+                studiedAt,
+                durationSeconds: 0,
+                targetSeconds: 600
+            )
         );
 
         Assert.Equal("studiedAt", exception.ParamName);
     }
 
     [Fact]
-    public void DurationSecondsとMemoを省略できる()
+    public void Memoを省略できる()
     {
-        var record = new StudyRecord(1, StudyResult.Success, StudiedAt);
+        var record = new StudyRecord(
+            1,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
 
-        Assert.Null(record.DurationSeconds);
+        Assert.Equal(0, record.DurationSeconds);
         Assert.Null(record.Memo);
     }
 
@@ -76,7 +108,8 @@ public sealed class StudyRecordTests
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "二分探索を復習した"
+            memo: "二分探索を復習した",
+            targetSeconds: 600
         );
 
         Assert.Equal(1800, record.DurationSeconds);
@@ -89,14 +122,26 @@ public sealed class StudyRecordTests
     public void DurationSecondsが負なら生成できない(int durationSeconds)
     {
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            new StudyRecord(1, StudyResult.Success, StudiedAt, durationSeconds: durationSeconds)
+            new StudyRecord(
+                1,
+                StudyResult.Success,
+                StudiedAt,
+                durationSeconds: durationSeconds,
+                targetSeconds: 600
+            )
         );
     }
 
     [Fact]
     public void DurationSecondsが0でも生成できる()
     {
-        var record = new StudyRecord(1, StudyResult.Success, StudiedAt, durationSeconds: 0);
+        var record = new StudyRecord(
+            1,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
 
         Assert.Equal(0, record.DurationSeconds);
     }
@@ -109,7 +154,8 @@ public sealed class StudyRecordTests
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "訂正前"
+            memo: "訂正前",
+            targetSeconds: 600
         );
 
         var originalId = record.Id;
@@ -145,22 +191,29 @@ public sealed class StudyRecordTests
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "訂正前"
+            memo: "訂正前",
+            targetSeconds: 600
         );
 
-        record.Update(StudyResult.Success, StudiedAt, durationSeconds: null, memo: null);
+        record.Update(StudyResult.Success, StudiedAt, durationSeconds: 0, memo: null);
 
-        Assert.Null(record.DurationSeconds);
+        Assert.Equal(0, record.DurationSeconds);
         Assert.Null(record.Memo);
     }
 
     [Fact]
     public void StudiedAtが未設定なら訂正できない()
     {
-        var record = new StudyRecord(1, StudyResult.Success, StudiedAt);
+        var record = new StudyRecord(
+            1,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
 
         Assert.Throws<ArgumentException>(() =>
-            record.Update(StudyResult.Success, default, durationSeconds: null, memo: null)
+            record.Update(StudyResult.Success, default, durationSeconds: 0, memo: null)
         );
     }
 
@@ -169,11 +222,17 @@ public sealed class StudyRecordTests
     [InlineData(DateTimeKind.Unspecified)]
     public void StudiedAtがUTC以外なら訂正できない(DateTimeKind kind)
     {
-        var record = new StudyRecord(1, StudyResult.Success, StudiedAt);
+        var record = new StudyRecord(
+            1,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
         var studiedAt = new DateTime(2026, 10, 16, 9, 0, 0, kind);
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            record.Update(StudyResult.Success, studiedAt, null, null)
+            record.Update(StudyResult.Success, studiedAt, 0, null)
         );
 
         Assert.Equal("studiedAt", exception.ParamName);
@@ -184,10 +243,16 @@ public sealed class StudyRecordTests
     [InlineData(999)]
     public void StudyResultが不正なら訂正できない(int value)
     {
-        var record = new StudyRecord(1, StudyResult.Success, StudiedAt);
+        var record = new StudyRecord(
+            1,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            record.Update((StudyResult)value, StudiedAt, null, null)
+            record.Update((StudyResult)value, StudiedAt, 0, null)
         );
     }
 
@@ -196,7 +261,13 @@ public sealed class StudyRecordTests
     [InlineData(-60)]
     public void DurationSecondsが負なら訂正できない(int durationSeconds)
     {
-        var record = new StudyRecord(1, StudyResult.Success, StudiedAt);
+        var record = new StudyRecord(
+            1,
+            StudyResult.Success,
+            StudiedAt,
+            durationSeconds: 0,
+            targetSeconds: 600
+        );
 
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             record.Update(StudyResult.Success, StudiedAt, durationSeconds, null)
@@ -211,7 +282,8 @@ public sealed class StudyRecordTests
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "訂正前"
+            memo: "訂正前",
+            targetSeconds: 600
         );
 
         var originalUpdatedAt = record.UpdatedAt;

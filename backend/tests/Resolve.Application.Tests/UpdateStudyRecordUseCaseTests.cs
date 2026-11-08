@@ -25,7 +25,8 @@ public sealed class UpdateStudyRecordUseCaseTests
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "訂正前"
+            memo: "訂正前",
+            targetSeconds: 600
         );
         _repository.RecordById = record;
         var originalCreatedAt = record.CreatedAt;
@@ -66,7 +67,8 @@ public sealed class UpdateStudyRecordUseCaseTests
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "訂正前"
+            memo: "訂正前",
+            targetSeconds: 600
         );
         _repository.RecordById = record;
 
@@ -75,14 +77,14 @@ public sealed class UpdateStudyRecordUseCaseTests
             Id = 10,
             Result = default,
             StudiedAt = default,
-            DurationSeconds = OptionalValue.Of<int?>(null),
+            DurationSeconds = default,
             Memo = OptionalValue.Of<string?>(null),
         };
 
         var output = await _useCase.ExecuteAsync(input);
 
         Assert.NotNull(output);
-        Assert.Null(output.DurationSeconds);
+        Assert.Equal(1800, output.DurationSeconds);
         Assert.Null(output.Memo);
         Assert.Equal(StudiedAt, output.StudiedAt);
         Assert.Equal(StudyResult.Success, output.Result);
@@ -116,7 +118,8 @@ public sealed class UpdateStudyRecordUseCaseTests
             StudyResult.Success,
             StudiedAt,
             durationSeconds: 1800,
-            memo: "訂正前"
+            memo: "訂正前",
+            targetSeconds: 600
         );
         _repository.RecordById = record;
 
@@ -125,7 +128,7 @@ public sealed class UpdateStudyRecordUseCaseTests
             Id = 10,
             Result = default,
             StudiedAt = default,
-            DurationSeconds = OptionalValue.Of<int?>(-1),
+            DurationSeconds = OptionalValue.Of(-1),
             Memo = OptionalValue.Of<string?>("訂正後"),
         };
 

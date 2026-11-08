@@ -16,10 +16,6 @@ const results = [
     value: "failure",
     label: "Failure",
   },
-  {
-    value: "reviewed",
-    label: "Reviewed",
-  },
 ] as const satisfies ReadonlyArray<{
   value: CreateStudyRecordRequestResult;
   label: string;
@@ -66,8 +62,13 @@ export function StudyRecordCreateForm({
       return;
     }
 
-    const duration = durationSeconds === "" ? null : Number(durationSeconds);
-    if (duration !== null && (!Number.isInteger(duration) || duration < 0)) {
+    const duration = Number(durationSeconds);
+    if (
+      durationSeconds.trim() === "" ||
+      !Number.isInteger(duration) ||
+      duration < 0 ||
+      duration > 2147483647
+    ) {
       setDurationSecondsError("学習時間は0以上の整数で入力してください。");
       return;
     }
@@ -181,6 +182,7 @@ export function StudyRecordCreateForm({
           <input
             id="durationSeconds"
             type="number"
+            required
             min={0}
             step={1}
             className={`w-full rounded-lg border bg-white px-3 py-2 outline-none ${

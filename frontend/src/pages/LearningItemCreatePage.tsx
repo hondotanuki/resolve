@@ -1,74 +1,61 @@
 import { useState, type SubmitEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   getListLearningItemsQueryKey,
   useCreateLearningItem,
 } from "../api/generated";
-import { useQueryClient } from "@tanstack/react-query";
-import type { CreateLearningItemRequestItemType } from "../api/generated/models";
+import type {
+  CreateLearningItemRequestCategory,
+  CreateLearningItemRequestSource,
+} from "../api/generated/models";
 
-const itemTypes = [
-  {
-    value: "algorithm_problem",
-    label: "Algorithm Problem",
-  },
-  {
-    value: "english_word",
-    label: "English Word",
-  },
-  {
-    value: "english_article",
-    label: "English Article",
-  },
-] as const satisfies ReadonlyArray<{
-  value: CreateLearningItemRequestItemType;
-  label: string;
-}>;
+const categories: Record<
+  CreateLearningItemRequestSource,
+  readonly CreateLearningItemRequestCategory[]
+> = {
+  AtCoder: ["Beginner", "Regular", "RegularPlus", "Grand"],
+  OnlineMathContest: ["Beginner", "Regular", "Expert"],
+};
 
 export function LearningItemCreatePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
-  const [itemType, setItemType] =
-    useState<CreateLearningItemRequestItemType>("algorithm_problem");
+  const [source, setSource] =
+    useState<CreateLearningItemRequestSource>("AtCoder");
+  const [category, setCategory] =
+    useState<CreateLearningItemRequestCategory>("Beginner");
+  const [problemIndex, setProblemIndex] = useState("A");
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-
   const [titleError, setTitleError] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
-
   const createMutation = useCreateLearningItem();
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-
     setTitleError(null);
     setApiError(null);
-
     if (title.trim() === "") {
       setTitleError("タイトルを入力してください。");
       return;
     }
-
     try {
       const response = await createMutation.mutateAsync({
         data: {
-          itemType,
           title: title.trim(),
-          content: content.trim() || null,
+          source,
+          category,
+          problemIndex,
         },
       });
-
       if (response.status !== 201) {
         setApiError("入力内容を確認してください。");
         return;
       }
-
       await queryClient.invalidateQueries({
         queryKey: getListLearningItemsQueryKey(),
       });
-
-      navigate("/learning-items");
+      navigate(`/learning-items/${response.data.id}`);
     } catch {
       setApiError("LearningItemの登録に失敗しました。");
     }
@@ -77,73 +64,106 @@ export function LearningItemCreatePage() {
   return (
     <div className="max-w-2xl">
       <h1 className="mb-8 text-2xl font-semibold">New Learning Item</h1>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="itemType" className="mb-2 block text-sm font-medium">
-            Item Type
-          </label>
-
-          <select
-            id="itemType"
-            value={itemType}
-            onChange={(event) => {
-              const selected = itemTypes.find(
-                (item) => item.value === event.target.value,
-              );
-              if (selected) setItemType(selected.value);
-            }}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 outline-none focus:border-zinc-900"
-          >
-            {itemTypes.map((item) => (
-              <option key={item.value} value={item.value}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
+      <form noValidate onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="title" className="mb-2 block text-sm font-medium">
             Title
           </label>
-
           <input
             id="title"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 outline-none focus:border-zinc-900"
+            className="w-full rounded-lg border border-zinc-300 px-3 py-2"
           />
-
           {titleError && (
-            <p className="mt-2 text-sm text-red-600">{titleError}</p>
+            <p role="alert" className="mt-2 text-sm text-red-600">
+              {titleError}
+            </p>
           )}
         </div>
-
         <div>
-          <label htmlFor="content" className="mb-2 block text-sm font-medium">
-            Content
+          <label htmlFor="source" className="mb-2 block text-sm font-medium">
+            Source
           </label>
-
-          <textarea
-            id="content"
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            rows={8}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 outline-none focus:border-zinc-900"
-          />
+          <select
+            id="source"
+            value={source}
+            onChange={(event) => {
+              const value = event.target.value;
+              if (value === "AtCoder" || value === "OnlineMathContest") {
+                setSource(value);
+                setCategory("Beginner");
+                setProblemIndex("A");
+              }
+            }}
+            className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          >
+            <option value="AtCoder">AtCoder</option>
+            <option value="OnlineMathContest">OnlineMathContest</option>
+          </select>
         </div>
-
+        <div>
+          <label htmlFor="category" className="mb-2 block text-sm font-medium">
+            Contest Category
+          </label>
+          <select
+            id="category"
+            value={category}
+            onChange={(event) => {
+              const selected = categories[source].find(
+                (value) => value === event.target.value,
+              );
+              if (selected) {
+                setCategory(selected);
+                setProblemIndex("A");
+              }
+            }}
+            className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          >
+            {categories[source].map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label
+            htmlFor="problemIndex"
+            className="mb-2 block text-sm font-medium"
+          >
+            Problem Index
+          </label>
+          <select
+            id="problemIndex"
+            value={problemIndex}
+            onChange={(event) => setProblemIndex(event.target.value)}
+            className="w-full rounded-lg border border-zinc-300 px-3 py-2"
+          >
+            {(source === "AtCoder" && category === "Grand"
+              ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+              : "ABCDEFG"
+            )
+              .split("")
+              .map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+          </select>
+        </div>
         {apiError && (
-          <p className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+          <p
+            role="alert"
+            className="rounded-lg bg-red-50 p-4 text-sm text-red-700"
+          >
             {apiError}
           </p>
         )}
-
         <button
           type="submit"
           disabled={createMutation.isPending}
-          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm text-white disabled:opacity-50"
         >
           {createMutation.isPending ? "Saving..." : "Create"}
         </button>

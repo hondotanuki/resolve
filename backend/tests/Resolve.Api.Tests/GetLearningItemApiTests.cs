@@ -32,7 +32,9 @@ public sealed class GetLearningItemApiTests
     {
         var createRequest = new
         {
-            itemType = "algorithm_problem",
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
             title = "二分探索",
             content = "二分探索を解く",
         };
@@ -48,9 +50,9 @@ public sealed class GetLearningItemApiTests
         var updatedAt = json.GetProperty("updatedAt").GetDateTime();
 
         Assert.Equal(id, json.GetProperty("id").GetInt32());
-        Assert.Equal("algorithm_problem", json.GetProperty("itemType").GetString());
+
         Assert.Equal("二分探索", json.GetProperty("title").GetString());
-        Assert.Equal("二分探索を解く", json.GetProperty("content").GetString());
+        Assert.False(json.TryGetProperty("content", out _));
         Assert.Equal("unstarted", json.GetProperty("status").GetString());
         Assert.Equal(JsonValueKind.Null, json.GetProperty("archivedAt").ValueKind);
         Assert.NotEqual(default, createdAt);
@@ -68,9 +70,15 @@ public sealed class GetLearningItemApiTests
     }
 
     [Fact]
-    public async Task ContentなしのLearningItemも取得できる()
+    public async Task 詳細に廃止したContentを含まない()
     {
-        var createRequest = new { itemType = "algorithm_problem", title = "二分探索" };
+        var createRequest = new
+        {
+            source = "AtCoder",
+            category = "Beginner",
+            problemIndex = "A",
+            title = "二分探索",
+        };
         var createResponse = await _client.PostAsJsonAsync("/learning-items", createRequest);
 
         var created = await createResponse.Content.ReadFromJsonAsync<JsonElement>();
@@ -79,18 +87,23 @@ public sealed class GetLearningItemApiTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal(JsonValueKind.Null, json.GetProperty("content").ValueKind);
+        Assert.False(json.TryGetProperty("content", out _));
     }
 
     [Theory]
     [InlineData("failure", "needs_review")]
     [InlineData("success", "completed")]
-    [InlineData("reviewed", "completed")]
     public async Task 最新の学習結果に応じた現在状態を返す(string result, string expectedStatus)
     {
         var createItemResponse = await _client.PostAsJsonAsync(
             "/learning-items",
-            new { itemType = "algorithm_problem", title = "二分探索" }
+            new
+            {
+                source = "AtCoder",
+                category = "Beginner",
+                problemIndex = "A",
+                title = "二分探索",
+            }
         );
         Assert.Equal(HttpStatusCode.Created, createItemResponse.StatusCode);
         var item = await createItemResponse.Content.ReadFromJsonAsync<JsonElement>();
@@ -99,7 +112,12 @@ public sealed class GetLearningItemApiTests
 
         var newerResponse = await _client.PostAsJsonAsync(
             $"/learning-items/{id}/study-records",
-            new { result, studiedAt = newer }
+            new
+            {
+                result,
+                studiedAt = newer,
+                durationSeconds = 0,
+            }
         );
         Assert.Equal(HttpStatusCode.Created, newerResponse.StatusCode);
 
@@ -107,7 +125,12 @@ public sealed class GetLearningItemApiTests
         var olderResult = result == "failure" ? "success" : "failure";
         var olderResponse = await _client.PostAsJsonAsync(
             $"/learning-items/{id}/study-records",
-            new { result = olderResult, studiedAt = newer.AddDays(-1) }
+            new
+            {
+                result = olderResult,
+                studiedAt = newer.AddDays(-1),
+                durationSeconds = 0,
+            }
         );
         Assert.Equal(HttpStatusCode.Created, olderResponse.StatusCode);
 

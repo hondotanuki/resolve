@@ -18,7 +18,14 @@ public sealed class ListLearningItemsUseCase
         var items = await _repository.ListAsync(cancellationToken);
 
         return items
-            .Select(x => new ListLearningItemsOutput(x.Id, x.ItemType, x.Title, x.ArchivedAt))
+            .Select(x => new ListLearningItemsOutput(
+                x.Id,
+                x.Title,
+                x.ArchivedAt,
+                x.Source,
+                x.Category,
+                x.ProblemIndex
+            ))
             .ToList();
     }
 }

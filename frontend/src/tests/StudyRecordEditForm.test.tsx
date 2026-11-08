@@ -21,6 +21,7 @@ const record: ListStudyRecordsResponse = {
   result: "success",
   studiedAt: "2026-10-15T09:00:37.123Z",
   durationSeconds: 60,
+  targetSeconds: 600,
   memo: "元のメモ",
 };
 
@@ -92,14 +93,12 @@ describe("StudyRecordEditForm", () => {
     fireEvent.change(screen.getByLabelText("学習日時"), {
       target: { value: "2026-11-03T10:30" },
     });
-    await user.clear(screen.getByLabelText("所要時間（秒）"));
     await user.clear(screen.getByLabelText("メモ"));
     await user.click(screen.getByRole("button", { name: "保存" }));
     expect(mutateAsync).toHaveBeenCalledWith({
       studyRecordId: 7,
       data: {
         studiedAt: new Date("2026-11-03T10:30").toISOString(),
-        durationSeconds: null,
         memo: null,
       },
     });
@@ -123,7 +122,7 @@ describe("StudyRecordEditForm", () => {
     expect(mutateAsync).not.toHaveBeenCalled();
   });
 
-  it.each(["-1", "1.5"])(
+  it.each(["", "-1", "1.5", "2147483648"])(
     "所要時間が%sなら入力エラーを表示する",
     async (value) => {
       const { user } = renderWithProviders(

@@ -27,7 +27,10 @@ describe("LearningItemListPage", () => {
         data: [
           {
             id: 1,
-            itemType: "algorithm_problem",
+
+            source: "AtCoder",
+            category: "Beginner",
+            problemIndex: "A",
             title: "二分探索",
             archivedAt: null,
           },
@@ -40,7 +43,7 @@ describe("LearningItemListPage", () => {
     renderWithProviders(<LearningItemListPage />);
 
     expect(await screen.findByText("二分探索")).toBeInTheDocument();
-    expect(screen.getByText("algorithm_problem")).toBeInTheDocument();
+    expect(screen.getByText("AtCoder / Beginner / A")).toBeInTheDocument();
   });
 
   it("取得中はLoadingを表示する", () => {

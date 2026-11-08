@@ -53,6 +53,8 @@ describe("StudyRecordCreateForm", () => {
     });
     await user.type(screen.getByLabelText("Duration (seconds)"), "300");
     await user.type(screen.getByLabelText("Memo"), "  復習した  ");
+    if (!screen.getByLabelText<HTMLInputElement>("Duration (seconds)").value)
+      await user.type(screen.getByLabelText("Duration (seconds)"), "0");
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     expect(mutateAsync).toHaveBeenCalledWith({
@@ -85,7 +87,8 @@ describe("StudyRecordCreateForm", () => {
         learningItemId: 42,
         result: "failure",
         studiedAt: "2026-11-03T01:30:00.000Z",
-        durationSeconds: null,
+        durationSeconds: 0,
+        targetSeconds: 600,
         memo: null,
         createdAt: "2026-11-03T01:30:00.000Z",
         updatedAt: "2026-11-03T01:30:00.000Z",
@@ -135,6 +138,8 @@ describe("StudyRecordCreateForm", () => {
     fireEvent.change(screen.getByLabelText("Studied At"), {
       target: { value: "2026-11-03T10:30" },
     });
+    if (!screen.getByLabelText<HTMLInputElement>("Duration (seconds)").value)
+      await user.type(screen.getByLabelText("Duration (seconds)"), "0");
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     expect(
@@ -158,6 +163,8 @@ describe("StudyRecordCreateForm", () => {
     );
     const invalidateQueries = vi.spyOn(queryClient, "invalidateQueries");
 
+    if (!screen.getByLabelText<HTMLInputElement>("Duration (seconds)").value)
+      await user.type(screen.getByLabelText("Duration (seconds)"), "0");
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     const input = screen.getByLabelText("Studied At");
@@ -188,6 +195,8 @@ describe("StudyRecordCreateForm", () => {
     fireEvent.change(screen.getByLabelText("Duration (seconds)"), {
       target: { value: "-1" },
     });
+    if (!screen.getByLabelText<HTMLInputElement>("Duration (seconds)").value)
+      await user.type(screen.getByLabelText("Duration (seconds)"), "0");
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     const input = screen.getByLabelText("Duration (seconds)");
@@ -199,7 +208,32 @@ describe("StudyRecordCreateForm", () => {
     expect(input).toHaveAttribute("aria-describedby", "durationSeconds-error");
   });
 
-  it("任意項目が未入力ならnullとして送信する", async () => {
+  it.each(["", "1.5", "2147483648"])(
+    "所要時間が%sの場合は送信しない",
+    async (value) => {
+      const mutateAsync = vi.fn();
+      vi.mocked(useCreateStudyRecord).mockReturnValue({
+        mutateAsync,
+        isPending: false,
+      } as never);
+      const { user } = renderWithProviders(
+        <StudyRecordCreateForm learningItemId={42} />,
+      );
+      fireEvent.change(screen.getByLabelText("Studied At"), {
+        target: { value: "2026-11-03T10:30" },
+      });
+      fireEvent.change(screen.getByLabelText("Duration (seconds)"), {
+        target: { value },
+      });
+      await user.click(screen.getByRole("button", { name: "Create" }));
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "学習時間は0以上の整数",
+      );
+      expect(mutateAsync).not.toHaveBeenCalled();
+    },
+  );
+
+  it("メモ未入力ならnull、所要時間0秒を送信する", async () => {
     const mutateAsync = vi.fn().mockResolvedValue({
       status: 201,
       headers: new Headers(),
@@ -218,6 +252,8 @@ describe("StudyRecordCreateForm", () => {
     fireEvent.change(screen.getByLabelText("Studied At"), {
       target: { value: "2026-11-03T10:30" },
     });
+    if (!screen.getByLabelText<HTMLInputElement>("Duration (seconds)").value)
+      await user.type(screen.getByLabelText("Duration (seconds)"), "0");
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     expect(mutateAsync).toHaveBeenCalledWith({
@@ -225,7 +261,7 @@ describe("StudyRecordCreateForm", () => {
       data: {
         result: "success",
         studiedAt: new Date("2026-11-03T10:30").toISOString(),
-        durationSeconds: null,
+        durationSeconds: 0,
         memo: null,
       },
     });
@@ -251,6 +287,8 @@ describe("StudyRecordCreateForm", () => {
     fireEvent.change(screen.getByLabelText("Studied At"), {
       target: { value: "2026-11-03T10:30" },
     });
+    if (!screen.getByLabelText<HTMLInputElement>("Duration (seconds)").value)
+      await user.type(screen.getByLabelText("Duration (seconds)"), "0");
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
@@ -272,6 +310,8 @@ describe("StudyRecordCreateForm", () => {
     fireEvent.change(screen.getByLabelText("Studied At"), {
       target: { value: "2026-11-03T10:30" },
     });
+    if (!screen.getByLabelText<HTMLInputElement>("Duration (seconds)").value)
+      await user.type(screen.getByLabelText("Duration (seconds)"), "0");
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
