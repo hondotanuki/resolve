@@ -11,6 +11,7 @@ using Resolve.Application.StudyRecords.Create;
 using Resolve.Application.StudyRecords.Delete;
 using Resolve.Application.StudyRecords.List;
 using Resolve.Application.StudyRecords.Update;
+using Resolve.Infrastructure.External;
 using Resolve.Infrastructure.Persistence;
 using Resolve.Infrastructure.Persistence.Repositories;
 using Scalar.AspNetCore;
@@ -32,6 +33,12 @@ builder.Services.AddDbContext<ResolveDbContext>(options =>
 {
     options.UseSqlite(connectionString);
 });
+
+builder.Services.AddSingleton<IExternalRequestClock>(new ExternalRequestClock(TimeProvider.System));
+builder.Services.AddSingleton(serviceProvider => new ExternalHttpClient(
+    serviceProvider.GetRequiredService<IExternalRequestClock>(),
+    new HttpClientHandler { AllowAutoRedirect = false }
+));
 
 // Repositories
 builder.Services.AddScoped<ILearningItemRepository, EfLearningItemRepository>();
