@@ -11,5 +11,4 @@ export type ListStudyRecordsResponseResult =
 export const ListStudyRecordsResponseResult = {
   success: "success",
   failure: "failure",
-  reviewed: "reviewed",
 } as const;

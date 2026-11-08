@@ -11,8 +11,8 @@ export interface UpdateStudyRecordResponse {
   learningItemId: number;
   result: UpdateStudyRecordResponseResult;
   studiedAt: string;
-  /** @nullable */
-  durationSeconds: number | null;
+  durationSeconds: number;
+  targetSeconds: number;
   /** @nullable */
   memo: string | null;
   createdAt: string;
