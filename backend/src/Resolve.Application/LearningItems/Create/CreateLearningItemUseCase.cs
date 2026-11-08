@@ -18,9 +18,7 @@ public sealed class CreateLearningItemUseCase
     )
     {
         var learningItem = new LearningItem(
-            input.ItemType,
             input.Title,
-            input.Content,
             input.Source,
             input.Category,
             input.ProblemIndex
@@ -28,9 +26,7 @@ public sealed class CreateLearningItemUseCase
         var saved = await _repository.CreateAsync(learningItem, cancellationToken);
         return new CreateLearningItemOutput(
             saved.Id,
-            saved.ItemType,
             saved.Title,
-            saved.Content,
             saved.ArchivedAt,
             saved.CreatedAt,
             saved.UpdatedAt,

@@ -30,9 +30,7 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
     public async Task CreateAsyncでLearningItemを保存できる()
     {
         var item = new LearningItem(
-            ItemType.AlgorithmProblem,
             "二分探索",
-            "二分探索の問題を解く",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'
@@ -46,8 +44,7 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
 
         Assert.True(saved.Id > 0);
         Assert.Equal("二分探索", actual.Title);
-        Assert.Equal(ItemType.AlgorithmProblem, actual.ItemType);
-        Assert.Equal("二分探索の問題を解く", actual.Content);
+
         Assert.Equal(saved.CreatedAt, actual.CreatedAt);
         Assert.Equal(saved.UpdatedAt, actual.UpdatedAt);
         Assert.Equal(DateTimeKind.Utc, actual.CreatedAt.Kind);
@@ -59,9 +56,7 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
     public async Task ArchivedAtをUTCで再取得できる()
     {
         var item = new LearningItem(
-            ItemType.AlgorithmProblem,
             "二分探索",
-            null,
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'

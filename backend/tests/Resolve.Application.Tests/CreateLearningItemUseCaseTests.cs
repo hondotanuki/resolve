@@ -23,15 +23,14 @@ public class CreateLearningItemUseCaseTests
             Source = ProblemSource.AtCoder,
             Category = ContestCategory.Beginner,
             ProblemIndex = 'A',
-            ItemType = ItemType.AlgorithmProblem,
             Title = "二分探索",
-            Content = "二分探索の問題を解く",
         };
         var output = await _useCase.ExecuteAsync(input);
 
-        Assert.Equal(ItemType.AlgorithmProblem, output.ItemType);
         Assert.Equal("二分探索", output.Title);
-        Assert.Equal("二分探索の問題を解く", output.Content);
+        Assert.Equal(ProblemSource.AtCoder, output.Source);
+        Assert.Equal(ContestCategory.Beginner, output.Category);
+        Assert.Equal('A', output.ProblemIndex);
     }
 
     [Fact]
@@ -42,9 +41,7 @@ public class CreateLearningItemUseCaseTests
             Source = ProblemSource.AtCoder,
             Category = ContestCategory.Beginner,
             ProblemIndex = 'A',
-            ItemType = ItemType.AlgorithmProblem,
             Title = "二分探索",
-            Content = "二分探索の問題を解く",
         };
         await _useCase.ExecuteAsync(input);
 
@@ -59,37 +56,37 @@ public class CreateLearningItemUseCaseTests
             Source = ProblemSource.AtCoder,
             Category = ContestCategory.Beginner,
             ProblemIndex = 'A',
-            ItemType = ItemType.AlgorithmProblem,
             Title = "二分探索",
-            Content = "二分探索の問題を解く",
         };
         await _useCase.ExecuteAsync(input);
 
         var item = _repository.ReceivedItem;
 
         Assert.NotNull(item);
-        Assert.Equal(ItemType.AlgorithmProblem, item.ItemType);
+
         Assert.Equal("二分探索", item.Title);
-        Assert.Equal("二分探索の問題を解く", item.Content);
+        Assert.Equal(ProblemSource.AtCoder, item.Source);
+        Assert.Equal(ContestCategory.Beginner, item.Category);
+        Assert.Equal('A', item.ProblemIndex);
     }
 
     [Fact]
-    public async Task Contentなしでも登録できる()
+    public async Task 登録時に問題区分を返す()
     {
         var input = new CreateLearningItemInput
         {
             Source = ProblemSource.AtCoder,
             Category = ContestCategory.Beginner,
             ProblemIndex = 'A',
-            ItemType = ItemType.AlgorithmProblem,
             Title = "二分探索",
         };
 
         var output = await _useCase.ExecuteAsync(input);
 
         Assert.Equal(1, _repository.CreateCallCount);
-        Assert.Null(_repository.ReceivedItem!.Content);
-        Assert.Null(output.Content);
+        Assert.Equal(ProblemSource.AtCoder, output.Source);
+        Assert.Equal(ContestCategory.Beginner, output.Category);
+        Assert.Equal('A', output.ProblemIndex);
     }
 
     [Fact]
@@ -100,7 +97,6 @@ public class CreateLearningItemUseCaseTests
             Source = ProblemSource.AtCoder,
             Category = ContestCategory.Beginner,
             ProblemIndex = 'A',
-            ItemType = ItemType.AlgorithmProblem,
             Title = "",
         };
 
@@ -109,28 +105,10 @@ public class CreateLearningItemUseCaseTests
     }
 
     [Fact]
-    public async Task 不正なItemTypeではRepositoryが呼ばれない()
-    {
-        var input = new CreateLearningItemInput
-        {
-            Source = ProblemSource.AtCoder,
-            Category = ContestCategory.Beginner,
-            ProblemIndex = 'A',
-            ItemType = (ItemType)999,
-            Title = "二分探索",
-        };
-
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _useCase.ExecuteAsync(input));
-        Assert.Equal(0, _repository.CreateCallCount);
-    }
-
-    [Fact]
     public async Task OutputにRepositoryの保存結果が反映される()
     {
         var savedItem = new LearningItem(
-            ItemType.AlgorithmProblem,
             "保存後タイトル",
-            "保存後Content",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'
@@ -143,17 +121,15 @@ public class CreateLearningItemUseCaseTests
             Source = ProblemSource.AtCoder,
             Category = ContestCategory.Beginner,
             ProblemIndex = 'A',
-            ItemType = ItemType.AlgorithmProblem,
             Title = "入力タイトル",
-            Content = "入力Content",
         };
 
         var output = await _useCase.ExecuteAsync(input);
 
         Assert.Equal(savedItem.Id, output.Id);
-        Assert.Equal(savedItem.ItemType, output.ItemType);
+
         Assert.Equal(savedItem.Title, output.Title);
-        Assert.Equal(savedItem.Content, output.Content);
+
         Assert.Equal(savedItem.ArchivedAt, output.ArchivedAt);
         Assert.Equal(savedItem.CreatedAt, output.CreatedAt);
         Assert.Equal(savedItem.UpdatedAt, output.UpdatedAt);

@@ -28,7 +28,6 @@ public sealed class NullableResponseContractTests
             "/learning-items",
             new
             {
-                itemType = "english_word",
                 source = "AtCoder",
                 category = "Beginner",
                 problemIndex = "A",
@@ -44,7 +43,8 @@ public sealed class NullableResponseContractTests
         Assert.Single(items.EnumerateArray());
         AssertNullProperties(items[0], "archivedAt");
         var detail = await _client.GetFromJsonAsync<JsonElement>($"/learning-items/{itemId}");
-        AssertNullProperties(detail, "content", "archivedAt");
+        AssertNullProperties(detail, "archivedAt");
+        Assert.False(detail.TryGetProperty("content", out _));
 
         var createdRecord = await _client.PostAsJsonAsync(
             $"/learning-items/{itemId}/study-records",
@@ -81,11 +81,22 @@ public sealed class NullableResponseContractTests
         var schemas = document.GetProperty("components").GetProperty("schemas");
         AssertRequiredNullable(schemas, "CreateLearningItemResponse", "archivedAt");
         AssertRequiredNullable(schemas, "ListLearningItemsResponse", "archivedAt");
-        AssertRequiredNullable(schemas, "GetLearningItemResponse", "content", "archivedAt");
+        AssertRequiredNullable(schemas, "GetLearningItemResponse", "archivedAt");
         AssertRequiredNullable(schemas, "CreateStudyRecordResponse", "memo");
         AssertRequiredNullable(schemas, "ListStudyRecordsResponse", "memo");
         AssertRequiredNullable(schemas, "UpdateStudyRecordResponse", "memo");
-        AssertOptionalNullable(schemas, "CreateLearningItemRequest", "content");
+        Assert.False(
+            schemas
+                .GetProperty("CreateLearningItemRequest")
+                .GetProperty("properties")
+                .TryGetProperty("content", out _)
+        );
+        Assert.False(
+            schemas
+                .GetProperty("GetLearningItemResponse")
+                .GetProperty("properties")
+                .TryGetProperty("content", out _)
+        );
         AssertOptionalNullable(schemas, "CreateStudyRecordRequest", "memo");
         AssertOptionalNullable(schemas, "UpdateStudyRecordRequest", "memo");
     }

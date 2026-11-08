@@ -21,9 +21,7 @@ public sealed class CreateStudyRecordUseCaseTests
     private static LearningItem CreateItem()
     {
         var item = new LearningItem(
-            ItemType.AlgorithmProblem,
             "二分探索",
-            content: null,
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'

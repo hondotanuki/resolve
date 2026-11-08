@@ -26,10 +26,8 @@ public static class GetLearningItemByIdEndpoint
                     var response = new GetLearningItemResponse
                     {
                         Id = output.Id,
-                        ItemType = ItemTypeMapping.ToApiValue(output.ItemType),
                         Title = output.Title,
                         Status = ItemStatusMapping.ToApiValue(output.Status),
-                        Content = output.Content,
                         ArchivedAt = output.ArchivedAt,
                         CreatedAt = output.CreatedAt,
                         UpdatedAt = output.UpdatedAt,

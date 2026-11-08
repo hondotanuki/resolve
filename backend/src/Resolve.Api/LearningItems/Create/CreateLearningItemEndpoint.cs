@@ -17,11 +17,6 @@ public static class CreateLearningItemEndpoint
                     CancellationToken cancellationToken
                 ) =>
                 {
-                    if (!ItemTypeMapping.TryParse(request.ItemType, out var itemType))
-                    {
-                        return Results.BadRequest();
-                    }
-
                     if (
                         !Enum.TryParse<ProblemSource>(request.Source, false, out var source)
                         || !Enum.IsDefined(source)
@@ -39,9 +34,7 @@ public static class CreateLearningItemEndpoint
 
                     var input = new CreateLearningItemInput
                     {
-                        ItemType = itemType,
                         Title = request.Title,
-                        Content = request.Content,
                         Source = source,
                         Category = category,
                         ProblemIndex = request.ProblemIndex[0],
@@ -53,7 +46,6 @@ public static class CreateLearningItemEndpoint
                         var response = new CreateLearningItemResponse
                         {
                             Id = output.Id,
-                            ItemType = ItemTypeMapping.ToApiValue(output.ItemType),
                             Title = output.Title,
                             ArchivedAt = output.ArchivedAt,
                             Source = output.Source.ToString(),

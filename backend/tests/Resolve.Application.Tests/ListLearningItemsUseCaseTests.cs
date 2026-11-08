@@ -19,9 +19,7 @@ public sealed class ListLearningItemsUseCaseTests
     public async Task 登録済み項目をOutputへ変換できる()
     {
         var item = new LearningItem(
-            ItemType.AlgorithmProblem,
             "二分探索",
-            "二分探索を解く",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'
@@ -36,7 +34,7 @@ public sealed class ListLearningItemsUseCaseTests
         var actual = output[0];
 
         Assert.Equal(item.Id, actual.Id);
-        Assert.Equal(item.ItemType, actual.ItemType);
+
         Assert.Equal(item.Title, actual.Title);
         Assert.Equal(item.ArchivedAt, actual.ArchivedAt);
     }

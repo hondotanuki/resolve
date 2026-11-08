@@ -18,9 +18,11 @@ public static class ListLearningItemsEndpoint
                         .Select(x => new ListLearningItemsResponse
                         {
                             Id = x.Id,
-                            ItemType = ItemTypeMapping.ToApiValue(x.ItemType),
                             Title = x.Title,
                             ArchivedAt = x.ArchivedAt,
+                            Source = x.Source.ToString(),
+                            Category = x.Category.ToString(),
+                            ProblemIndex = x.ProblemIndex.ToString(),
                         })
                         .ToList();
 

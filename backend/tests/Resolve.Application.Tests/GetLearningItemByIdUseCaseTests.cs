@@ -21,9 +21,7 @@ public class GetLearningItemByIdUseCaseTests
     public async Task 存在するIDなら詳細を返す()
     {
         var item = new LearningItem(
-            ItemType.AlgorithmProblem,
             "二分探索",
-            "二分探索を解く",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'
@@ -33,9 +31,8 @@ public class GetLearningItemByIdUseCaseTests
         var output = await _useCase.ExecuteAsync(1);
 
         Assert.NotNull(output);
-        Assert.Equal(ItemType.AlgorithmProblem, output.ItemType);
+
         Assert.Equal("二分探索", output.Title);
-        Assert.Equal("二分探索を解く", output.Content);
     }
 
     [Fact]
@@ -51,9 +48,7 @@ public class GetLearningItemByIdUseCaseTests
     public async Task 記録なしならUnstartedを返す()
     {
         var item = new LearningItem(
-            ItemType.AlgorithmProblem,
             "二分探索",
-            "二分探索を解く",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'
@@ -74,9 +69,7 @@ public class GetLearningItemByIdUseCaseTests
     {
         const int learningItemId = 42;
         _learningItemRepository.GetByIdResult = new LearningItem(
-            ItemType.EnglishWord,
             "apple",
-            content: null,
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'

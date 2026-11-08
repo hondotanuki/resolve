@@ -22,7 +22,6 @@ public sealed class ListStudyRecordsApiTests
     {
         var request = new
         {
-            itemType = "algorithm_problem",
             source = "AtCoder",
             category = "Beginner",
             problemIndex = "A",

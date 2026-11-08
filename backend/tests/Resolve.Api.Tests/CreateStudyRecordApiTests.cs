@@ -33,7 +33,6 @@ public sealed class CreateStudyRecordApiTests
     {
         var request = new
         {
-            itemType = "algorithm_problem",
             source = "AtCoder",
             category = "Beginner",
             problemIndex = "A",

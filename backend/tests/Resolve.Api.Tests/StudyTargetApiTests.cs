@@ -26,7 +26,6 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
             "/learning-items",
             new
             {
-                itemType = "algorithm_problem",
                 title = "問題",
                 source = "AtCoder",
                 category = "Beginner",
@@ -107,7 +106,6 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
             "/learning-items",
             new
             {
-                itemType = "algorithm_problem",
                 title = "問題",
                 source = "AtCoder",
                 category = "Beginner",
@@ -143,7 +141,6 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
             "/learning-items",
             new
             {
-                itemType = "algorithm_problem",
                 title = "問題",
                 source,
                 category,
@@ -156,23 +153,13 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
     }
 
     [Theory]
+    [InlineData("""{"title":"問題","category":"Beginner","problemIndex":"A"}""")]
+    [InlineData("""{"title":"問題","source":null,"category":"Beginner","problemIndex":"A"}""")]
+    [InlineData("""{"title":"問題","source":"AtCoder","problemIndex":"A"}""")]
+    [InlineData("""{"title":"問題","source":"AtCoder","category":null,"problemIndex":"A"}""")]
+    [InlineData("""{"title":"問題","source":"AtCoder","category":"Beginner"}""")]
     [InlineData(
-        """{"itemType":"algorithm_problem","title":"問題","category":"Beginner","problemIndex":"A"}"""
-    )]
-    [InlineData(
-        """{"itemType":"algorithm_problem","title":"問題","source":null,"category":"Beginner","problemIndex":"A"}"""
-    )]
-    [InlineData(
-        """{"itemType":"algorithm_problem","title":"問題","source":"AtCoder","problemIndex":"A"}"""
-    )]
-    [InlineData(
-        """{"itemType":"algorithm_problem","title":"問題","source":"AtCoder","category":null,"problemIndex":"A"}"""
-    )]
-    [InlineData(
-        """{"itemType":"algorithm_problem","title":"問題","source":"AtCoder","category":"Beginner"}"""
-    )]
-    [InlineData(
-        """{"itemType":"algorithm_problem","title":"問題","source":"AtCoder","category":"Beginner","problemIndex":null}"""
+        """{"title":"問題","source":"AtCoder","category":"Beginner","problemIndex":null}"""
     )]
     public async Task 問題区分が欠けた入力は保存しない(string json)
     {
@@ -194,10 +181,12 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
                 "CreateLearningItemRequest",
                 "CreateLearningItemResponse",
                 "GetLearningItemResponse",
+                "ListLearningItemsResponse",
             }
         )
         {
             var schema = schemas.GetProperty(name);
+            Assert.False(schema.GetProperty("properties").TryGetProperty("itemType", out _));
             var required = schema
                 .GetProperty("required")
                 .EnumerateArray()

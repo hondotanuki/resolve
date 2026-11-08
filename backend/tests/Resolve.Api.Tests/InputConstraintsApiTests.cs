@@ -152,7 +152,6 @@ public sealed class InputConstraintsApiTests
             "/learning-items",
             new
             {
-                itemType = "english_word",
                 source = "AtCoder",
                 category = "Beginner",
                 problemIndex = "A",

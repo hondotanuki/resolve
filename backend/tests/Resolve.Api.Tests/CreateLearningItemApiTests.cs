@@ -33,7 +33,6 @@ public sealed class CreateLearningItemApiTests
     {
         var request = new
         {
-            itemType = "algorithm_problem",
             source = "AtCoder",
             category = "Beginner",
             problemIndex = "A",
@@ -47,18 +46,17 @@ public sealed class CreateLearningItemApiTests
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
         var id = json.GetProperty("id").GetInt32();
         Assert.True(id > 0);
-        Assert.Equal("algorithm_problem", json.GetProperty("itemType").GetString());
+
         Assert.Equal("二分探索", json.GetProperty("title").GetString());
         Assert.Equal(JsonValueKind.Null, json.GetProperty("archivedAt").ValueKind);
         Assert.Equal($"/learning-items/{id}", response.Headers.Location?.ToString());
     }
 
     [Fact]
-    public async Task Contentなしでも201を返す()
+    public async Task 必須項目のみで201を返す()
     {
         var request = new
         {
-            itemType = "algorithm_problem",
             source = "AtCoder",
             category = "Beginner",
             problemIndex = "A",
@@ -73,7 +71,7 @@ public sealed class CreateLearningItemApiTests
     public async Task 必須項目の名前が大文字小文字まで一致しなければ400を返す()
     {
         using var request = new StringContent(
-            """{"ItemType":"algorithm_problem","title":"二分探索"}""",
+            """{"Title":"二分探索","source":"AtCoder","category":"Beginner","problemIndex":"A"}""",
             Encoding.UTF8,
             "application/json"
         );
@@ -87,7 +85,7 @@ public sealed class CreateLearningItemApiTests
     public async Task 任意項目の名前が一致しなければ未知の項目として無視する()
     {
         using var request = new StringContent(
-            """{"itemType":"algorithm_problem","title":"二分探索","Content":"本文","source":"AtCoder","category":"Beginner","problemIndex":"A"}""",
+            """{"title":"二分探索","Content":"本文","source":"AtCoder","category":"Beginner","problemIndex":"A"}""",
             Encoding.UTF8,
             "application/json"
         );
@@ -99,7 +97,7 @@ public sealed class CreateLearningItemApiTests
             $"/learning-items/{created.GetProperty("id").GetInt32()}"
         );
 
-        Assert.Equal(JsonValueKind.Null, detail.GetProperty("content").ValueKind);
+        Assert.False(detail.TryGetProperty("content", out _));
     }
 
     [Fact]
@@ -107,7 +105,6 @@ public sealed class CreateLearningItemApiTests
     {
         var request = new
         {
-            itemType = "algorithm_problem",
             source = "AtCoder",
             category = "Beginner",
             problemIndex = "A",
@@ -124,28 +121,10 @@ public sealed class CreateLearningItemApiTests
     {
         var request = new
         {
-            itemType = "algorithm_problem",
             source = "AtCoder",
             category = "Beginner",
             problemIndex = "A",
             title = "   ",
-            content = "二分探索の問題を解く",
-        };
-        var response = await _client.PostAsJsonAsync("/learning-items", request);
-
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task 未定義のItemTypeなら400を返す()
-    {
-        var request = new
-        {
-            itemType = "invalid_type",
-            source = "AtCoder",
-            category = "Beginner",
-            problemIndex = "A",
-            title = "二分探索",
             content = "二分探索の問題を解く",
         };
         var response = await _client.PostAsJsonAsync("/learning-items", request);

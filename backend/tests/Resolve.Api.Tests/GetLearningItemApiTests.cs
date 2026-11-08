@@ -32,7 +32,6 @@ public sealed class GetLearningItemApiTests
     {
         var createRequest = new
         {
-            itemType = "algorithm_problem",
             source = "AtCoder",
             category = "Beginner",
             problemIndex = "A",
@@ -51,9 +50,9 @@ public sealed class GetLearningItemApiTests
         var updatedAt = json.GetProperty("updatedAt").GetDateTime();
 
         Assert.Equal(id, json.GetProperty("id").GetInt32());
-        Assert.Equal("algorithm_problem", json.GetProperty("itemType").GetString());
+
         Assert.Equal("二分探索", json.GetProperty("title").GetString());
-        Assert.Equal("二分探索を解く", json.GetProperty("content").GetString());
+        Assert.False(json.TryGetProperty("content", out _));
         Assert.Equal("unstarted", json.GetProperty("status").GetString());
         Assert.Equal(JsonValueKind.Null, json.GetProperty("archivedAt").ValueKind);
         Assert.NotEqual(default, createdAt);
@@ -71,11 +70,10 @@ public sealed class GetLearningItemApiTests
     }
 
     [Fact]
-    public async Task ContentなしのLearningItemも取得できる()
+    public async Task 詳細に廃止したContentを含まない()
     {
         var createRequest = new
         {
-            itemType = "algorithm_problem",
             source = "AtCoder",
             category = "Beginner",
             problemIndex = "A",
@@ -89,7 +87,7 @@ public sealed class GetLearningItemApiTests
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
-        Assert.Equal(JsonValueKind.Null, json.GetProperty("content").ValueKind);
+        Assert.False(json.TryGetProperty("content", out _));
     }
 
     [Theory]
@@ -101,7 +99,6 @@ public sealed class GetLearningItemApiTests
             "/learning-items",
             new
             {
-                itemType = "algorithm_problem",
                 source = "AtCoder",
                 category = "Beginner",
                 problemIndex = "A",

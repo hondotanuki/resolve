@@ -35,7 +35,6 @@ public sealed class UpdateStudyRecordApiTests
             "/learning-items",
             new
             {
-                itemType = "algorithm_problem",
                 source = "AtCoder",
                 category = "Beginner",
                 problemIndex = "A",

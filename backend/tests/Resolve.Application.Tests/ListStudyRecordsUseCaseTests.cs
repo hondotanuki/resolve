@@ -23,9 +23,7 @@ public sealed class ListStudyRecordsUseCaseTests
     {
         const int learningItemId = 42;
         _learningItems.GetByIdResult = new LearningItem(
-            ItemType.EnglishWord,
             "apple",
-            content: null,
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'
@@ -59,9 +57,7 @@ public sealed class ListStudyRecordsUseCaseTests
     public async Task 対象は存在するが記録がなければ空の一覧を返す()
     {
         _learningItems.GetByIdResult = new LearningItem(
-            ItemType.EnglishWord,
             "apple",
-            content: null,
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'

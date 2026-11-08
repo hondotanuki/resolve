@@ -31,9 +31,7 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
     private async Task<LearningItem> CreateLearningItemAsync(string title = "二分探索")
     {
         var item = new LearningItem(
-            ItemType.AlgorithmProblem,
             title,
-            null,
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'
@@ -434,9 +432,7 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
     private async Task<StudyRecord> CreateStudyRecordAsync()
     {
         var learningItem = new LearningItem(
-            ItemType.AlgorithmProblem,
             "二分探索",
-            null,
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
             problemIndex: 'A'
