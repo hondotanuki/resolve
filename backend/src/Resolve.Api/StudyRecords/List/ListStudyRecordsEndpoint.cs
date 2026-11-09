@@ -16,7 +16,10 @@ public static class ListStudyRecordsEndpoint
                     CancellationToken cancellationToken
                 ) =>
                 {
-                    var output = await useCase.ExecuteAsync(learningItemId, cancellationToken);
+                    var output = await useCase.ExecuteAsync(
+                        new ListStudyRecordsInput(learningItemId),
+                        cancellationToken
+                    );
 
                     if (output is null)
                     {

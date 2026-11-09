@@ -24,11 +24,15 @@ public class GetLearningItemByIdUseCaseTests
             "二分探索",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
 
         _learningItemRepository.GetByIdResult = item;
-        var output = await _useCase.ExecuteAsync(1);
+        var output = await _useCase.ExecuteAsync(new GetLearningItemByIdInput(1));
 
         Assert.NotNull(output);
 
@@ -39,7 +43,7 @@ public class GetLearningItemByIdUseCaseTests
     public async Task 存在しないIDならnullを返す()
     {
         _learningItemRepository.GetByIdResult = null;
-        var output = await _useCase.ExecuteAsync(999);
+        var output = await _useCase.ExecuteAsync(new GetLearningItemByIdInput(999));
         Assert.Null(output);
         Assert.Equal(0, _studyRecordRepository.GetLatestCallCount);
     }
@@ -51,11 +55,15 @@ public class GetLearningItemByIdUseCaseTests
             "二分探索",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
         _learningItemRepository.GetByIdResult = item;
         _studyRecordRepository.LatestRecord = null;
-        var output = await _useCase.ExecuteAsync(1);
+        var output = await _useCase.ExecuteAsync(new GetLearningItemByIdInput(1));
         Assert.NotNull(output);
         Assert.Equal(ItemStatus.Unstarted, output.Status);
         Assert.Equal(1, _studyRecordRepository.GetLatestCallCount);
@@ -72,7 +80,11 @@ public class GetLearningItemByIdUseCaseTests
             "apple",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
         _studyRecordRepository.LatestRecord = new StudyRecord(
             learningItemId,
@@ -82,7 +94,7 @@ public class GetLearningItemByIdUseCaseTests
             targetSeconds: 600
         );
 
-        var output = await _useCase.ExecuteAsync(learningItemId);
+        var output = await _useCase.ExecuteAsync(new GetLearningItemByIdInput(learningItemId));
 
         Assert.NotNull(output);
         Assert.Equal(expected, output.Status);
