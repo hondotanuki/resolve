@@ -39,7 +39,7 @@ dotnet ef database update --project backend/src/Resolve.Infrastructure --startup
 
 問題区分と学習記録の目標時間を追加するMigrationは、既存の問題・記録があるDBには適用できません。開発用DBを作り直す場合は、必要なデータを退避してから対象のSQLite DBを削除し、上のコマンドを実行してください。既定のDBは `backend/src/Resolve.Api/resolve.db` です。
 
-問題URLとコンテスト情報を追加するMigrationは、既存データを残したまま適用できます。新しい項目は、URL登録機能を追加するまでは未設定です。既存DBへの適用にも上の `dotnet ef database update` を使用します。
+問題URLとコンテスト情報を必須にするMigrationは、これらが欠けている既存問題がある場合は失敗します。検証用DBは作り直すか、必要なデータを退避したうえで対応してください。
 
 ```bash
 dotnet run --project backend/src/Resolve.Api --launch-profile http
@@ -53,7 +53,7 @@ Backendは次のURLで起動します。
 
 ## フロントエンドの起動
 
-問題は現在、タイトル・出典・コンテスト種別・問題区分を手入力して登録します。URLからの自動登録とタイマーは今後実装します。
+バックエンドの問題登録APIはURL入力に切り替わりました。Frontendの登録画面はまだ旧API向けのため、画面側の対応が必要です。タイマーは今後実装します。
 
 AtCoder Problemsの問題情報取得基盤は、一覧を `backend/src/Resolve.Api/.cache/atcoder-problems/datasets.json` に保存します。未登録問題の取得時、前回の取得開始後に日本時間の木曜日0時を過ぎていれば更新します。現在この取得基盤は登録画面には接続されていません。
 

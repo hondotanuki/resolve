@@ -30,6 +30,7 @@
 - 開発者自身がコードを書くことを前提に支援する。
 - SDK、パッケージ、VS Code拡張、GitHub設定などの導入作業は開発者が行う。Codexは手順・設定・結果をレビューする。
 - GitHub CLI認証、GitHub Project、Issue、Pull Requestの作成・操作は、開発者がGitHub GUI上で行う。
+- ソースコード内のエラーメッセージは必ず日本語で書くこと。
 
 ## 実装を進めるときの基本方針
 
