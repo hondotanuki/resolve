@@ -1,8 +1,8 @@
 using Resolve.Domain;
 
-namespace Resolve.Infrastructure.External;
+namespace Resolve.Infrastructure.External.OMC;
 
-public sealed record OmcProblemInfo(
+public sealed record OMCProblemInfo(
     Uri ProblemUrl,
     string Title,
     string ContestId,

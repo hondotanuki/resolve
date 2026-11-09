@@ -1,12 +1,14 @@
 using System.Text.RegularExpressions;
 using Resolve.Application.Interfaces;
 using Resolve.Domain;
+using Resolve.Infrastructure.External.AtCoder;
+using Resolve.Infrastructure.External.OMC;
 
 namespace Resolve.Infrastructure.External;
 
 public sealed class ProblemMetadataProvider(
     AtCoderProblemInfoProvider atCoder,
-    OmcProblemInfoProvider omc
+    OMCProblemInfoProvider omc
 ) : IProblemMetadataProvider
 {
     public Uri Normalize(Uri uri)
@@ -19,7 +21,7 @@ public sealed class ProblemMetadataProvider(
             || uri.UserInfo.Length != 0
             || uri.Fragment.Length != 0
         )
-            throw new ArgumentException("Unsupported problem URL.", nameof(uri));
+            throw new UnsupportedProblemUrlException("対応していない問題URLです。");
         if (
             uri.IdnHost == "atcoder.jp"
             && Regex.IsMatch(
@@ -42,7 +44,7 @@ public sealed class ProblemMetadataProvider(
             )
         )
             return new Uri($"https://onlinemathcontest.com{uri.AbsolutePath}");
-        throw new ArgumentException("Unsupported problem URL.", nameof(uri));
+        throw new UnsupportedProblemUrlException("対応していない問題URLです。");
     }
 
     public async Task<ProblemMetadata> GetAsync(
@@ -51,30 +53,40 @@ public sealed class ProblemMetadataProvider(
     )
     {
         var normalized = Normalize(uri);
-        if (normalized.IdnHost == "atcoder.jp")
+        try
         {
-            var result = await atCoder.GetAsync(normalized, cancellationToken);
+            if (normalized.IdnHost == "atcoder.jp")
+            {
+                var result = await atCoder.GetAsync(normalized, cancellationToken);
+                return new(
+                    result.ProblemUrl,
+                    result.Title,
+                    ProblemSource.AtCoder,
+                    result.Category,
+                    result.ProblemIndex,
+                    result.ContestId,
+                    result.ContestName,
+                    result.ContestStartDate
+                );
+            }
+            var omcResult = await omc.GetAsync(normalized, cancellationToken);
             return new(
-                result.ProblemUrl,
-                result.Title,
-                ProblemSource.AtCoder,
-                result.Category,
-                result.ProblemIndex,
-                result.ContestId,
-                result.ContestName,
-                result.ContestStartDate
+                omcResult.ProblemUrl,
+                omcResult.Title,
+                ProblemSource.OnlineMathContest,
+                omcResult.Category,
+                omcResult.ProblemIndex,
+                omcResult.ContestId,
+                omcResult.ContestName,
+                omcResult.ContestStartDate
             );
         }
-        var omcResult = await omc.GetAsync(normalized, cancellationToken);
-        return new(
-            omcResult.ProblemUrl,
-            omcResult.Title,
-            ProblemSource.OnlineMathContest,
-            omcResult.Category,
-            omcResult.ProblemIndex,
-            omcResult.ContestId,
-            omcResult.ContestName,
-            omcResult.ContestStartDate
-        );
+        catch (ArgumentException exception)
+        {
+            throw new InvalidDataException(
+                "指定されたサービスから問題情報を取得できませんでした。",
+                exception
+            );
+        }
     }
 }

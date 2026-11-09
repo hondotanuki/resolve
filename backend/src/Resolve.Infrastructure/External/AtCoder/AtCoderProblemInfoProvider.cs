@@ -1,7 +1,8 @@
 using System.Text.RegularExpressions;
+using Resolve.Application.Interfaces;
 using Resolve.Domain;
 
-namespace Resolve.Infrastructure.External;
+namespace Resolve.Infrastructure.External.AtCoder;
 
 public sealed partial class AtCoderProblemInfoProvider
 {
@@ -25,7 +26,7 @@ public sealed partial class AtCoderProblemInfoProvider
             || uri.Fragment.Length != 0
         )
             throw new ArgumentException(
-                "The problem URL must use HTTPS on atcoder.jp without credentials, a custom port, or a fragment.",
+                "問題URLには認証情報・独自ポート・フラグメントを含まないatcoder.jpのHTTPS URLを指定してください。",
                 nameof(uri)
             );
         var match = ProblemPath().Match(uri.AbsolutePath);
@@ -34,28 +35,41 @@ public sealed partial class AtCoderProblemInfoProvider
             || (uri.Query.Length != 0 && uri.Query is not "?lang=ja" and not "?lang=en")
         )
             throw new ArgumentException(
-                "The problem URL must identify an ABC, ARC, or AGC task and may only include ?lang=ja or ?lang=en.",
+                "ABC、ARC、AGCの問題URLを指定してください。クエリには?lang=jaまたは?lang=enのみ指定できます。",
                 nameof(uri)
             );
         var contestId = match.Groups[1].Value;
         var problemId = match.Groups[2].Value;
         var cache = await _cache.GetAsync(cancellationToken);
-        var problem = cache.Problems.SingleOrDefault(x => x.Id == problemId);
-        var mapping = cache.ContestProblems.SingleOrDefault(x =>
-            x.ContestId == contestId && x.ProblemId == problemId
-        );
-        var contest = cache.Contests.SingleOrDefault(x => x.Id == contestId);
+        AtCoderDatasetCache.Problem? problem;
+        AtCoderDatasetCache.ContestProblem? mapping;
+        AtCoderDatasetCache.Contest? contest;
+        try
+        {
+            problem = cache.Problems.SingleOrDefault(x => x.Id == problemId);
+            mapping = cache.ContestProblems.SingleOrDefault(x =>
+                x.ContestId == contestId && x.ProblemId == problemId
+            );
+            contest = cache.Contests.SingleOrDefault(x => x.Id == contestId);
+        }
+        catch (InvalidOperationException exception)
+        {
+            throw new InvalidDataException(
+                "AtCoder Problemsから取得した問題情報に重複があります。",
+                exception
+            );
+        }
         if (problem is null || string.IsNullOrWhiteSpace(problem.Name))
-            throw new InvalidOperationException(
-                $"AtCoder Problems does not contain a title for problem '{problemId}'."
+            throw new InvalidDataException(
+                $"AtCoder Problemsから問題 '{problemId}' のタイトルを取得できませんでした。"
             );
         if (mapping is null || mapping.ProblemIndex is not { Length: 1 })
-            throw new InvalidOperationException(
-                $"AtCoder Problems does not contain a valid problem index for '{problemId}' in contest '{contestId}'."
+            throw new InvalidDataException(
+                $"AtCoder Problemsからコンテスト '{contestId}' の問題 '{problemId}' の有効な問題記号を取得できませんでした。"
             );
         if (contest is null || string.IsNullOrWhiteSpace(contest.Title))
-            throw new InvalidOperationException(
-                $"AtCoder Problems does not contain a title for contest '{contestId}'."
+            throw new InvalidDataException(
+                $"AtCoder Problemsからコンテスト '{contestId}' の名称を取得できませんでした。"
             );
         var category = contestId[..3] switch
         {
@@ -67,16 +81,18 @@ public sealed partial class AtCoderProblemInfoProvider
                 ) => ContestCategory.RegularPlus,
             "arc" => ContestCategory.Regular,
             "agc" => ContestCategory.Grand,
-            _ => throw new InvalidOperationException($"Unsupported AtCoder contest '{contestId}'."),
+            _ => throw new InvalidDataException(
+                $"対応していないAtCoderのコンテストです: '{contestId}'。"
+            ),
         };
         var index = mapping.ProblemIndex[0];
         if (TargetTime.GetSeconds(ProblemSource.AtCoder, category, index) is null)
-            throw new InvalidOperationException(
-                $"No target time is defined for contest '{contestId}' and problem index '{index}'."
+            throw new UnsupportedProblemCategoryException(
+                $"コンテスト '{contestId}' の問題 '{index}' に対応する目標時間がありません。"
             );
         if (contest.StartEpochSecond is null)
-            throw new InvalidOperationException(
-                $"AtCoder Problems does not contain a start date for contest '{contestId}'."
+            throw new InvalidDataException(
+                $"AtCoder Problemsからコンテスト '{contestId}' の開始日を取得できませんでした。"
             );
         DateOnly date;
         try
@@ -90,8 +106,8 @@ public sealed partial class AtCoderProblemInfoProvider
         }
         catch (ArgumentOutOfRangeException exception)
         {
-            throw new InvalidOperationException(
-                $"AtCoder Problems returned an invalid start date for contest '{contestId}'.",
+            throw new InvalidDataException(
+                $"AtCoder Problemsから取得したコンテスト '{contestId}' の開始日が不正です。",
                 exception
             );
         }

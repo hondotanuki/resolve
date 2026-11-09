@@ -1,7 +1,9 @@
 using System.Net;
 using System.Text;
+using Resolve.Application.Interfaces;
 using Resolve.Domain;
-using Resolve.Infrastructure.External;
+using Resolve.Infrastructure.External.AtCoder;
+using Resolve.Infrastructure.External.Http;
 
 namespace Resolve.Infrastructure.Tests;
 
@@ -132,8 +134,17 @@ public sealed class AtCoderProblemInfoProviderTests : IDisposable
     [Fact]
     public async Task 一致しない問題は推測しない()
     {
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+        await Assert.ThrowsAsync<InvalidDataException>(() =>
             _provider.GetAsync(new Uri("https://atcoder.jp/contests/abc482/tasks/unknown"))
+        );
+    }
+
+    [Fact]
+    public async Task 目標時間のない問題区分は専用の例外で拒否する()
+    {
+        _handler.UnsupportedCategory = true;
+        await Assert.ThrowsAsync<UnsupportedProblemCategoryException>(() =>
+            _provider.GetAsync(new Uri("https://atcoder.jp/contests/abc482/tasks/abc482_a"))
         );
     }
 
@@ -180,6 +191,7 @@ public sealed class AtCoderProblemInfoProviderTests : IDisposable
         public bool Fail { get; set; }
         public bool Incomplete { get; set; }
         public bool PartiallyIncomplete { get; set; }
+        public bool UnsupportedCategory { get; set; }
 
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
@@ -232,6 +244,18 @@ public sealed class AtCoderProblemInfoProviderTests : IDisposable
                     $$"""[{"id":"abc482","title":"AtCoder Beginner Contest 482","start_epoch_second":{{epoch}}},{"id":"arc233","title":"AtCoder Regular Contest++ 233","start_epoch_second":{{epoch}}},{"id":"agc078","title":"AtCoder Grand Contest 078","start_epoch_second":{{epoch}}},{"id":"abc043","title":"AtCoder Beginner Contest 043","start_epoch_second":{{epoch}}},{"id":"arc059","title":"AtCoder Regular Contest 059","start_epoch_second":{{epoch}}}]""",
                 _ => throw new InvalidOperationException("Unexpected dataset request."),
             };
+            if (
+                UnsupportedCategory
+                && request.RequestUri.AbsolutePath.EndsWith(
+                    "contest-problem.json",
+                    StringComparison.Ordinal
+                )
+            )
+                json = json.Replace(
+                    "\"problem_index\":\"A\"",
+                    "\"problem_index\":\"H\"",
+                    StringComparison.Ordinal
+                );
             return Task.FromResult(
                 new HttpResponseMessage(HttpStatusCode.OK)
                 {

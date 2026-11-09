@@ -13,6 +13,9 @@ using Resolve.Application.StudyRecords.Delete;
 using Resolve.Application.StudyRecords.List;
 using Resolve.Application.StudyRecords.Update;
 using Resolve.Infrastructure.External;
+using Resolve.Infrastructure.External.AtCoder;
+using Resolve.Infrastructure.External.Http;
+using Resolve.Infrastructure.External.OMC;
 using Resolve.Infrastructure.Persistence;
 using Resolve.Infrastructure.Persistence.Repositories;
 using Scalar.AspNetCore;
@@ -45,8 +48,10 @@ builder.Services.AddSingleton(serviceProvider => new AtCoderDatasetCache(
     serviceProvider.GetRequiredService<IExternalRequestClock>(),
     Path.Combine(builder.Environment.ContentRootPath, ".cache", "atcoder-problems", "datasets.json")
 ));
+
+// External
 builder.Services.AddSingleton<AtCoderProblemInfoProvider>();
-builder.Services.AddSingleton<OmcProblemInfoProvider>();
+builder.Services.AddSingleton<OMCProblemInfoProvider>();
 builder.Services.AddSingleton<IProblemMetadataProvider, ProblemMetadataProvider>();
 
 // Repositories
@@ -55,7 +60,6 @@ builder.Services.AddScoped<IStudyRecordRepository, EfStudyRecordRepository>();
 
 // UseCases
 builder.Services.AddScoped<CreateLearningItemUseCase>();
-builder.Services.AddScoped<CreateLearningItemFromUrlUseCase>();
 builder.Services.AddScoped<ListLearningItemsUseCase>();
 builder.Services.AddScoped<UpdateLearningItemTitleUseCase>();
 builder.Services.AddScoped<GetLearningItemByIdUseCase>();

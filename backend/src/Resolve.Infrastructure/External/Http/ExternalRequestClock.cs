@@ -1,4 +1,4 @@
-namespace Resolve.Infrastructure.External;
+namespace Resolve.Infrastructure.External.Http;
 
 public interface IExternalRequestClock
 {

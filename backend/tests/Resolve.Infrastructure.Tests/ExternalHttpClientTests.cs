@@ -1,13 +1,13 @@
 using System.Net;
 using System.Net.Http.Headers;
-using Resolve.Infrastructure.External;
+using Resolve.Infrastructure.External.Http;
 
 namespace Resolve.Infrastructure.Tests;
 
 public sealed class ExternalHttpClientTests
 {
     private static readonly Uri AtCoder = new("https://atcoder.jp/contests/abc482");
-    private static readonly Uri Omc = new("https://onlinemathcontest.com/contests/omcb087");
+    private static readonly Uri OMC = new("https://onlinemathcontest.com/contests/omcb087");
 
     [Fact]
     public async Task 同じ提供元への同時要求は開始間隔が2秒以上になる()
@@ -49,7 +49,7 @@ public sealed class ExternalHttpClientTests
         );
 
         using var first = await client.GetAsync(AtCoder);
-        using var second = await client.GetAsync(Omc);
+        using var second = await client.GetAsync(OMC);
         Assert.Equal(starts[0], starts[1]);
     }
 
@@ -64,7 +64,7 @@ public sealed class ExternalHttpClientTests
             new BlockingHandler(clock, starts, release)
         );
         var first = client.GetAsync(AtCoder);
-        using var second = await client.GetAsync(Omc);
+        using var second = await client.GetAsync(OMC);
         Assert.False(first.IsCompleted);
         Assert.Equal(2, starts.Count);
         release.SetResult();

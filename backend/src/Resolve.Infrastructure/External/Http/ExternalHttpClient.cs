@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Resolve.Infrastructure.External;
+namespace Resolve.Infrastructure.External.Http;
 
 // This client is shared across requests so all calls to a provider use the same gate.
 public sealed class ExternalHttpClient : IDisposable
@@ -35,10 +35,12 @@ public sealed class ExternalHttpClient : IDisposable
             try
             {
                 if (redirects >= MaxRedirects)
-                    throw new HttpRequestException("Too many redirects.");
+                    throw new HttpRequestException("リダイレクトの回数が上限を超えました。");
                 var location =
                     response.Headers.Location
-                    ?? throw new HttpRequestException("Redirect has no Location header.");
+                    ?? throw new HttpRequestException(
+                        "リダイレクト先を示すLocationヘッダーがありません。"
+                    );
                 uri = location.IsAbsoluteUri ? location : new Uri(uri, location);
                 _ = GetProvider(uri);
             }
@@ -110,17 +112,14 @@ public sealed class ExternalHttpClient : IDisposable
             || !uri.IsDefaultPort
             || uri.UserInfo.Length != 0
         )
-            throw new ArgumentException(
-                "Only allowed HTTPS destinations are supported.",
-                nameof(uri)
-            );
+            throw new ArgumentException("許可されたHTTPSの送信先を指定してください。", nameof(uri));
 
         return uri.IdnHost.ToLowerInvariant() switch
         {
             "atcoder.jp" => _atCoder,
             "kenkoooo.com" => _atCoderProblems,
             "onlinemathcontest.com" or "www.onlinemathcontest.com" => _omc,
-            _ => throw new ArgumentException("The destination is not allowed.", nameof(uri)),
+            _ => throw new ArgumentException("許可されていない送信先です。", nameof(uri)),
         };
     }
 

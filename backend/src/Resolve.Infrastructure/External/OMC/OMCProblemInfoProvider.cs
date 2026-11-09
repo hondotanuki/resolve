@@ -1,13 +1,15 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using AngleSharp.Html.Parser;
+using Resolve.Application.Interfaces;
 using Resolve.Domain;
+using Resolve.Infrastructure.External.Http;
 
-namespace Resolve.Infrastructure.External;
+namespace Resolve.Infrastructure.External.OMC;
 
-public sealed partial class OmcProblemInfoProvider(ExternalHttpClient client)
+public sealed partial class OMCProblemInfoProvider(ExternalHttpClient client)
 {
-    public async Task<OmcProblemInfo> GetAsync(
+    public async Task<OMCProblemInfo> GetAsync(
         Uri uri,
         CancellationToken cancellationToken = default
     )
@@ -22,12 +24,12 @@ public sealed partial class OmcProblemInfoProvider(ExternalHttpClient client)
             || uri.Query.Length != 0
             || uri.Fragment.Length != 0
         )
-            throw new ArgumentException("Unsupported OMC problem URL.", nameof(uri));
+            throw new ArgumentException("対応していないOMCの問題URLです。", nameof(uri));
 
         var path = ProblemPath().Match(uri.AbsolutePath);
         if (!path.Success)
             throw new ArgumentException(
-                "The URL must identify an OMC, OMCB, or OMCE problem.",
+                "OMC、OMCB、OMCEの問題URLを指定してください。",
                 nameof(uri)
             );
 
@@ -43,7 +45,7 @@ public sealed partial class OmcProblemInfoProvider(ExternalHttpClient client)
         var headings = problemDocument.QuerySelectorAll("h1#problem-title");
         if (headings.Length != 1)
             throw new InvalidDataException(
-                "The OMC problem page does not contain a unique problem title."
+                "OMCの問題ページから問題名を一意に取得できませんでした。"
             );
         var title = headings[0].TextContent.Trim();
         var titleMatch = ProblemTitle().Match(title);
@@ -55,9 +57,7 @@ public sealed partial class OmcProblemInfoProvider(ExternalHttpClient client)
                 StringComparison.OrdinalIgnoreCase
             )
         )
-            throw new InvalidDataException(
-                "The OMC problem title does not match the requested contest."
-            );
+            throw new InvalidDataException("OMCの問題名が指定されたコンテストと一致しません。");
         var index = titleMatch.Groups[2].Value[0];
         var category = contestId switch
         {
@@ -66,8 +66,8 @@ public sealed partial class OmcProblemInfoProvider(ExternalHttpClient client)
             _ => ContestCategory.Regular,
         };
         if (TargetTime.GetSeconds(ProblemSource.OnlineMathContest, category, index) is null)
-            throw new InvalidOperationException(
-                "No target time is defined for the OMC problem category."
+            throw new UnsupportedProblemCategoryException(
+                "OMCの問題区分に対応する目標時間がありません。"
             );
 
         using var contestResponse = await client.GetAsync(contestUrl, cancellationToken);
@@ -78,7 +78,7 @@ public sealed partial class OmcProblemInfoProvider(ExternalHttpClient client)
         var contestName = contestId.ToUpperInvariant();
         if (!contestDocument.QuerySelectorAll("h1").Any(x => x.TextContent.Trim() == contestName))
             throw new InvalidDataException(
-                "The OMC contest page does not match the requested contest."
+                "OMCのコンテストページが指定されたコンテストと一致しません。"
             );
         var startLabels = contestDocument
             .QuerySelectorAll("p.list-group-item-text")
@@ -102,10 +102,10 @@ public sealed partial class OmcProblemInfoProvider(ExternalHttpClient client)
             )
         )
             throw new InvalidDataException(
-                "The OMC contest page does not contain a valid displayed start date."
+                "OMCのコンテストページから有効な開始日を取得できませんでした。"
             );
 
-        return new OmcProblemInfo(
+        return new OMCProblemInfo(
             problemUrl,
             title,
             contestId,
@@ -125,7 +125,7 @@ public sealed partial class OmcProblemInfoProvider(ExternalHttpClient client)
             || actual.IdnHost is not ("onlinemathcontest.com" or "www.onlinemathcontest.com")
             || actual.AbsolutePath != expected.AbsolutePath
         )
-            throw new InvalidDataException("OMC redirected to a different page.");
+            throw new InvalidDataException("OMCから別のページへリダイレクトされました。");
     }
 
     [GeneratedRegex(

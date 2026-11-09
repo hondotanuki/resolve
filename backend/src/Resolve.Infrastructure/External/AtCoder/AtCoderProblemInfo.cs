@@ -1,6 +1,6 @@
 using Resolve.Domain;
 
-namespace Resolve.Infrastructure.External;
+namespace Resolve.Infrastructure.External.AtCoder;
 
 public sealed record AtCoderProblemInfo(
     Uri ProblemUrl,

@@ -1,22 +1,24 @@
 using System.Net;
 using System.Text;
+using Resolve.Application.Interfaces;
 using Resolve.Domain;
-using Resolve.Infrastructure.External;
+using Resolve.Infrastructure.External.Http;
+using Resolve.Infrastructure.External.OMC;
 
 namespace Resolve.Infrastructure.Tests;
 
-public sealed class OmcProblemInfoProviderTests : IDisposable
+public sealed class OMCProblemInfoProviderTests : IDisposable
 {
     private readonly FakeClock _clock = new();
     private readonly FakeHandler _handler = new();
     private readonly ExternalHttpClient _client;
-    private readonly OmcProblemInfoProvider _provider;
+    private readonly OMCProblemInfoProvider _provider;
 
-    public OmcProblemInfoProviderTests()
+    public OMCProblemInfoProviderTests()
     {
         _client = new ExternalHttpClient(_clock, _handler);
         _handler.Clock = _clock;
-        _provider = new OmcProblemInfoProvider(_client);
+        _provider = new OMCProblemInfoProvider(_client);
     }
 
     [Theory]
@@ -78,7 +80,9 @@ public sealed class OmcProblemInfoProviderTests : IDisposable
     public async Task 未対応の問題区分は拒否する()
     {
         _handler.Title = "OMCB087(H)";
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _provider.GetAsync(ProblemUrl()));
+        await Assert.ThrowsAsync<UnsupportedProblemCategoryException>(() =>
+            _provider.GetAsync(ProblemUrl())
+        );
         Assert.Single(_handler.Paths);
     }
 

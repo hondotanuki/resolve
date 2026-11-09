@@ -1,7 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Resolve.Infrastructure.External.Http;
 
-namespace Resolve.Infrastructure.External;
+namespace Resolve.Infrastructure.External.AtCoder;
 
 public sealed class AtCoderDatasetCache : IDisposable
 {
@@ -58,12 +59,12 @@ public sealed class AtCoderDatasetCache : IDisposable
             var updated = new CacheData(fetchedAt, problems, mappings, contests);
             if (!IsValid(updated))
                 throw new InvalidDataException(
-                    "AtCoder Problems returned incomplete datasets; the existing cache was not replaced."
+                    "AtCoder Problemsから取得したデータが不完全なため、既存のキャッシュを更新しませんでした。"
                 );
             var directory =
                 Path.GetDirectoryName(_cachePath)
                 ?? throw new InvalidOperationException(
-                    "The AtCoder Problems cache path must include a directory."
+                    "AtCoder Problemsのキャッシュパスにはディレクトリを指定してください。"
                 );
             Directory.CreateDirectory(directory);
             var temporaryPath = Path.Combine(directory, $".{Guid.NewGuid():N}.tmp");
@@ -98,7 +99,7 @@ public sealed class AtCoderDatasetCache : IDisposable
         await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
         return await JsonSerializer.DeserializeAsync<T>(stream, JsonOptions, cancellationToken)
             ?? throw new InvalidDataException(
-                $"AtCoder Problems returned a null dataset for '{name}'."
+                $"AtCoder Problemsから取得したデータセット '{name}' はnullでした。"
             );
     }
 

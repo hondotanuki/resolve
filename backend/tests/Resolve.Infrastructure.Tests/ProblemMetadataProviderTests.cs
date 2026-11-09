@@ -1,4 +1,8 @@
+using Resolve.Application.Interfaces;
 using Resolve.Infrastructure.External;
+using Resolve.Infrastructure.External.AtCoder;
+using Resolve.Infrastructure.External.Http;
+using Resolve.Infrastructure.External.OMC;
 
 namespace Resolve.Infrastructure.Tests;
 
@@ -21,7 +25,7 @@ public sealed class ProblemMetadataProviderTests : IDisposable
         );
         _provider = new ProblemMetadataProvider(
             new AtCoderProblemInfoProvider(_cache),
-            new OmcProblemInfoProvider(_client)
+            new OMCProblemInfoProvider(_client)
         );
     }
 
@@ -42,7 +46,7 @@ public sealed class ProblemMetadataProviderTests : IDisposable
     [InlineData("http://atcoder.jp/contests/abc482/tasks/abc482_a")]
     [InlineData("https://example.com/contests/abc482/tasks/abc482_a")]
     public void 未対応URLは拒否する(string input) =>
-        Assert.Throws<ArgumentException>(() => _provider.Normalize(new Uri(input)));
+        Assert.Throws<UnsupportedProblemUrlException>(() => _provider.Normalize(new Uri(input)));
 
     public void Dispose()
     {
