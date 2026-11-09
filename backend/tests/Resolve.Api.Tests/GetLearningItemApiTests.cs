@@ -30,16 +30,7 @@ public sealed class GetLearningItemApiTests
     [Fact]
     public async Task 登録済みIDなら詳細を返す()
     {
-        var createRequest = new
-        {
-            source = "AtCoder",
-            category = "Beginner",
-            problemIndex = "A",
-            title = "二分探索",
-            content = "二分探索を解く",
-        };
-
-        var createResponse = await _client.PostAsJsonAsync("/learning-items", createRequest);
+        var createResponse = await TestProblemApi.CreateAsync(_client, "二分探索");
         var created = await createResponse.Content.ReadFromJsonAsync<JsonElement>();
         var id = created.GetProperty("id").GetInt32();
         var response = await _client.GetAsync($"/learning-items/{id}");
@@ -72,14 +63,7 @@ public sealed class GetLearningItemApiTests
     [Fact]
     public async Task 詳細に廃止したContentを含まない()
     {
-        var createRequest = new
-        {
-            source = "AtCoder",
-            category = "Beginner",
-            problemIndex = "A",
-            title = "二分探索",
-        };
-        var createResponse = await _client.PostAsJsonAsync("/learning-items", createRequest);
+        var createResponse = await TestProblemApi.CreateAsync(_client, "二分探索");
 
         var created = await createResponse.Content.ReadFromJsonAsync<JsonElement>();
         var id = created.GetProperty("id").GetInt32();
@@ -95,16 +79,7 @@ public sealed class GetLearningItemApiTests
     [InlineData("success", "completed")]
     public async Task 最新の学習結果に応じた現在状態を返す(string result, string expectedStatus)
     {
-        var createItemResponse = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                source = "AtCoder",
-                category = "Beginner",
-                problemIndex = "A",
-                title = "二分探索",
-            }
-        );
+        var createItemResponse = await TestProblemApi.CreateAsync(_client, "二分探索");
         Assert.Equal(HttpStatusCode.Created, createItemResponse.StatusCode);
         var item = await createItemResponse.Content.ReadFromJsonAsync<JsonElement>();
         var id = item.GetProperty("id").GetInt32();

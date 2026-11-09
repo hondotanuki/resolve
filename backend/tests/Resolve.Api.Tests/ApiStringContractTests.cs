@@ -27,16 +27,7 @@ public sealed class ApiStringContractTests
     [InlineData("failure")]
     public async Task 学習結果は既存の文字列で登録と更新ができる(string result)
     {
-        var itemResponse = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                source = "AtCoder",
-                category = "Beginner",
-                problemIndex = "A",
-                title = "title",
-            }
-        );
+        var itemResponse = await TestProblemApi.CreateAsync(_client, "title");
         var item = await itemResponse.Content.ReadFromJsonAsync<JsonElement>();
         var itemId = item.GetProperty("id").GetInt32();
         var created = await _client.PostAsJsonAsync(

@@ -24,7 +24,11 @@ public sealed class CreateStudyRecordUseCaseTests
             "二分探索",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
         item.SetProblemCategory(ProblemSource.AtCoder, ContestCategory.Beginner, 'A');
         return item;

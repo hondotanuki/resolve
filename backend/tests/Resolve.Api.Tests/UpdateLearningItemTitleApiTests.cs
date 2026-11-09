@@ -24,16 +24,7 @@ public sealed class UpdateLearningItemTitleApiTests
     [Fact]
     public async Task タイトルを変更して詳細から確認できる()
     {
-        var created = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                title = "元のタイトル",
-                source = "AtCoder",
-                category = "Beginner",
-                problemIndex = "A",
-            }
-        );
+        var created = await TestProblemApi.CreateAsync(_client, "元のタイトル");
         var item = await created.Content.ReadFromJsonAsync<JsonElement>();
         var id = item.GetProperty("id").GetInt32();
 
@@ -49,16 +40,7 @@ public sealed class UpdateLearningItemTitleApiTests
     [Fact]
     public async Task 空白タイトルは拒否し既存の値を保持する()
     {
-        var created = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                title = "元のタイトル",
-                source = "AtCoder",
-                category = "Beginner",
-                problemIndex = "A",
-            }
-        );
+        var created = await TestProblemApi.CreateAsync(_client, "元のタイトル");
         var item = await created.Content.ReadFromJsonAsync<JsonElement>();
         var id = item.GetProperty("id").GetInt32();
 

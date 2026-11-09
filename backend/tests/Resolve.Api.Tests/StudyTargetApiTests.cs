@@ -22,22 +22,10 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
     [Fact]
     public async Task 記録時の目標時間が保存され訂正後の状態に反映される()
     {
-        var itemResponse = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                title = "問題",
-                source = "AtCoder",
-                category = "Beginner",
-                problemIndex = "A",
-            }
-        );
+        var itemResponse = await TestProblemApi.CreateAsync(_client, "問題");
         Assert.Equal(HttpStatusCode.Created, itemResponse.StatusCode);
         var item = await itemResponse.Content.ReadFromJsonAsync<JsonElement>();
         int itemId = item.GetProperty("id").GetInt32();
-        Assert.Equal("AtCoder", item.GetProperty("source").GetString());
-        Assert.Equal("Beginner", item.GetProperty("category").GetString());
-        Assert.Equal("A", item.GetProperty("problemIndex").GetString());
 
         var createResponse = await _client.PostAsJsonAsync(
             $"/learning-items/{itemId}/study-records",
@@ -102,16 +90,7 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
     )]
     public async Task 廃止した結果と所要時間なしの記録を拒否する(string json)
     {
-        var itemResponse = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                title = "問題",
-                source = "AtCoder",
-                category = "Beginner",
-                problemIndex = "A",
-            }
-        );
+        var itemResponse = await TestProblemApi.CreateAsync(_client, "問題");
         Assert.Equal(HttpStatusCode.Created, itemResponse.StatusCode);
         var item = await itemResponse.Content.ReadFromJsonAsync<JsonElement>();
         int itemId = item.GetProperty("id").GetInt32();
@@ -126,73 +105,22 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
         Assert.Empty(history.EnumerateArray());
     }
 
-    [Theory]
-    [InlineData("AtCoder", "Beginner", "H")]
-    [InlineData("OnlineMathContest", "Grand", "A")]
-    [InlineData("0", "Beginner", "A")]
-    [InlineData("AtCoder", "Beginner", "a")]
-    public async Task 未対応の区分では問題を登録しない(
-        string source,
-        string category,
-        string problemIndex
-    )
-    {
-        var response = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                title = "問題",
-                source,
-                category,
-                problemIndex,
-            }
-        );
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        var items = await _client.GetFromJsonAsync<JsonElement>("/learning-items");
-        Assert.Empty(items.EnumerateArray());
-    }
-
-    [Theory]
-    [InlineData("""{"title":"問題","category":"Beginner","problemIndex":"A"}""")]
-    [InlineData("""{"title":"問題","source":null,"category":"Beginner","problemIndex":"A"}""")]
-    [InlineData("""{"title":"問題","source":"AtCoder","problemIndex":"A"}""")]
-    [InlineData("""{"title":"問題","source":"AtCoder","category":null,"problemIndex":"A"}""")]
-    [InlineData("""{"title":"問題","source":"AtCoder","category":"Beginner"}""")]
-    [InlineData(
-        """{"title":"問題","source":"AtCoder","category":"Beginner","problemIndex":null}"""
-    )]
-    public async Task 問題区分が欠けた入力は保存しない(string json)
-    {
-        using var body = new StringContent(json, Encoding.UTF8, "application/json");
-        var response = await _client.PostAsync("/learning-items", body);
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        var items = await _client.GetFromJsonAsync<JsonElement>("/learning-items");
-        Assert.Empty(items.EnumerateArray());
-    }
-
     [Fact]
-    public async Task 問題区分はOpenAPIで必須の非nullとして表される()
+    public async Task 問題情報はOpenAPIで必須かつ非nullとして表される()
     {
         var document = await _client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
         var schemas = document.GetProperty("components").GetProperty("schemas");
-        foreach (
-            var name in new[]
-            {
-                "CreateLearningItemRequest",
-                "CreateLearningItemResponse",
-                "GetLearningItemResponse",
-                "ListLearningItemsResponse",
-            }
-        )
+        foreach (var name in new[] { "GetLearningItemResponse", "ListLearningItemsResponse" })
         {
             var schema = schemas.GetProperty(name);
-            Assert.False(schema.GetProperty("properties").TryGetProperty("itemType", out _));
             var required = schema
                 .GetProperty("required")
                 .EnumerateArray()
                 .Select(x => x.GetString())
                 .ToArray();
-            foreach (var field in new[] { "source", "category", "problemIndex" })
+            foreach (
+                var field in new[] { "problemUrl", "contestId", "contestName", "contestStartDate" }
+            )
             {
                 Assert.Contains(field, required);
                 Assert.Equal(
@@ -204,22 +132,23 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
                         .GetString()
                 );
             }
-            Assert.Contains(
-                schema
-                    .GetProperty("properties")
-                    .GetProperty("source")
-                    .GetProperty("enum")
-                    .EnumerateArray(),
-                x => x.GetString() == "AtCoder"
-            );
-            Assert.Contains(
-                schema
-                    .GetProperty("properties")
-                    .GetProperty("category")
-                    .GetProperty("enum")
-                    .EnumerateArray(),
-                x => x.GetString() == "Beginner"
-            );
         }
+        var request = schemas.GetProperty("CreateLearningItemRequest");
+        Assert.Contains(
+            request.GetProperty("required").EnumerateArray(),
+            value => value.GetString() == "url"
+        );
+        var path = document
+            .GetProperty("paths")
+            .EnumerateObject()
+            .Single(x => x.Name.TrimEnd('/') == "/learning-items")
+            .Value;
+        Assert.Equal(
+            "CreateLearningItem",
+            path.GetProperty("post").GetProperty("operationId").GetString()
+        );
+        var responses = path.GetProperty("post").GetProperty("responses");
+        foreach (var code in new[] { "200", "201", "400", "422", "502", "504" })
+            Assert.True(responses.TryGetProperty(code, out _), $"Missing {code} response");
     }
 }

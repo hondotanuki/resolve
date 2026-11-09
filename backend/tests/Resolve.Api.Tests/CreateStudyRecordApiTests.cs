@@ -31,16 +31,7 @@ public sealed class CreateStudyRecordApiTests
 
     private async Task<int> CreateLearningItemAsync()
     {
-        var request = new
-        {
-            source = "AtCoder",
-            category = "Beginner",
-            problemIndex = "A",
-            title = "二分探索",
-            content = "二分探索を解く",
-        };
-
-        var response = await _client.PostAsJsonAsync("/learning-items", request);
+        var response = await TestProblemApi.CreateAsync(_client, "二分探索");
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();

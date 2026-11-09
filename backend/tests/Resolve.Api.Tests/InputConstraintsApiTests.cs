@@ -28,11 +28,10 @@ public sealed class InputConstraintsApiTests
         var document = await _client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
         var schemas = document.GetProperty("components").GetProperty("schemas");
         var title = schemas
-            .GetProperty("CreateLearningItemRequest")
+            .GetProperty("UpdateLearningItemTitleRequest")
             .GetProperty("properties")
             .GetProperty("title");
         Assert.Equal(1, title.GetProperty("minLength").GetInt32());
-        Assert.Contains("空白", title.GetProperty("description").GetString());
 
         foreach (var name in new[] { "CreateStudyRecordRequest", "UpdateStudyRecordRequest" })
         {
@@ -148,16 +147,7 @@ public sealed class InputConstraintsApiTests
 
     private async Task<int> CreateItemAsync()
     {
-        var response = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                source = "AtCoder",
-                category = "Beginner",
-                problemIndex = "A",
-                title = "a",
-            }
-        );
+        var response = await TestProblemApi.CreateAsync(_client, "a");
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         return (await response.Content.ReadFromJsonAsync<JsonElement>())
             .GetProperty("id")

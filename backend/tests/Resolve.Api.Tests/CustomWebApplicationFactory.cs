@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Resolve.Application.Interfaces;
 using Resolve.Infrastructure.Persistence;
 
 namespace Resolve.Api.Tests;
@@ -38,6 +40,8 @@ public sealed class CustomWebApplicationFactory<TProgram> : WebApplicationFactor
             {
                 options.UseSqlite(_connection);
             });
+            services.RemoveAll<IProblemMetadataProvider>();
+            services.AddSingleton<IProblemMetadataProvider, TestProblemMetadataProvider>();
         });
     }
 
