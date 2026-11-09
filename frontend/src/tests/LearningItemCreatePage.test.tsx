@@ -210,7 +210,7 @@ describe("CreateLearningItemPage", () => {
     );
 
     expect(
-      await screen.findByText("LearningItemの登録に失敗しました。"),
+      await screen.findByText("問題の登録に失敗しました。"),
     ).toBeInTheDocument();
   });
 });

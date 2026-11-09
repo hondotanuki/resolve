@@ -34,7 +34,7 @@ public sealed class CreateStudyRecordUseCase(
             )
             is not { } targetSeconds
         )
-            throw new ArgumentException("Learning item has no supported problem category.");
+            throw new ArgumentException("学習対象の問題区分に対応する目標時間がありません。");
 
         StudyRecord record = new(
             input.LearningItemId,

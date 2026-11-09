@@ -22,7 +22,7 @@ public static class ItemStatusCalculator
                 ? ItemStatus.NeedsReview
                 : ItemStatus.Completed,
             StudyResult.Failure => ItemStatus.NeedsReview,
-            _ => throw new InvalidOperationException("Unknown study result."),
+            _ => throw new InvalidOperationException("不明な学習結果です。"),
         };
     }
 }

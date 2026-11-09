@@ -12,7 +12,11 @@ public static class ItemStatusMapping
             ItemStatus.Unstarted => ApiValues.ItemStatuses.Unstarted,
             ItemStatus.NeedsReview => ApiValues.ItemStatuses.NeedsReview,
             ItemStatus.Completed => ApiValues.ItemStatuses.Completed,
-            _ => throw new ArgumentOutOfRangeException(nameof(itemStatus), itemStatus, null),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(itemStatus),
+                itemStatus,
+                "対応していない学習状態です。"
+            ),
         };
     }
 }

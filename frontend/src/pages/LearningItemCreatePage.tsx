@@ -57,7 +57,7 @@ export function LearningItemCreatePage() {
       });
       navigate(`/learning-items/${response.data.id}`);
     } catch {
-      setApiError("LearningItemの登録に失敗しました。");
+      setApiError("問題の登録に失敗しました。");
     }
   }
 

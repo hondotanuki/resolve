@@ -85,7 +85,7 @@ export function StudyRecordCreateForm({
       });
 
       if (response.status === 404) {
-        setApiError("対象のLearningItemが見つかりません。");
+        setApiError("対象の問題が見つかりません。");
         return;
       }
 
@@ -102,7 +102,7 @@ export function StudyRecordCreateForm({
         queryKey: getListStudyRecordsQueryKey(learningItemId),
       });
     } catch {
-      setApiError("StudyRecordの登録に失敗しました。");
+      setApiError("学習記録の登録に失敗しました。");
     }
   }
 

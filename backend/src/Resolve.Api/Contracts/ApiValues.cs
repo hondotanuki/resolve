@@ -21,7 +21,11 @@ public static class ApiValues
                 "Grand",
                 "Expert",
             ],
-            _ => throw new ArgumentOutOfRangeException(nameof(valueSet)),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(valueSet),
+                valueSet,
+                "対応していない値の種類です。"
+            ),
         };
 
     public static class StudyResults

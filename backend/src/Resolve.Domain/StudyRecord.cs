@@ -55,17 +55,21 @@ public sealed class StudyRecord
 
         if (!Enum.IsDefined(result))
         {
-            throw new ArgumentOutOfRangeException(nameof(result));
+            throw new ArgumentOutOfRangeException(
+                nameof(result),
+                result,
+                "対応していない学習結果です。"
+            );
         }
 
         if (studiedAt == default)
         {
-            throw new ArgumentException("StudiedAt must be specified.", nameof(studiedAt));
+            throw new ArgumentException("学習日時を指定してください。", nameof(studiedAt));
         }
 
         if (studiedAt.Kind != DateTimeKind.Utc)
         {
-            throw new ArgumentException("StudiedAt must be in UTC.", nameof(studiedAt));
+            throw new ArgumentException("学習日時はUTCで指定してください。", nameof(studiedAt));
         }
     }
 }
