@@ -4,17 +4,16 @@ namespace Resolve.Application.LearningItems.Update;
 
 public sealed class UpdateLearningItemTitleUseCase(ILearningItemRepository repository)
 {
-    public async Task<bool> ExecuteAsync(
-        int id,
-        string title,
+    public async Task<UpdateLearningItemTitleOutput> ExecuteAsync(
+        UpdateLearningItemTitleInput input,
         CancellationToken cancellationToken = default
     )
     {
-        var item = await repository.GetForUpdateAsync(id, cancellationToken);
+        var item = await repository.GetForUpdateAsync(input.Id, cancellationToken);
         if (item is null)
-            return false;
-        item.UpdateTitle(title);
+            return new(false);
+        item.UpdateTitle(input.Title);
         await repository.SaveChangesAsync(cancellationToken);
-        return true;
+        return new(true);
     }
 }

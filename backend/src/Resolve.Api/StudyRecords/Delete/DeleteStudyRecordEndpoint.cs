@@ -15,9 +15,12 @@ public static class DeleteStudyRecordEndpoint
                     CancellationToken cancellationToken
                 ) =>
                 {
-                    var result = await useCase.ExecuteAsync(studyRecordId, cancellationToken);
+                    var result = await useCase.ExecuteAsync(
+                        new DeleteStudyRecordInput(studyRecordId),
+                        cancellationToken
+                    );
 
-                    if (result is false)
+                    if (!result.Deleted)
                     {
                         return Results.NotFound();
                     }

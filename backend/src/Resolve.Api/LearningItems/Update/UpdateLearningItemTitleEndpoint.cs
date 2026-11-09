@@ -1,13 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using Resolve.Application.LearningItems.Update;
 
 namespace Resolve.Api.LearningItems.Update;
-
-public sealed record UpdateLearningItemTitleRequest
-{
-    [MinLength(1)]
-    public required string Title { get; init; }
-}
 
 public static class UpdateLearningItemTitleEndpoint
 {
@@ -25,9 +18,11 @@ public static class UpdateLearningItemTitleEndpoint
                 {
                     try
                     {
-                        return await useCase.ExecuteAsync(id, request.Title, cancellationToken)
-                            ? Results.NoContent()
-                            : Results.NotFound();
+                        var output = await useCase.ExecuteAsync(
+                            new UpdateLearningItemTitleInput(id, request.Title),
+                            cancellationToken
+                        );
+                        return output.Updated ? Results.NoContent() : Results.NotFound();
                     }
                     catch (ArgumentException)
                     {
