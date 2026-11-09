@@ -9,7 +9,11 @@ public class LearningItemTests
             "タイトル",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
 
         Assert.Equal("タイトル", item.Title);
@@ -17,10 +21,9 @@ public class LearningItemTests
         Assert.Equal(ProblemSource.AtCoder, item.Source);
         Assert.Equal(ContestCategory.Beginner, item.Category);
         Assert.Equal('A', item.ProblemIndex);
-        Assert.Null(item.ProblemUrl);
-        Assert.Null(item.ContestId);
-        Assert.Null(item.ContestName);
-        Assert.Null(item.ContestStartDate);
+        Assert.Equal("abc482", item.ContestId);
+        Assert.Equal("ABC 482", item.ContestName);
+        Assert.Equal(new DateOnly(2026, 10, 31), item.ContestStartDate);
     }
 
     [Fact]
@@ -44,6 +47,47 @@ public class LearningItemTests
         Assert.Equal(date, item.ContestStartDate);
     }
 
+    [Theory]
+    [InlineData("", "abc482", "ABC 482")]
+    [InlineData("https://atcoder.jp/contests/abc482/tasks/abc482_a", " ", "ABC 482")]
+    [InlineData("https://atcoder.jp/contests/abc482/tasks/abc482_a", "abc482", "")]
+    public void URLとコンテスト情報が空なら生成できない(
+        string url,
+        string contestId,
+        string contestName
+    )
+    {
+        Assert.ThrowsAny<ArgumentException>(() =>
+            new LearningItem(
+                "問題",
+                ProblemSource.AtCoder,
+                ContestCategory.Beginner,
+                'A',
+                url,
+                contestId,
+                contestName,
+                new DateOnly(2026, 10, 31)
+            )
+        );
+    }
+
+    [Fact]
+    public void 開始日が初期値なら生成できない()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new LearningItem(
+                "問題",
+                ProblemSource.AtCoder,
+                ContestCategory.Beginner,
+                'A',
+                "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+                "abc482",
+                "ABC 482",
+                default
+            )
+        );
+    }
+
     [Fact]
     public void 不正な区分への変更では元の区分を保持する()
     {
@@ -51,7 +95,11 @@ public class LearningItemTests
             "問題",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
         Assert.Throws<ArgumentException>(() =>
             item.SetProblemCategory(ProblemSource.AtCoder, ContestCategory.Beginner, 'H')
@@ -70,7 +118,11 @@ public class LearningItemTests
                 title,
                 source: ProblemSource.AtCoder,
                 category: ContestCategory.Beginner,
-                problemIndex: 'A'
+                problemIndex: 'A',
+                problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+                contestId: "abc482",
+                contestName: "ABC 482",
+                contestStartDate: new DateOnly(2026, 10, 31)
             )
         );
     }
@@ -86,7 +138,16 @@ public class LearningItemTests
     )
     {
         Assert.Throws<ArgumentException>(() =>
-            new LearningItem("問題", source, category, problemIndex)
+            new LearningItem(
+                "問題",
+                source,
+                category,
+                problemIndex,
+                problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+                contestId: "abc482",
+                contestName: "ABC 482",
+                contestStartDate: new DateOnly(2026, 10, 31)
+            )
         );
     }
 }

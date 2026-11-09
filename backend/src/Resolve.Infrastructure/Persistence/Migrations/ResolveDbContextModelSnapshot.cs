@@ -34,14 +34,16 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                         .HasColumnName("category");
 
                     b.Property<string>("ContestId")
+                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("contest_id");
 
                     b.Property<string>("ContestName")
+                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("contest_name");
 
-                    b.Property<DateOnly?>("ContestStartDate")
+                    b.Property<DateOnly>("ContestStartDate")
                         .HasColumnType("TEXT")
                         .HasColumnName("contest_start_date");
 
@@ -55,6 +57,7 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                         .HasColumnName("problem_index");
 
                     b.Property<string>("ProblemUrl")
+                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("problem_url");
 

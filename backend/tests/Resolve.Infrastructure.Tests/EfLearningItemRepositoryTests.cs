@@ -63,7 +63,11 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
             "二分探索",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: $"https://atcoder.jp/contests/abc482/tasks/test_{Guid.NewGuid():N}",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
 
         var saved = await _repository.CreateAsync(item);
@@ -113,7 +117,11 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
             "二分探索",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: $"https://atcoder.jp/contests/abc482/tasks/test_{Guid.NewGuid():N}",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
         _dbContext.LearningItems.Add(item);
         var archivedAt = new DateTime(2026, 10, 15, 9, 0, 0, DateTimeKind.Utc);

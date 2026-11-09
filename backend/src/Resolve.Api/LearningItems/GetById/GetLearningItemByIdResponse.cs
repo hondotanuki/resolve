@@ -2,7 +2,7 @@ using Resolve.Api.Contracts;
 
 namespace Resolve.Api.LearningItems.GetById;
 
-public sealed record GetLearningItemResponse
+public sealed record GetLearningItemByIdResponse
 {
     public required int Id { get; init; }
 
@@ -20,8 +20,8 @@ public sealed record GetLearningItemResponse
     [ApiAllowedValues(ApiValueSet.ContestCategories)]
     public required string Category { get; init; }
     public required string ProblemIndex { get; init; }
-    public string? ProblemUrl { get; init; }
-    public string? ContestId { get; init; }
-    public string? ContestName { get; init; }
-    public DateOnly? ContestStartDate { get; init; }
+    public required string ProblemUrl { get; init; }
+    public required string ContestId { get; init; }
+    public required string ContestName { get; init; }
+    public required DateOnly ContestStartDate { get; init; }
 };

@@ -34,7 +34,11 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
             title,
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: $"https://atcoder.jp/contests/abc482/tasks/test_{Guid.NewGuid():N}",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
 
         _dbContext.LearningItems.Add(item);
@@ -435,7 +439,11 @@ public sealed class EfStudyRecordRepositoryTests : IDisposable
             "二分探索",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: $"https://atcoder.jp/contests/abc482/tasks/test_{Guid.NewGuid():N}",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
 
         _dbContext.LearningItems.Add(learningItem);

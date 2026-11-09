@@ -9,8 +9,8 @@ public sealed record ListLearningItemsOutput(
     ProblemSource Source,
     ContestCategory Category,
     char ProblemIndex,
-    string? ProblemUrl = null,
-    string? ContestId = null,
-    string? ContestName = null,
-    DateOnly? ContestStartDate = null
+    string ProblemUrl,
+    string ContestId,
+    string ContestName,
+    DateOnly ContestStartDate
 );
