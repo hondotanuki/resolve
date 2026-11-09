@@ -12,7 +12,6 @@ public static class LearningItemEndpoints
         var group = app.MapGroup("/learning-items");
 
         group.MapCreateLearningItem();
-        group.MapCreateLearningItemFromUrl();
         group.MapListLearningItems();
         group.MapGetLearningItemById();
         group.MapUpdateLearningItemTitle();

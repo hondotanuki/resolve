@@ -1,137 +1,122 @@
+using Resolve.Application.Interfaces;
 using Resolve.Application.LearningItems.Create;
 using Resolve.Application.Tests.Fakes;
 using Resolve.Domain;
 
 namespace Resolve.Application.Tests;
 
-public class CreateLearningItemUseCaseTests
+public sealed class CreateLearningItemUseCaseTests
 {
-    private readonly FakeLearningItemRepository _repository;
-    private readonly CreateLearningItemUseCase _useCase;
-
-    public CreateLearningItemUseCaseTests()
-    {
-        _repository = new FakeLearningItemRepository();
-        _useCase = new CreateLearningItemUseCase(_repository);
-    }
-
     [Fact]
-    public async Task 有効な入力でUseCaseが実行できる()
+    public async Task 既存問題なら外部取得せず返す()
     {
-        var input = new CreateLearningItemInput
+        var repository = new FakeLearningItemRepository
         {
-            Source = ProblemSource.AtCoder,
-            Category = ContestCategory.Beginner,
-            ProblemIndex = 'A',
-            Title = "二分探索",
+            FindByUrlResult = new LearningItem(
+                "existing",
+                ProblemSource.AtCoder,
+                ContestCategory.Beginner,
+                'A',
+                problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+                contestId: "abc482",
+                contestName: "ABC 482",
+                contestStartDate: new DateOnly(2026, 10, 31)
+            ),
         };
-        var output = await _useCase.ExecuteAsync(input);
-
-        Assert.Equal("二分探索", output.Title);
-        Assert.Equal(ProblemSource.AtCoder, output.Source);
-        Assert.Equal(ContestCategory.Beginner, output.Category);
-        Assert.Equal('A', output.ProblemIndex);
-    }
-
-    [Fact]
-    public async Task 有効な入力でRepositoryが1回呼ばれる()
-    {
-        var input = new CreateLearningItemInput
-        {
-            Source = ProblemSource.AtCoder,
-            Category = ContestCategory.Beginner,
-            ProblemIndex = 'A',
-            Title = "二分探索",
-        };
-        await _useCase.ExecuteAsync(input);
-
-        Assert.Equal(1, _repository.CreateCallCount);
-    }
-
-    [Fact]
-    public async Task Repositoryに正しいLearningItemが渡される()
-    {
-        var input = new CreateLearningItemInput
-        {
-            Source = ProblemSource.AtCoder,
-            Category = ContestCategory.Beginner,
-            ProblemIndex = 'A',
-            Title = "二分探索",
-        };
-        await _useCase.ExecuteAsync(input);
-
-        var item = _repository.ReceivedItem;
-
-        Assert.NotNull(item);
-
-        Assert.Equal("二分探索", item.Title);
-        Assert.Equal(ProblemSource.AtCoder, item.Source);
-        Assert.Equal(ContestCategory.Beginner, item.Category);
-        Assert.Equal('A', item.ProblemIndex);
-    }
-
-    [Fact]
-    public async Task 登録時に問題区分を返す()
-    {
-        var input = new CreateLearningItemInput
-        {
-            Source = ProblemSource.AtCoder,
-            Category = ContestCategory.Beginner,
-            ProblemIndex = 'A',
-            Title = "二分探索",
-        };
-
-        var output = await _useCase.ExecuteAsync(input);
-
-        Assert.Equal(1, _repository.CreateCallCount);
-        Assert.Equal(ProblemSource.AtCoder, output.Source);
-        Assert.Equal(ContestCategory.Beginner, output.Category);
-        Assert.Equal('A', output.ProblemIndex);
-    }
-
-    [Fact]
-    public async Task 空タイトルではRepositoryが呼ばれない()
-    {
-        var input = new CreateLearningItemInput
-        {
-            Source = ProblemSource.AtCoder,
-            Category = ContestCategory.Beginner,
-            ProblemIndex = 'A',
-            Title = "",
-        };
-
-        await Assert.ThrowsAsync<ArgumentException>(() => _useCase.ExecuteAsync(input));
-        Assert.Equal(0, _repository.CreateCallCount);
-    }
-
-    [Fact]
-    public async Task OutputにRepositoryの保存結果が反映される()
-    {
-        var savedItem = new LearningItem(
-            "保存後タイトル",
-            source: ProblemSource.AtCoder,
-            category: ContestCategory.Beginner,
-            problemIndex: 'A'
+        var provider = new FakeProvider();
+        var useCase = new CreateLearningItemUseCase(repository, provider);
+        var result = await useCase.ExecuteAsync(
+            new CreateLearningItemInput(
+                new Uri("https://atcoder.jp/contests/abc482/tasks/abc482_a?lang=en")
+            )
         );
+        Assert.False(result.Created);
+        Assert.Equal(0, provider.GetCount);
+        Assert.Equal(0, repository.CreateCallCount);
+    }
 
-        _repository.CreateResult = savedItem;
+    [Fact]
+    public async Task 新規問題なら取得結果を保存する()
+    {
+        var repository = new FakeLearningItemRepository();
+        var provider = new FakeProvider();
+        var useCase = new CreateLearningItemUseCase(repository, provider);
+        var result = await useCase.ExecuteAsync(
+            new CreateLearningItemInput(
+                new Uri("https://atcoder.jp/contests/abc482/tasks/abc482_a?lang=en")
+            )
+        );
+        Assert.True(result.Created);
+        Assert.Equal(1, provider.GetCount);
+        Assert.Equal("abc482", repository.ReceivedItem!.ContestId);
+        Assert.Equal(
+            "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            repository.ReceivedItem.ProblemUrl
+        );
+    }
 
-        var input = new CreateLearningItemInput
+    [Fact]
+    public async Task 情報取得失敗時は保存しない()
+    {
+        var repository = new FakeLearningItemRepository();
+        var provider = new FakeProvider { Fail = true };
+        var useCase = new CreateLearningItemUseCase(repository, provider);
+        await Assert.ThrowsAsync<HttpRequestException>(() =>
+            useCase.ExecuteAsync(
+                new CreateLearningItemInput(
+                    new Uri("https://atcoder.jp/contests/abc482/tasks/abc482_a")
+                )
+            )
+        );
+        Assert.Equal(0, repository.CreateCallCount);
+    }
+
+    [Fact]
+    public async Task 異なるURLの取得結果は保存しない()
+    {
+        var repository = new FakeLearningItemRepository();
+        var provider = new FakeProvider { MismatchedUrl = true };
+        var useCase = new CreateLearningItemUseCase(repository, provider);
+        await Assert.ThrowsAsync<InvalidDataException>(() =>
+            useCase.ExecuteAsync(
+                new CreateLearningItemInput(
+                    new Uri("https://atcoder.jp/contests/abc482/tasks/abc482_a")
+                )
+            )
+        );
+        Assert.Equal(0, repository.CreateCallCount);
+    }
+
+    private sealed class FakeProvider : IProblemMetadataProvider
+    {
+        public int GetCount { get; private set; }
+        public bool Fail { get; init; }
+        public bool MismatchedUrl { get; init; }
+
+        public Uri Normalize(Uri uri) => new("https://atcoder.jp/contests/abc482/tasks/abc482_a");
+
+        public Task<ProblemMetadata> GetAsync(
+            Uri uri,
+            CancellationToken cancellationToken = default
+        )
         {
-            Source = ProblemSource.AtCoder,
-            Category = ContestCategory.Beginner,
-            ProblemIndex = 'A',
-            Title = "入力タイトル",
-        };
-
-        var output = await _useCase.ExecuteAsync(input);
-
-        Assert.Equal(savedItem.Id, output.Id);
-
-        Assert.Equal(savedItem.Title, output.Title);
-
-        Assert.Equal(savedItem.ArchivedAt, output.ArchivedAt);
-        Assert.Equal(savedItem.CreatedAt, output.CreatedAt);
-        Assert.Equal(savedItem.UpdatedAt, output.UpdatedAt);
+            GetCount++;
+            if (Fail)
+                throw new HttpRequestException("Fetch failed.");
+            return Task.FromResult(
+                new ProblemMetadata(
+                    MismatchedUrl
+                        ? new Uri("https://atcoder.jp/contests/abc482/tasks/abc482_b")
+                        : uri,
+                    "Nigiri",
+                    ProblemSource.AtCoder,
+                    ContestCategory.Beginner,
+                    'A',
+                    "abc482",
+                    "ABC 482",
+                    new DateOnly(2026, 10, 31)
+                )
+            );
+        }
     }
 }
