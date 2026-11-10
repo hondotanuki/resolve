@@ -34,17 +34,25 @@ public sealed class AtCoderProblemInfoProviderTests : IDisposable
     }
 
     [Theory]
-    [InlineData("abc482", "abc482_a", "Nigiri", ContestCategory.Beginner, 'A')]
-    [InlineData("arc233", "arc233_a", "Strange Subset Sum", ContestCategory.RegularPlus, 'A')]
-    [InlineData("agc078", "agc078_a", "Rearrange ABC", ContestCategory.Grand, 'A')]
-    [InlineData("abc043", "arc059_a", "Common", ContestCategory.Beginner, 'C')]
-    [InlineData("arc059", "arc059_a", "Common", ContestCategory.Regular, 'C')]
+    [InlineData("abc482", "abc482_a", "Nigiri", ContestCategory.Beginner, 'A', "2026-10-31")]
+    [InlineData(
+        "arc233",
+        "arc233_a",
+        "Strange Subset Sum",
+        ContestCategory.RegularPlus,
+        'A',
+        "2026-10-25"
+    )]
+    [InlineData("agc078", "agc078_a", "Rearrange ABC", ContestCategory.Grand, 'A', "2026-09-27")]
+    [InlineData("abc043", "arc059_a", "Be Together", ContestCategory.Beginner, 'C', "2016-08-13")]
+    [InlineData("arc059", "arc059_a", "Be Together", ContestCategory.Regular, 'C', "2016-08-13")]
     public async Task コンテストと問題の組から情報を取得する(
         string contest,
         string problem,
         string title,
         ContestCategory category,
-        char index
+        char index,
+        string expectedDate
     )
     {
         var result = await _provider.GetAsync(
@@ -54,7 +62,14 @@ public sealed class AtCoderProblemInfoProviderTests : IDisposable
         Assert.Equal(contest, result.ContestId);
         Assert.Equal(category, result.Category);
         Assert.Equal(index, result.ProblemIndex);
-        Assert.Equal(new DateOnly(2026, 10, 31), result.ContestStartDate);
+        Assert.Equal(
+            DateOnly.ParseExact(
+                expectedDate,
+                "yyyy-MM-dd",
+                System.Globalization.CultureInfo.InvariantCulture
+            ),
+            result.ContestStartDate
+        );
         Assert.Equal(
             $"https://atcoder.jp/contests/{contest}/tasks/{problem}",
             result.ProblemUrl.ToString()
@@ -225,23 +240,15 @@ public sealed class AtCoderProblemInfoProviderTests : IDisposable
                         ),
                     }
                 );
-            var epoch = new DateTimeOffset(
-                2026,
-                10,
-                31,
-                12,
-                0,
-                0,
-                TimeSpan.Zero
-            ).ToUnixTimeSeconds();
+            // ローカルに保存したAtCoder Problemsのデータから対象レコードを抽出。
             var json = request.RequestUri!.AbsolutePath.Split('/')[^1] switch
             {
                 "merged-problems.json" =>
-                    """[{"id":"abc482_a","name":"Nigiri"},{"id":"arc233_a","name":"Strange Subset Sum"},{"id":"agc078_a","name":"Rearrange ABC"},{"id":"arc059_a","name":"Common"}]""",
+                    """[{"id":"abc482_a","name":"Nigiri"},{"id":"arc233_a","name":"Strange Subset Sum"},{"id":"agc078_a","name":"Rearrange ABC"},{"id":"arc059_a","name":"Be Together"}]""",
                 "contest-problem.json" =>
                     """[{"contest_id":"abc482","problem_id":"abc482_a","problem_index":"A"},{"contest_id":"arc233","problem_id":"arc233_a","problem_index":"A"},{"contest_id":"agc078","problem_id":"agc078_a","problem_index":"A"},{"contest_id":"abc043","problem_id":"arc059_a","problem_index":"C"},{"contest_id":"arc059","problem_id":"arc059_a","problem_index":"C"}]""",
                 "contests.json" =>
-                    $$"""[{"id":"abc482","title":"AtCoder Beginner Contest 482","start_epoch_second":{{epoch}}},{"id":"arc233","title":"AtCoder Regular Contest++ 233","start_epoch_second":{{epoch}}},{"id":"agc078","title":"AtCoder Grand Contest 078","start_epoch_second":{{epoch}}},{"id":"abc043","title":"AtCoder Beginner Contest 043","start_epoch_second":{{epoch}}},{"id":"arc059","title":"AtCoder Regular Contest 059","start_epoch_second":{{epoch}}}]""",
+                    """[{"id":"abc482","title":"AtCoder Beginner Contest 482","start_epoch_second":1793448000},{"id":"arc233","title":"AtCoder Regular Contest++ 233","start_epoch_second":1792929600},{"id":"agc078","title":"AtCoder Grand Contest 078","start_epoch_second":1790510400},{"id":"abc043","title":"AtCoder Beginner Contest 043","start_epoch_second":1471089600},{"id":"arc059","title":"AtCoder Regular Contest 059","start_epoch_second":1471089600}]""",
                 _ => throw new InvalidOperationException("Unexpected dataset request."),
             };
             if (
