@@ -33,16 +33,14 @@ public sealed class OMCProblemInfoProviderTests : IDisposable
         ContestCategory category
     )
     {
-        _handler.Title = $"{contestId.ToUpperInvariant()}({index})";
-        _handler.ContestName = contestId.ToUpperInvariant();
-        _handler.Date = date;
+        _handler.UseSampleResponses = true;
         var result = await _provider.GetAsync(
             new Uri($"https://onlinemathcontest.com/contests/{contestId}/tasks/{problemId}")
         );
 
         Assert.Equal(contestId, result.ContestId);
-        Assert.Equal(_handler.Title, result.Title);
-        Assert.Equal(_handler.ContestName, result.ContestName);
+        Assert.Equal($"{contestId.ToUpperInvariant()}({index})", result.Title);
+        Assert.Equal(contestId.ToUpperInvariant(), result.ContestName);
         Assert.Equal(
             DateOnly.ParseExact(
                 date,
@@ -143,6 +141,7 @@ public sealed class OMCProblemInfoProviderTests : IDisposable
         public string ContestName { get; set; } = "OMCB087";
         public string Date { get; set; } = "2026-10-20";
         public HttpStatusCode Status { get; set; } = HttpStatusCode.OK;
+        public bool UseSampleResponses { get; set; }
 
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request,
@@ -152,6 +151,39 @@ public sealed class OMCProblemInfoProviderTests : IDisposable
             var path = request.RequestUri!.AbsolutePath;
             Paths.Add(path);
             Starts.Add(Clock.GetTimestamp());
+            // 表示日時はOMCのページで確認。HTML自体は必要な構造を再現した模擬データ。
+            if (UseSampleResponses)
+            {
+                var (contest, title, date) = path switch
+                {
+                    var p when p.StartsWith("/contests/omcb087", StringComparison.Ordinal) => (
+                        "OMCB087",
+                        "OMCB087(B)",
+                        "2026-10-20"
+                    ),
+                    var p when p.StartsWith("/contests/omc294", StringComparison.Ordinal) => (
+                        "OMC294",
+                        "OMC294(A)",
+                        "2026-10-16"
+                    ),
+                    var p when p.StartsWith("/contests/omce028", StringComparison.Ordinal) => (
+                        "OMCE028",
+                        "OMCE028(A)",
+                        "2026-10-05"
+                    ),
+                    _ => throw new InvalidOperationException("想定外のOMCのURLです。"),
+                };
+                var sampleHtml = path.Contains("/tasks/", StringComparison.Ordinal)
+                    ? $"<h1 id=\"problem-title\">{title}</h1>"
+                    : $"<h1>{contest}</h1><p class=\"list-group-item-heading\">{date} 21:00</p><p class=\"list-group-item-text\">Begin Time</p>";
+                return Task.FromResult(
+                    new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        RequestMessage = request,
+                        Content = new StringContent(sampleHtml, Encoding.UTF8, "text/html"),
+                    }
+                );
+            }
             var html = path.Contains("/tasks/", StringComparison.Ordinal)
                 ? $"<html><body><h1 id=\"problem-title\">{Title}</h1></body></html>"
                 : $"<html><body><h1>{ContestName}</h1><div class=\"bmd-list-group-col\"><p class=\"list-group-item-heading\">{Date} (火) 21:00</p><p class=\"list-group-item-text\">Begin Time</p></div></body></html>";
