@@ -53,9 +53,9 @@ Backendは次のURLで起動します。
 
 ## フロントエンドの起動
 
-バックエンドの問題登録APIはURL入力に切り替わりました。Frontendの登録画面はまだ旧API向けのため、画面側の対応が必要です。タイマーは今後実装します。
+問題のURLから登録し、詳細画面で問題情報と学習履歴を確認できます。タイマーは今後実装します。
 
-AtCoder Problemsの問題情報取得基盤は、一覧を `backend/src/Resolve.Api/.cache/atcoder-problems/datasets.json` に保存します。未登録問題の取得時、前回の取得開始後に日本時間の木曜日0時を過ぎていれば更新します。現在この取得基盤は登録画面には接続されていません。
+AtCoder Problemsの問題情報取得基盤は、一覧を `backend/src/Resolve.Api/.cache/atcoder-problems/datasets.json` に保存します。未登録問題の取得時、前回の取得開始後に日本時間の木曜日0時を過ぎていれば更新します。登録済みの問題を再入力した場合は既存の問題を開きます。
 
 ```bash
 fnm use
