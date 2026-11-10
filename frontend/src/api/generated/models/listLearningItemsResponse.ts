@@ -15,4 +15,8 @@ export interface ListLearningItemsResponse {
   source: ListLearningItemsResponseSource;
   category: ListLearningItemsResponseCategory;
   problemIndex: string;
+  problemUrl: string;
+  contestId: string;
+  contestName: string;
+  contestStartDate: string;
 }

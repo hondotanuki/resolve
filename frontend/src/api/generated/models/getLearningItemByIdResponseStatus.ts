@@ -5,10 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type GetLearningItemResponseStatus =
-  (typeof GetLearningItemResponseStatus)[keyof typeof GetLearningItemResponseStatus];
+export type GetLearningItemByIdResponseStatus =
+  (typeof GetLearningItemByIdResponseStatus)[keyof typeof GetLearningItemByIdResponseStatus];
 
-export const GetLearningItemResponseStatus = {
+export const GetLearningItemByIdResponseStatus = {
   unstarted: "unstarted",
   needs_review: "needs_review",
   completed: "completed",

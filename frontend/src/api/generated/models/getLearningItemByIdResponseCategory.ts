@@ -5,10 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type GetLearningItemResponseCategory =
-  (typeof GetLearningItemResponseCategory)[keyof typeof GetLearningItemResponseCategory];
+export type GetLearningItemByIdResponseCategory =
+  (typeof GetLearningItemByIdResponseCategory)[keyof typeof GetLearningItemByIdResponseCategory];
 
-export const GetLearningItemResponseCategory = {
+export const GetLearningItemByIdResponseCategory = {
   Beginner: "Beginner",
   Regular: "Regular",
   RegularPlus: "RegularPlus",

@@ -25,9 +25,11 @@ import type {
   CreateLearningItemResponse,
   CreateStudyRecordRequest,
   CreateStudyRecordResponse,
-  GetLearningItemResponse,
+  GetLearningItemByIdResponse,
   ListLearningItemsResponse,
   ListStudyRecordsResponse,
+  ProblemDetails,
+  UpdateLearningItemTitleRequest,
   UpdateStudyRecordRequest,
   UpdateStudyRecordResponse,
 } from "../models";
@@ -50,21 +52,47 @@ const withQueryKey = <T extends object, K>(
   return result;
 };
 
+export type createLearningItemResponse200 = {
+  data: CreateLearningItemResponse;
+  status: 200;
+};
+
 export type createLearningItemResponse201 = {
   data: CreateLearningItemResponse;
   status: 201;
 };
 
 export type createLearningItemResponse400 = {
-  data: void;
+  data: ProblemDetails;
   status: 400;
 };
 
-export type createLearningItemResponseSuccess =
-  createLearningItemResponse201 & {
-    headers: Headers;
-  };
-export type createLearningItemResponseError = createLearningItemResponse400 & {
+export type createLearningItemResponse422 = {
+  data: ProblemDetails;
+  status: 422;
+};
+
+export type createLearningItemResponse502 = {
+  data: ProblemDetails;
+  status: 502;
+};
+
+export type createLearningItemResponse504 = {
+  data: ProblemDetails;
+  status: 504;
+};
+
+export type createLearningItemResponseSuccess = (
+  createLearningItemResponse200 | createLearningItemResponse201
+) & {
+  headers: Headers;
+};
+export type createLearningItemResponseError = (
+  | createLearningItemResponse400
+  | createLearningItemResponse422
+  | createLearningItemResponse502
+  | createLearningItemResponse504
+) & {
   headers: Headers;
 };
 
@@ -124,7 +152,7 @@ export const getCreateLearningItemMutationKey = () =>
   ["createLearningItem"] as const;
 
 export const getCreateLearningItemMutationOptions = <
-  TError = void,
+  TError = ProblemDetails,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -165,12 +193,15 @@ export type CreateLearningItemMutationResult = NonNullable<
   Awaited<ReturnType<typeof createLearningItem>>
 >;
 export type CreateLearningItemMutationBody = CreateLearningItemRequest;
-export type CreateLearningItemMutationError = void;
+export type CreateLearningItemMutationError = ProblemDetails;
 export type CreateLearningItemMutationVariables = {
   data: CreateLearningItemRequest;
 };
 
-export const useCreateLearningItem = <TError = void, TContext = unknown>(
+export const useCreateLearningItem = <
+  TError = ProblemDetails,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createLearningItem>>,
@@ -361,7 +392,7 @@ export function useListLearningItems<
 }
 
 export type getLearningItemByIdResponse200 = {
-  data: GetLearningItemResponse;
+  data: GetLearningItemByIdResponse;
   status: 200;
 };
 
@@ -555,6 +586,160 @@ export function useGetLearningItemById<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type updateLearningItemTitleResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type updateLearningItemTitleResponse400 = {
+  data: void;
+  status: 400;
+};
+
+export type updateLearningItemTitleResponse404 = {
+  data: void;
+  status: 404;
+};
+
+export type updateLearningItemTitleResponseSuccess =
+  updateLearningItemTitleResponse204 & {
+    headers: Headers;
+  };
+export type updateLearningItemTitleResponseError = (
+  updateLearningItemTitleResponse400 | updateLearningItemTitleResponse404
+) & {
+  headers: Headers;
+};
+
+export type updateLearningItemTitleResponse =
+  updateLearningItemTitleResponseSuccess | updateLearningItemTitleResponseError;
+
+export const getUpdateLearningItemTitleUrl = (id: number) => {
+  return `/api/learning-items/${id}`;
+};
+
+export const updateLearningItemTitle = async (
+  id: number,
+  updateLearningItemTitleRequest: UpdateLearningItemTitleRequest,
+  options?: RequestInit,
+): Promise<updateLearningItemTitleResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getUpdateLearningItemTitleUrl(id), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(updateLearningItemTitleRequest),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateLearningItemTitleResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateLearningItemTitleResponse;
+};
+
+export const getUpdateLearningItemTitleMutationKey = () =>
+  ["updateLearningItemTitle"] as const;
+
+export const getUpdateLearningItemTitleMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateLearningItemTitle>>,
+    TError,
+    UpdateLearningItemTitleMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateLearningItemTitle>>,
+  TError,
+  UpdateLearningItemTitleMutationVariables,
+  TContext
+> => {
+  const mutationKey = getUpdateLearningItemTitleMutationKey();
+  const { mutation: mutationOptions, fetch: fetchOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateLearningItemTitle>>,
+    UpdateLearningItemTitleMutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateLearningItemTitle(id, data, fetchOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateLearningItemTitleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateLearningItemTitle>>
+>;
+export type UpdateLearningItemTitleMutationBody =
+  UpdateLearningItemTitleRequest;
+export type UpdateLearningItemTitleMutationError = void;
+export type UpdateLearningItemTitleMutationVariables = {
+  id: number;
+  data: UpdateLearningItemTitleRequest;
+};
+
+export const useUpdateLearningItemTitle = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateLearningItemTitle>>,
+      TError,
+      UpdateLearningItemTitleMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateLearningItemTitle>>,
+  TError,
+  UpdateLearningItemTitleMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getUpdateLearningItemTitleMutationOptions(options),
+    queryClient,
+  );
+};
 export type createStudyRecordResponse201 = {
   data: CreateStudyRecordResponse;
   status: 201;

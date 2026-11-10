@@ -47,6 +47,11 @@ describe("LearningItemDetailPage", () => {
           source: "AtCoder",
           category: "Beginner",
           problemIndex: "A",
+          problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+          contestId: "abc482",
+          contestName: "ABC 482",
+          contestStartDate: "2026-10-31",
+          targetSeconds: 600,
           title: "二分探索",
           status: "unstarted",
           archivedAt: null,
@@ -66,6 +71,15 @@ describe("LearningItemDetailPage", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText("AtCoder / Beginner / A")).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: /https:\/\/atcoder.jp/ }),
+    ).toHaveAttribute(
+      "href",
+      "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+    );
+    expect(screen.getByText("ABC 482 (abc482)")).toBeInTheDocument();
+    expect(screen.getByText("2026-10-31")).toBeInTheDocument();
+    expect(screen.getByText("10分")).toBeInTheDocument();
     expect(screen.getByText("現在の状態: unstarted")).toBeInTheDocument();
     expect(screen.getByText("学習履歴はまだありません。")).toBeInTheDocument();
     expect(vi.mocked(useListStudyRecords).mock.calls[0][0]).toBe(1);
