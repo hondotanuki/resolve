@@ -15,5 +15,6 @@ public sealed record GetLearningItemByIdOutput(
     string ProblemUrl,
     string ContestId,
     string ContestName,
-    DateOnly ContestStartDate
+    DateOnly ContestStartDate,
+    int TargetSeconds
 );

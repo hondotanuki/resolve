@@ -90,7 +90,7 @@ public sealed class ApiStringContractTests
             }
         )
             AssertValues(schemas, name, "result", ["success", "failure"]);
-        foreach (var name in new[] { "GetLearningItemResponse", "CreateStudyRecordResponse" })
+        foreach (var name in new[] { "GetLearningItemByIdResponse", "CreateStudyRecordResponse" })
             AssertValues(schemas, name, "status", ["unstarted", "needs_review", "completed"]);
     }
 

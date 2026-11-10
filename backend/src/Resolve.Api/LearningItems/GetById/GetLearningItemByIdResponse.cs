@@ -24,4 +24,5 @@ public sealed record GetLearningItemByIdResponse
     public required string ContestId { get; init; }
     public required string ContestName { get; init; }
     public required DateOnly ContestStartDate { get; init; }
+    public required int TargetSeconds { get; init; }
 };

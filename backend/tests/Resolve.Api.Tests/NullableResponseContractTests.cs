@@ -70,7 +70,7 @@ public sealed class NullableResponseContractTests
         var document = await _client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
         var schemas = document.GetProperty("components").GetProperty("schemas");
         AssertRequiredNullable(schemas, "ListLearningItemsResponse", "archivedAt");
-        AssertRequiredNullable(schemas, "GetLearningItemResponse", "archivedAt");
+        AssertRequiredNullable(schemas, "GetLearningItemByIdResponse", "archivedAt");
         AssertRequiredNullable(schemas, "CreateStudyRecordResponse", "memo");
         AssertRequiredNullable(schemas, "ListStudyRecordsResponse", "memo");
         AssertRequiredNullable(schemas, "UpdateStudyRecordResponse", "memo");
@@ -82,7 +82,7 @@ public sealed class NullableResponseContractTests
         );
         Assert.False(
             schemas
-                .GetProperty("GetLearningItemResponse")
+                .GetProperty("GetLearningItemByIdResponse")
                 .GetProperty("properties")
                 .TryGetProperty("content", out _)
         );

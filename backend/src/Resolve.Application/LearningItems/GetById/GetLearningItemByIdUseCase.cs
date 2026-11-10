@@ -48,7 +48,9 @@ public sealed class GetLearningItemByIdUseCase
             item.ProblemUrl,
             item.ContestId,
             item.ContestName,
-            item.ContestStartDate
+            item.ContestStartDate,
+            TargetTime.GetSeconds(item.Source, item.Category, item.ProblemIndex)
+                ?? throw new InvalidOperationException("問題区分に対応する目標時間がありません。")
         );
     }
 }

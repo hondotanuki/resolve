@@ -110,7 +110,7 @@ public sealed class StudyTargetApiTests(CustomWebApplicationFactory<Program> fac
     {
         var document = await _client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
         var schemas = document.GetProperty("components").GetProperty("schemas");
-        foreach (var name in new[] { "GetLearningItemResponse", "ListLearningItemsResponse" })
+        foreach (var name in new[] { "GetLearningItemByIdResponse", "ListLearningItemsResponse" })
         {
             var schema = schemas.GetProperty(name);
             var required = schema

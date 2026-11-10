@@ -41,6 +41,7 @@ public static class GetLearningItemByIdEndpoint
                         ContestId = output.ContestId,
                         ContestName = output.ContestName,
                         ContestStartDate = output.ContestStartDate,
+                        TargetSeconds = output.TargetSeconds,
                     };
 
                     return Results.Ok(response);

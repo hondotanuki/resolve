@@ -43,6 +43,7 @@ public sealed class GetLearningItemApiTests
         Assert.Equal(id, json.GetProperty("id").GetInt32());
 
         Assert.Equal("二分探索", json.GetProperty("title").GetString());
+        Assert.Equal(600, json.GetProperty("targetSeconds").GetInt32());
         Assert.False(json.TryGetProperty("content", out _));
         Assert.Equal("unstarted", json.GetProperty("status").GetString());
         Assert.Equal(JsonValueKind.Null, json.GetProperty("archivedAt").ValueKind);
