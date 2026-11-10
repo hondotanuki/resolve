@@ -1,12 +1,12 @@
-using Resolve.Api.Mapping;
+using System.Text.Json;
+using Resolve.Application.Interfaces;
 using Resolve.Application.LearningItems.Create;
-using Resolve.Domain;
 
 namespace Resolve.Api.LearningItems.Create;
 
 public static class CreateLearningItemEndpoint
 {
-    public static void MapCreateLearningItem(this RouteGroupBuilder group)
+    public static void MapCreateLearningItem(this IEndpointRouteBuilder group)
     {
         group
             .MapPost(
@@ -17,52 +17,60 @@ public static class CreateLearningItemEndpoint
                     CancellationToken cancellationToken
                 ) =>
                 {
-                    if (
-                        !Enum.TryParse<ProblemSource>(request.Source, false, out var source)
-                        || !Enum.IsDefined(source)
-                        || source.ToString() != request.Source
-                        || !Enum.TryParse<ContestCategory>(
-                            request.Category,
-                            false,
-                            out var category
-                        )
-                        || !Enum.IsDefined(category)
-                        || category.ToString() != request.Category
-                        || request.ProblemIndex is not { Length: 1 }
-                    )
-                        return Results.BadRequest();
-
-                    var input = new CreateLearningItemInput
-                    {
-                        Title = request.Title,
-                        Source = source,
-                        Category = category,
-                        ProblemIndex = request.ProblemIndex[0],
-                    };
+                    if (!Uri.TryCreate(request.Url, UriKind.Absolute, out var uri))
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status400BadRequest,
+                            title: "対応している問題URLを指定してください。"
+                        );
                     try
                     {
-                        var output = await useCase.ExecuteAsync(input, cancellationToken);
-
-                        var response = new CreateLearningItemResponse
-                        {
-                            Id = output.Id,
-                            Title = output.Title,
-                            ArchivedAt = output.ArchivedAt,
-                            Source = output.Source.ToString(),
-                            Category = output.Category.ToString(),
-                            ProblemIndex = output.ProblemIndex.ToString(),
-                        };
-
-                        return Results.Created($"/learning-items/{response.Id}", response);
+                        var result = await useCase.ExecuteAsync(
+                            new CreateLearningItemInput(uri),
+                            cancellationToken
+                        );
+                        var response = new CreateLearningItemResponse(result.Id);
+                        return result.Created
+                            ? Results.Created($"/learning-items/{result.Id}", response)
+                            : Results.Ok(response);
                     }
-                    catch (ArgumentException)
+                    catch (UnsupportedProblemUrlException)
                     {
-                        return Results.BadRequest();
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status400BadRequest,
+                            title: "対応している問題URLを指定してください。"
+                        );
+                    }
+                    catch (UnsupportedProblemCategoryException)
+                    {
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status422UnprocessableEntity,
+                            title: "この問題区分には目標時間が設定されていません。"
+                        );
+                    }
+                    catch (OperationCanceledException)
+                        when (!cancellationToken.IsCancellationRequested)
+                    {
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status504GatewayTimeout,
+                            title: "問題情報の取得がタイムアウトしました。"
+                        );
+                    }
+                    catch (Exception exception)
+                        when (exception is HttpRequestException or IOException or JsonException)
+                    {
+                        return Results.Problem(
+                            statusCode: StatusCodes.Status502BadGateway,
+                            title: "問題情報を取得できませんでした。"
+                        );
                     }
                 }
             )
             .WithName("CreateLearningItem")
             .Produces<CreateLearningItemResponse>(StatusCodes.Status201Created)
-            .Produces(StatusCodes.Status400BadRequest);
+            .Produces<CreateLearningItemResponse>(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+            .ProducesProblem(StatusCodes.Status504GatewayTimeout)
+            .ProducesProblem(StatusCodes.Status502BadGateway);
     }
 }

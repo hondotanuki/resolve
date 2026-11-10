@@ -15,4 +15,8 @@ public sealed record ListLearningItemsResponse
     [ApiAllowedValues(ApiValueSet.ContestCategories)]
     public required string Category { get; init; }
     public required string ProblemIndex { get; init; }
+    public required string ProblemUrl { get; init; }
+    public required string ContestId { get; init; }
+    public required string ContestName { get; init; }
+    public required DateOnly ContestStartDate { get; init; }
 }

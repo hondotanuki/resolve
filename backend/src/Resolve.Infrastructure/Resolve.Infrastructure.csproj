@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Resolve.Domain\Resolve.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.10.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12" />
   </ItemGroup>
   <PropertyGroup>

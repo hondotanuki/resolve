@@ -11,20 +11,20 @@ public sealed class DeleteStudyRecordUseCase
         _repository = repository;
     }
 
-    public async Task<bool> ExecuteAsync(
-        int studyRecordId,
+    public async Task<DeleteStudyRecordOutput> ExecuteAsync(
+        DeleteStudyRecordInput input,
         CancellationToken cancellationToken = default
     )
     {
-        var record = await _repository.GetByIdAsync(studyRecordId, cancellationToken);
+        var record = await _repository.GetByIdAsync(input.StudyRecordId, cancellationToken);
 
         if (record is null)
         {
-            return false;
+            return new(false);
         }
 
         await _repository.DeleteAsync(record, cancellationToken);
 
-        return true;
+        return new(true);
     }
 }

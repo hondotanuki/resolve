@@ -3,6 +3,7 @@ import {
   useGetLearningItemById,
   getGetLearningItemByIdQueryKey,
 } from "../api/generated";
+import { LearningItemTitleEdit } from "../components/learning-items/LearningItemTitleEdit";
 import { StudyRecordCreateForm } from "../components/study-records/StudyRecordCreateForm";
 import { StudyRecordList } from "../components/study-records/StudyRecordList";
 
@@ -76,11 +77,42 @@ export function LearningItemDetailPage() {
       </Link>
 
       <h1 className="text-3xl font-semibold">{item.title}</h1>
+      <LearningItemTitleEdit id={itemId} title={item.title} />
       <p>現在の状態: {item.status}</p>
 
       <p className="mt-4 text-sm text-zinc-600">
         {item.source} / {item.category} / {item.problemIndex}
       </p>
+
+      <dl className="mt-4 space-y-2 text-sm">
+        <div>
+          <dt className="font-medium">問題URL</dt>
+          <dd>
+            <a
+              className="break-all text-blue-700 underline"
+              href={item.problemUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {item.problemUrl}
+            </a>
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium">コンテスト</dt>
+          <dd>
+            {item.contestName} ({item.contestId})
+          </dd>
+        </div>
+        <div>
+          <dt className="font-medium">開催開始日</dt>
+          <dd>{item.contestStartDate}</dd>
+        </div>
+        <div>
+          <dt className="font-medium">目標時間</dt>
+          <dd>{item.targetSeconds / 60}分</dd>
+        </div>
+      </dl>
 
       <div className="mt-6 space-y-1 text-xs text-zinc-400">
         <p>Created: {item.createdAt}</p>

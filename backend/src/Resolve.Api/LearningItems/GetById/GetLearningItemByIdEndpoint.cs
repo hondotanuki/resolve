@@ -16,14 +16,17 @@ public static class GetLearningItemByIdEndpoint
                     CancellationToken cancellationToken
                 ) =>
                 {
-                    var output = await useCase.ExecuteAsync(id, cancellationToken);
+                    var output = await useCase.ExecuteAsync(
+                        new GetLearningItemByIdInput(id),
+                        cancellationToken
+                    );
 
                     if (output is null)
                     {
                         return Results.NotFound();
                     }
 
-                    var response = new GetLearningItemResponse
+                    var response = new GetLearningItemByIdResponse
                     {
                         Id = output.Id,
                         Title = output.Title,
@@ -34,13 +37,18 @@ public static class GetLearningItemByIdEndpoint
                         Source = output.Source.ToString(),
                         Category = output.Category.ToString(),
                         ProblemIndex = output.ProblemIndex.ToString(),
+                        ProblemUrl = output.ProblemUrl,
+                        ContestId = output.ContestId,
+                        ContestName = output.ContestName,
+                        ContestStartDate = output.ContestStartDate,
+                        TargetSeconds = output.TargetSeconds,
                     };
 
                     return Results.Ok(response);
                 }
             )
             .WithName("GetLearningItemById")
-            .Produces<GetLearningItemResponse>(StatusCodes.Status200OK)
+            .Produces<GetLearningItemByIdResponse>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound);
     }
 }

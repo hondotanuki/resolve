@@ -26,7 +26,11 @@ public sealed class ListStudyRecordsUseCaseTests
             "apple",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
         var record = new StudyRecord(
             learningItemId,
@@ -38,7 +42,7 @@ public sealed class ListStudyRecordsUseCaseTests
         );
         _records.ListResult = [record];
 
-        var output = await _useCase.ExecuteAsync(learningItemId);
+        var output = await _useCase.ExecuteAsync(new ListStudyRecordsInput(learningItemId));
 
         Assert.NotNull(output);
         var actual = Assert.Single(output);
@@ -60,10 +64,14 @@ public sealed class ListStudyRecordsUseCaseTests
             "apple",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
 
-        var output = await _useCase.ExecuteAsync(42);
+        var output = await _useCase.ExecuteAsync(new ListStudyRecordsInput(42));
 
         Assert.NotNull(output);
         Assert.Empty(output);
@@ -74,7 +82,7 @@ public sealed class ListStudyRecordsUseCaseTests
     [Fact]
     public async Task 対象が存在しなければnullを返し履歴を取得しない()
     {
-        var output = await _useCase.ExecuteAsync(42);
+        var output = await _useCase.ExecuteAsync(new ListStudyRecordsInput(42));
 
         Assert.Null(output);
         Assert.Equal(42, _learningItems.ReceivedId);

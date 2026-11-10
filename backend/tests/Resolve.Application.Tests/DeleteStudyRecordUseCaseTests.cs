@@ -28,9 +28,9 @@ public sealed class DeleteStudyRecordUseCaseTests
         );
         _repository.RecordById = record;
 
-        var result = await _useCase.ExecuteAsync(10);
+        var result = await _useCase.ExecuteAsync(new DeleteStudyRecordInput(10));
 
-        Assert.True(result);
+        Assert.True(result.Deleted);
         Assert.Equal(1, _repository.GetByIdCallCount);
         Assert.Equal(10, _repository.LastRequestedStudyRecordId);
         Assert.Equal(1, _repository.DeleteCallCount);
@@ -40,9 +40,9 @@ public sealed class DeleteStudyRecordUseCaseTests
     [Fact]
     public async Task 対象が存在しなければ削除しない()
     {
-        var result = await _useCase.ExecuteAsync(999);
+        var result = await _useCase.ExecuteAsync(new DeleteStudyRecordInput(999));
 
-        Assert.False(result);
+        Assert.False(result.Deleted);
         Assert.Equal(1, _repository.GetByIdCallCount);
         Assert.Equal(0, _repository.DeleteCallCount);
     }

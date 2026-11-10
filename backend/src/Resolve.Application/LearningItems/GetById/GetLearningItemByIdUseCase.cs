@@ -17,25 +17,25 @@ public sealed class GetLearningItemByIdUseCase
         _studyRecordRepository = studyRecordRepository;
     }
 
-    public async Task<GetLearningItemOutput?> ExecuteAsync(
-        int id,
+    public async Task<GetLearningItemByIdOutput?> ExecuteAsync(
+        GetLearningItemByIdInput input,
         CancellationToken cancellationToken = default
     )
     {
-        var item = await _learningItemRepository.GetByIdAsync(id, cancellationToken);
+        var item = await _learningItemRepository.GetByIdAsync(input.Id, cancellationToken);
         if (item is null)
         {
             return null;
         }
 
         StudyRecord? latestRecord = await _studyRecordRepository.GetLatestByLearningItemIdAsync(
-            id,
+            input.Id,
             cancellationToken
         );
         StudyRecord[] latestRecords = latestRecord is null ? [] : [latestRecord];
         ItemStatus status = ItemStatusCalculator.Calculate(latestRecords);
 
-        return new GetLearningItemOutput(
+        return new GetLearningItemByIdOutput(
             item.Id,
             item.Title,
             status,
@@ -44,7 +44,13 @@ public sealed class GetLearningItemByIdUseCase
             item.UpdatedAt,
             item.Source,
             item.Category,
-            item.ProblemIndex
+            item.ProblemIndex,
+            item.ProblemUrl,
+            item.ContestId,
+            item.ContestName,
+            item.ContestStartDate,
+            TargetTime.GetSeconds(item.Source, item.Category, item.ProblemIndex)
+                ?? throw new InvalidOperationException("問題区分に対応する目標時間がありません。")
         );
     }
 }

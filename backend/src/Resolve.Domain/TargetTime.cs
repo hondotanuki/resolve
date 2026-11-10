@@ -4,9 +4,9 @@ public static class TargetTime
 {
     private static readonly int[] AtCoderBeginnerMinutes = [10, 10, 20, 20, 20, 20, 40];
     private static readonly int[] AtCoderRegularMinutes = [30, 40, 50, 100, 100, 100, 100];
-    private static readonly int[] OmcBeginnerMinutes = [5, 10, 10, 10, 15, 15, 20];
-    private static readonly int[] OmcRegularMinutes = [10, 10, 20, 20, 20, 20, 40];
-    private static readonly int[] OmcExpertMinutes = [30, 40, 50, 100, 100, 100, 100];
+    private static readonly int[] OMCBeginnerMinutes = [5, 10, 10, 10, 15, 15, 20];
+    private static readonly int[] OMCRegularMinutes = [10, 10, 20, 20, 20, 20, 40];
+    private static readonly int[] OMCExpertMinutes = [30, 40, 50, 100, 100, 100, 100];
 
     public static int? GetSeconds(ProblemSource source, ContestCategory category, char problemIndex)
     {
@@ -26,9 +26,9 @@ public static class TargetTime
             (ProblemSource.AtCoder, ContestCategory.Beginner) => AtCoderBeginnerMinutes,
             (ProblemSource.AtCoder, ContestCategory.Regular or ContestCategory.RegularPlus) =>
                 AtCoderRegularMinutes,
-            (ProblemSource.OnlineMathContest, ContestCategory.Beginner) => OmcBeginnerMinutes,
-            (ProblemSource.OnlineMathContest, ContestCategory.Regular) => OmcRegularMinutes,
-            (ProblemSource.OnlineMathContest, ContestCategory.Expert) => OmcExpertMinutes,
+            (ProblemSource.OnlineMathContest, ContestCategory.Beginner) => OMCBeginnerMinutes,
+            (ProblemSource.OnlineMathContest, ContestCategory.Regular) => OMCRegularMinutes,
+            (ProblemSource.OnlineMathContest, ContestCategory.Expert) => OMCExpertMinutes,
             _ => null,
         };
 

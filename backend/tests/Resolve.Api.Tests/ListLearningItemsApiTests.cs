@@ -30,16 +30,7 @@ public sealed class ListLearningItemsApiTests
     [Fact]
     public async Task 登録済みLearningItemが一覧で返る()
     {
-        var createRequest = new
-        {
-            source = "AtCoder",
-            category = "Beginner",
-            problemIndex = "A",
-            title = "二分探索",
-            content = "二分探索を解く",
-        };
-
-        await _client.PostAsJsonAsync("/learning-items", createRequest);
+        await TestProblemApi.CreateAsync(_client, "二分探索");
         var response = await _client.GetAsync("/learning-items");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

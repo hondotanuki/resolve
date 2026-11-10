@@ -1,6 +1,7 @@
 using Resolve.Api.LearningItems.Create;
 using Resolve.Api.LearningItems.GetById;
 using Resolve.Api.LearningItems.List;
+using Resolve.Api.LearningItems.Update;
 
 namespace Resolve.Api.LearningItems;
 
@@ -13,5 +14,6 @@ public static class LearningItemEndpoints
         group.MapCreateLearningItem();
         group.MapListLearningItems();
         group.MapGetLearningItemById();
+        group.MapUpdateLearningItemTitle();
     }
 }

@@ -24,19 +24,9 @@ public sealed class NullableResponseContractTests
     [Fact]
     public async Task 全Responseにnull可能な項目がnullでも出力される()
     {
-        var createdItem = await _client.PostAsJsonAsync(
-            "/learning-items",
-            new
-            {
-                source = "AtCoder",
-                category = "Beginner",
-                problemIndex = "A",
-                title = "title",
-            }
-        );
+        var createdItem = await TestProblemApi.CreateAsync(_client, "title");
         Assert.Equal(HttpStatusCode.Created, createdItem.StatusCode);
         var item = await createdItem.Content.ReadFromJsonAsync<JsonElement>();
-        AssertNullProperties(item, "archivedAt");
         var itemId = item.GetProperty("id").GetInt32();
 
         var items = await _client.GetFromJsonAsync<JsonElement>("/learning-items");
@@ -79,9 +69,8 @@ public sealed class NullableResponseContractTests
     {
         var document = await _client.GetFromJsonAsync<JsonElement>("/openapi/v1.json");
         var schemas = document.GetProperty("components").GetProperty("schemas");
-        AssertRequiredNullable(schemas, "CreateLearningItemResponse", "archivedAt");
         AssertRequiredNullable(schemas, "ListLearningItemsResponse", "archivedAt");
-        AssertRequiredNullable(schemas, "GetLearningItemResponse", "archivedAt");
+        AssertRequiredNullable(schemas, "GetLearningItemByIdResponse", "archivedAt");
         AssertRequiredNullable(schemas, "CreateStudyRecordResponse", "memo");
         AssertRequiredNullable(schemas, "ListStudyRecordsResponse", "memo");
         AssertRequiredNullable(schemas, "UpdateStudyRecordResponse", "memo");
@@ -93,7 +82,7 @@ public sealed class NullableResponseContractTests
         );
         Assert.False(
             schemas
-                .GetProperty("GetLearningItemResponse")
+                .GetProperty("GetLearningItemByIdResponse")
                 .GetProperty("properties")
                 .TryGetProperty("content", out _)
         );

@@ -33,6 +33,20 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("category");
 
+                    b.Property<string>("ContestId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("contest_id");
+
+                    b.Property<string>("ContestName")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("contest_name");
+
+                    b.Property<DateOnly>("ContestStartDate")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("contest_start_date");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT")
                         .HasColumnName("created_at");
@@ -41,6 +55,11 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("problem_index");
+
+                    b.Property<string>("ProblemUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("problem_url");
 
                     b.Property<string>("Source")
                         .IsRequired()
@@ -57,6 +76,9 @@ namespace Resolve.Infrastructure.Persistence.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProblemUrl")
+                        .IsUnique();
 
                     b.ToTable("learning_items", (string)null);
                 });

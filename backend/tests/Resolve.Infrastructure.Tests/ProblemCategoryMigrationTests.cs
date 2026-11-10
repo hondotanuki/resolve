@@ -9,6 +9,25 @@ namespace Resolve.Infrastructure.Tests;
 public sealed class ProblemCategoryMigrationTests
 {
     [Fact]
+    public async Task 情報不足の既存問題は必須化マイグレーションで拒否する()
+    {
+        await using var connection = new SqliteConnection("DataSource=:memory:");
+        await connection.OpenAsync();
+        var options = new DbContextOptionsBuilder<ResolveDbContext>().UseSqlite(connection).Options;
+        await using var context = new ResolveDbContext(options);
+        var migrator = context.GetService<IMigrator>();
+        await migrator.MigrateAsync("20261108074817_RemoveLearningItemType");
+        await context.Database.ExecuteSqlRawAsync(
+            "INSERT INTO learning_items (title, source, category, problem_index, created_at, updated_at) VALUES ('既存の問題', 'AtCoder', 'Beginner', 'A', '2026-01-01', '2026-01-01')"
+        );
+
+        await Assert.ThrowsAsync<SqliteException>(() => migrator.MigrateAsync());
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM learning_items WHERE title = '既存の問題'";
+        Assert.Equal(1L, await command.ExecuteScalarAsync());
+    }
+
+    [Fact]
     public async Task ContentとItemTypeの削除後も問題と学習記録を保持する()
     {
         await using var connection = new SqliteConnection("DataSource=:memory:");
@@ -24,6 +43,10 @@ public sealed class ProblemCategoryMigrationTests
             "INSERT INTO study_records (learning_item_id, result, studied_at, duration_seconds, target_seconds, memo, created_at, updated_at) VALUES (1, 'Success', '2026-01-01', 30, 600, '復習', '2026-01-01', '2026-01-01')"
         );
 
+        await migrator.MigrateAsync("20261108085423_AddLearningItemContestInfo");
+        await context.Database.ExecuteSqlRawAsync(
+            "UPDATE learning_items SET problem_url = 'https://atcoder.jp/contests/abc482/tasks/abc482_a', contest_id = 'abc482', contest_name = 'ABC 482', contest_start_date = '2026-10-31'"
+        );
         await migrator.MigrateAsync();
 
         var item = await context.LearningItems.SingleAsync();
@@ -45,6 +68,10 @@ public sealed class ProblemCategoryMigrationTests
     [InlineData("source")]
     [InlineData("category")]
     [InlineData("problem_index")]
+    [InlineData("problem_url")]
+    [InlineData("contest_id")]
+    [InlineData("contest_name")]
+    [InlineData("contest_start_date")]
     public async Task 問題区分のDB列はnullを拒否する(string column)
     {
         await using var connection = new SqliteConnection("DataSource=:memory:");
@@ -53,7 +80,7 @@ public sealed class ProblemCategoryMigrationTests
         await using var context = new ResolveDbContext(options);
         await context.Database.MigrateAsync();
         await context.Database.ExecuteSqlRawAsync(
-            "INSERT INTO learning_items (title, source, category, problem_index, created_at, updated_at) VALUES ('問題', 'AtCoder', 'Beginner', 'A', '2026-01-01', '2026-01-01')"
+            "INSERT INTO learning_items (title, source, category, problem_index, problem_url, contest_id, contest_name, contest_start_date, created_at, updated_at) VALUES ('問題', 'AtCoder', 'Beginner', 'A', 'https://atcoder.jp/contests/abc482/tasks/abc482_a', 'abc482', 'ABC 482', '2026-10-31', '2026-01-01', '2026-01-01')"
         );
 
         // 列名はInlineDataの固定値のみを使用する。

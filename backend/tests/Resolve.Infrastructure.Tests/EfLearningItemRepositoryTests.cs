@@ -27,13 +27,47 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task 同じURLの競合登録は既存の問題を返す()
+    {
+        var first = new LearningItem(
+            "first",
+            ProblemSource.AtCoder,
+            ContestCategory.Beginner,
+            'A',
+            "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            "abc482",
+            "ABC 482",
+            new DateOnly(2026, 10, 31)
+        );
+        var second = new LearningItem(
+            "second",
+            ProblemSource.AtCoder,
+            ContestCategory.Beginner,
+            'A',
+            "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            "abc482",
+            "ABC 482",
+            new DateOnly(2026, 10, 31)
+        );
+        var saved = await _repository.CreateOrGetByProblemUrlAsync(first);
+        var existing = await _repository.CreateOrGetByProblemUrlAsync(second);
+        Assert.Equal(saved.Id, existing.Id);
+        Assert.Equal("first", existing.Title);
+        Assert.Equal(1, await _dbContext.LearningItems.CountAsync());
+    }
+
+    [Fact]
     public async Task CreateAsyncでLearningItemを保存できる()
     {
         var item = new LearningItem(
             "二分探索",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: $"https://atcoder.jp/contests/abc482/tasks/test_{Guid.NewGuid():N}",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
 
         var saved = await _repository.CreateAsync(item);
@@ -53,13 +87,41 @@ public sealed class EfLearningItemRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task 問題URLとコンテスト情報を保存し再取得できる()
+    {
+        var item = new LearningItem(
+            "Nigiri",
+            ProblemSource.AtCoder,
+            ContestCategory.Beginner,
+            'A',
+            "https://atcoder.jp/contests/abc482/tasks/abc482_a",
+            "abc482",
+            "AtCoder Beginner Contest 482",
+            new DateOnly(2026, 10, 31)
+        );
+
+        var saved = await _repository.CreateAsync(item);
+        _dbContext.ChangeTracker.Clear();
+        var actual = await _dbContext.LearningItems.SingleAsync(x => x.Id == saved.Id);
+
+        Assert.Equal(item.ProblemUrl, actual.ProblemUrl);
+        Assert.Equal(item.ContestId, actual.ContestId);
+        Assert.Equal(item.ContestName, actual.ContestName);
+        Assert.Equal(item.ContestStartDate, actual.ContestStartDate);
+    }
+
+    [Fact]
     public async Task ArchivedAtをUTCで再取得できる()
     {
         var item = new LearningItem(
             "二分探索",
             source: ProblemSource.AtCoder,
             category: ContestCategory.Beginner,
-            problemIndex: 'A'
+            problemIndex: 'A',
+            problemUrl: $"https://atcoder.jp/contests/abc482/tasks/test_{Guid.NewGuid():N}",
+            contestId: "abc482",
+            contestName: "ABC 482",
+            contestStartDate: new DateOnly(2026, 10, 31)
         );
         _dbContext.LearningItems.Add(item);
         var archivedAt = new DateTime(2026, 10, 15, 9, 0, 0, DateTimeKind.Utc);

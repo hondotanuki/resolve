@@ -4,15 +4,7 @@
  * Resolve.Api | v1
  * OpenAPI spec version: 1.0.0
  */
-import type { CreateLearningItemResponseCategory } from "./createLearningItemResponseCategory";
-import type { CreateLearningItemResponseSource } from "./createLearningItemResponseSource";
 
 export interface CreateLearningItemResponse {
   id: number;
-  title: string;
-  /** @nullable */
-  archivedAt: string | null;
-  source: CreateLearningItemResponseSource;
-  category: CreateLearningItemResponseCategory;
-  problemIndex: string;
 }

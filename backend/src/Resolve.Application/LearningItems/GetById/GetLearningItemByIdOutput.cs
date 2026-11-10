@@ -2,7 +2,7 @@ using Resolve.Domain;
 
 namespace Resolve.Application.LearningItems.GetById;
 
-public sealed record GetLearningItemOutput(
+public sealed record GetLearningItemByIdOutput(
     int Id,
     string Title,
     ItemStatus Status,
@@ -11,5 +11,10 @@ public sealed record GetLearningItemOutput(
     DateTime UpdatedAt,
     ProblemSource Source,
     ContestCategory Category,
-    char ProblemIndex
+    char ProblemIndex,
+    string ProblemUrl,
+    string ContestId,
+    string ContestName,
+    DateOnly ContestStartDate,
+    int TargetSeconds
 );

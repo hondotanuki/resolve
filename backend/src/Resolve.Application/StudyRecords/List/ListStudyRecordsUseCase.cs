@@ -17,12 +17,12 @@ public sealed class ListStudyRecordsUseCase
     }
 
     public async Task<IReadOnlyList<ListStudyRecordsOutput>?> ExecuteAsync(
-        int learningItemId,
+        ListStudyRecordsInput input,
         CancellationToken cancellationToken = default
     )
     {
         var learningItem = await _learningItemRepository.GetByIdAsync(
-            learningItemId,
+            input.LearningItemId,
             cancellationToken
         );
         if (learningItem is null)
@@ -31,7 +31,7 @@ public sealed class ListStudyRecordsUseCase
         }
 
         var items = await _studyRecordRepository.ListByLearningItemIdAsync(
-            learningItemId,
+            input.LearningItemId,
             cancellationToken
         );
 

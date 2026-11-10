@@ -27,7 +27,11 @@ public static class StudyResultMapping
         {
             StudyResult.Success => ApiValues.StudyResults.Success,
             StudyResult.Failure => ApiValues.StudyResults.Failure,
-            _ => throw new ArgumentOutOfRangeException(nameof(studyResult), studyResult, null),
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(studyResult),
+                studyResult,
+                "対応していない学習結果です。"
+            ),
         };
     }
 }

@@ -292,7 +292,7 @@ describe("StudyRecordCreateForm", () => {
     await user.click(screen.getByRole("button", { name: "Create" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "対象のLearningItemが見つかりません。",
+      "対象の問題が見つかりません。",
     );
     expect(invalidateQueries).not.toHaveBeenCalled();
   });

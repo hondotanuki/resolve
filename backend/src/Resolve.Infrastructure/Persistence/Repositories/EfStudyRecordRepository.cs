@@ -42,7 +42,9 @@ public sealed class EfStudyRecordRepository : IStudyRecordRepository
     {
         if (_dbContext.Entry(studyRecord).State == EntityState.Detached)
         {
-            throw new InvalidOperationException("StudyRecord must be tracked.");
+            throw new InvalidOperationException(
+                "学習記録はDbContextに追跡されている必要があります。"
+            );
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);

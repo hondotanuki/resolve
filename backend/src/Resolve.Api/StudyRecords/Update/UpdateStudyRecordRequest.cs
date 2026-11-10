@@ -31,7 +31,7 @@ public sealed record UpdateStudyRecordRequest
         get => _result;
         init
         {
-            _result = value ?? throw new JsonException("Result cannot be null.");
+            _result = value ?? throw new JsonException("学習結果にnullは指定できません。");
             ResultIsSpecified = true;
         }
     }
