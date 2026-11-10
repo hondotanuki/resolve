@@ -151,31 +151,25 @@ public sealed class OMCProblemInfoProviderTests : IDisposable
             var path = request.RequestUri!.AbsolutePath;
             Paths.Add(path);
             Starts.Add(Clock.GetTimestamp());
-            // 表示日時はOMCのページで確認。HTML自体は必要な構造を再現した模擬データ。
             if (UseSampleResponses)
             {
-                var (contest, title, date) = path switch
+                var fileName = path switch
                 {
-                    var p when p.StartsWith("/contests/omcb087", StringComparison.Ordinal) => (
-                        "OMCB087",
-                        "OMCB087(B)",
-                        "2026-10-20"
-                    ),
-                    var p when p.StartsWith("/contests/omc294", StringComparison.Ordinal) => (
-                        "OMC294",
-                        "OMC294(A)",
-                        "2026-10-16"
-                    ),
-                    var p when p.StartsWith("/contests/omce028", StringComparison.Ordinal) => (
-                        "OMCE028",
-                        "OMCE028(A)",
-                        "2026-10-05"
-                    ),
+                    "/contests/omcb087/tasks/5454" => "omcb087-task.html",
+                    "/contests/omcb087" => "omcb087-contest.html",
+                    "/contests/omc294/tasks/18178" => "omc294-task.html",
+                    "/contests/omc294" => "omc294-contest.html",
+                    "/contests/omce028/tasks/19075" => "omce028-task.html",
+                    "/contests/omce028" => "omce028-contest.html",
                     _ => throw new InvalidOperationException("想定外のOMCのURLです。"),
                 };
-                var sampleHtml = path.Contains("/tasks/", StringComparison.Ordinal)
-                    ? $"<h1 id=\"problem-title\">{title}</h1>"
-                    : $"<h1>{contest}</h1><p class=\"list-group-item-heading\">{date} 21:00</p><p class=\"list-group-item-text\">Begin Time</p>";
+                var fixturePath = Path.Combine(
+                    AppContext.BaseDirectory,
+                    "Fixtures",
+                    "OMC",
+                    fileName
+                );
+                var sampleHtml = File.ReadAllText(fixturePath);
                 return Task.FromResult(
                     new HttpResponseMessage(HttpStatusCode.OK)
                     {
